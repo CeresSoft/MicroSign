@@ -17,7 +17,7 @@ MicroSignで再生するアニメーションを作成するアプリケーシ�
 
 最新バージョンの「.NET デスクトップ ランタイム」をインストールしてください
 
-![.NET6](./DocumentImages\dotNet6Install.png)
+![.NET6](./DocumentImages/dotNet6Install.png)
 
 
 
