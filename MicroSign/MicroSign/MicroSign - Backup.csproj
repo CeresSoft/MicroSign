@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>MicroSign.ico</ApplicationIcon>
+    <Authors>CeresSoft.inc</Authors>
+    <VersionPefix>1.0.1</VersionPefix>
+    <VersionSuffix></VersionSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="MicroSign.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MicroSign.Core\MicroSign.Core\MicroSign.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Prms\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Prms\log4net.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

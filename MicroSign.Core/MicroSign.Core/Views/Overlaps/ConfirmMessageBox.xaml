@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="MicroSign.Core.Views.Overlaps.ConfirmMessageBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MicroSign.Core.Views.Overlaps"
+             xmlns:vm="clr-namespace:MicroSign.Core.ViewModels.Overlaps"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/MicroSign.Core;component/CommonResourceDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid x:Name="RootGrid" Style="{StaticResource Overlap.TranslucentBackground}">
+        <Grid.DataContext>
+            <vm:ConfirmMessageBoxViewModel x:Name="ViewModel" OkClick="OnOkClick" CancelClick="OnCancelClick"/>
+        </Grid.DataContext>
+        <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Border Style="{StaticResource Overlap.MessageBoxFrame}"/>
+            <Grid Margin="{StaticResource Overlap.GridMargin}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="{StaticResource Overlap.GridSeparetor}"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="{StaticResource Overlap.GridSeparetor}"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="{StaticResource Overlap.GridSeparetor}"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Image Width="50" Grid.RowSpan="3" Grid.Row="1" Source="/MicroSign.Core;component/IconImages/Confirm.png" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" Grid.ColumnSpan="3"/>
+                <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Visibility="{Binding Message, Converter={StaticResource NotNullVisibleValueConverter}}" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center"/>
+                <Grid Grid.Row="5" Grid.ColumnSpan="3" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="{StaticResource Overlap.ButtonMargin}"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="{StaticResource Overlap.GridSeparetor}"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition MinWidth="{StaticResource Overlap.ButtonMargin}"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="{Binding OkText}" Grid.Column="1" Command="{Binding OkCommand}" Width="{StaticResource Overlap.ButtonWidth}" Height="{StaticResource Overlap.ButtonHeight}"/>
+                    <Button Content="{Binding CancelText}" Grid.Column="3" Command="{Binding CancelCommand}" Width="{StaticResource Overlap.ButtonWidth}" Height="{StaticResource Overlap.ButtonHeight}"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
