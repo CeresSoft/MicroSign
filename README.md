@@ -7,17 +7,17 @@
 
 MicroSignで再生するアニメーションを作成するアプリケーション
 
-[MicroSign.sln](MicroSign\MicroSign.sln)
+[MicroSign/MicroSign.sln](MicroSign/MicroSign.sln)
 
 
 実行するのに.NET6 が必要になります
  .NET6は以下のURLからダウンロードできます
 
-https://dotnet.microsoft.com/ja-jp/download/dotnet/6.0
+[.NET 6.0 のダウンロード](https://dotnet.microsoft.com/ja-jp/download/dotnet/6.0)
 
 最新バージョンの「.NET デスクトップ ランタイム」をインストールしてください
 
-![.NET6](DocumentImages\dotNet6Install.png)
+![.NET6](./DocumentImages/dotNet6Install.png)
 
 
 
@@ -25,7 +25,7 @@ https://dotnet.microsoft.com/ja-jp/download/dotnet/6.0
 
 ### MicroSign パネルテスト アニメーション
 
-[MicroSign パネルテスト アニメーション](MicroSign/MicroSignパネルテストアニメーション/)
+[MicroSign パネルテスト アニメーション](./SampleAnimations/MicroSignパネルテストアニメーション/)
 
 MicroSignの全LEDが正しく点灯しているか確認するためのアニメーション
 
@@ -35,10 +35,10 @@ MicroSignの全LEDが正しく点灯しているか確認するためのアニ�
 
 ### MicroSign プロモーション アニメーション
 
-[MicroSign プロモーション アニメーション](MicroSign/MicroSignプロモーションアニメーション/)
+[MicroSign プロモーション アニメーション](./SampleAnimations/MicroSignプロモーションアニメーション/)
 
 MicroSignのプロモーション用に作成したアニメーション
 
 Clip Studio PAINTのアニメーション機能を使ってアニメーションを用意しました
 
-![MicroSignプロモーション](DocumentImages\MicroSignPromotion.png)
+![MicroSignプロモーション](./DocumentImages/MicroSignPromotion.png)
