@@ -7,7 +7,7 @@
 
 MicroSignで再生するアニメーションを作成するアプリケーション
 
-[MicroSign.sln](MicroSign\MicroSign.sln)
+[MicroSign.sln](MicroSign/MicroSign.sln)
 
 
 実行するのに.NET6 が必要になります
@@ -41,4 +41,4 @@ MicroSignのプロモーション用に作成したアニメーション
 
 Clip Studio PAINTのアニメーション機能を使ってアニメーションを用意しました
 
-![MicroSignプロモーション](./DocumentImages\MicroSignPromotion.png)
+![MicroSignプロモーション](./DocumentImages/MicroSignPromotion.png)
