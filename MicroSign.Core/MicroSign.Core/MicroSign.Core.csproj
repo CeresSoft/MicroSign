@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="IconImages\Confirm.png" />
+    <None Remove="IconImages\Error.png" />
+    <None Remove="IconImages\Info.png" />
+    <None Remove="IconImages\Warning.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="IconImages\Error.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="IconImages\Confirm.png" />
+    <Resource Include="IconImages\Info.png" />
+    <Resource Include="IconImages\Warning.png" />
+  </ItemGroup>
+
+</Project>
