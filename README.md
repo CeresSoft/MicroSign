@@ -7,7 +7,7 @@
 
 MicroSignで再生するアニメーションを作成するアプリケーション
 
-[MicroSign.sln](MicroSign/MicroSign.sln)
+[MicroSign/MicroSign.sln](MicroSign/MicroSign.sln)
 
 
 実行するのに.NET6 が必要になります
@@ -25,7 +25,7 @@ MicroSignで再生するアニメーションを作成するアプリケーシ�
 
 ### MicroSign パネルテスト アニメーション
 
-[MicroSign パネルテスト アニメーション](MicroSign/MicroSignパネルテストアニメーション/)
+[MicroSign パネルテスト アニメーション](./SampleAnimations/MicroSignパネルテストアニメーション/)
 
 MicroSignの全LEDが正しく点灯しているか確認するためのアニメーション
 
@@ -35,7 +35,7 @@ MicroSignの全LEDが正しく点灯しているか確認するためのアニ�
 
 ### MicroSign プロモーション アニメーション
 
-[MicroSign プロモーション アニメーション](MicroSign/MicroSignプロモーションアニメーション/)
+[MicroSign プロモーション アニメーション](./SampleAnimations/MicroSignプロモーションアニメーション/)
 
 MicroSignのプロモーション用に作成したアニメーション
 
