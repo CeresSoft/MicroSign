@@ -498,5 +498,39 @@ namespace MicroSign.Core
             /// </summary>
             public static System.Windows.Point Zero = new System.Windows.Point(0, 0);
         }
+
+        /// <summary>
+        /// 時間関連
+        /// </summary>
+        public static class Time
+        {
+            /// <summary>
+            /// GIFの遅延時間単位(1単位=10ms)
+            /// </summary>
+            public const int GifUnitTime = 10;
+
+            /// <summary>
+            /// ゼロ値
+            /// </summary>
+            public const int Zero = 0;
+        }
+
+        /// <summary>
+        /// ファイル関連
+        /// </summary>
+        public static class File
+        {
+            /// <summary>
+            /// ゼロプレース
+            /// </summary>
+            public static readonly string ZeroPrace = "0";
+
+            /// <summary>
+            /// PNGファイルフォーマット
+            /// </summary>
+            public static readonly string PngFileFormat = "{0}.png";
+
+
+        }
     }
 }
