@@ -96,6 +96,12 @@ namespace MicroSign.Core.Models
                 case FormatKinds.Color256:
                     return this.ConvertImageImpl(image, MicroSignConsts.RGB.Bit3, MicroSignConsts.RGB.Bit3, MicroSignConsts.RGB.Bit2);
 
+                //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //----------
+                case FormatKinds.IndexColor:
+                    return this.ConvertImageImpl(image, MicroSignConsts.RGB.Bit8, MicroSignConsts.RGB.Bit8, MicroSignConsts.RGB.Bit8);
+                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
+
                 default:
                     //不明な形式
                     return ConvertImageResult.Failed($"不明な変換フォーマット ({formatKind})");
@@ -149,7 +155,10 @@ namespace MicroSign.Core.Models
             int outputImageStride = CommonConsts.Collection.Empty;
             {
                 //画像データを出力データに変換
-                var convertColorImplResult = this.ConvertColorImpl(image, redBits, greenBits, blueBits);
+                //TODO: 2025.08.05:既存のConvertColorImplへ分岐 >>>>> ここから
+                //var convertColorImplResult = this.ConvertColorImpl(image, redBits, greenBits, blueBits);
+                var convertColorImplResult = this.ConvertColorImpl(image);
+                //TODO: 2025.08.05:既存のConvertColorImplへ分岐 <<<<< ここまで
                 if (convertColorImplResult.IsSuccess)
                 {
                     //成功した場合は処理続行

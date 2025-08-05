@@ -32,6 +32,11 @@ namespace MicroSign.Core.Models
                 case FormatKinds.Color256:
                     return this.ConvertAnimationColor256(animationImages, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
 
+                //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //----------
+                case FormatKinds.IndexColor:
+                    return this.ConvertAnimationIndexColor(animationImages, name, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
 
                 default:
                     //不明な形式

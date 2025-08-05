@@ -96,6 +96,12 @@ namespace MicroSign.Core.Models
                 case FormatKinds.TestColor256:
                     return this.ConvertTestColor256(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
 
+                //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //----------
+                case FormatKinds.IndexColor:
+                    return this.ConvertIndexColor(image, name, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
+
                 default:
                     //不明な形式
                     return ConvertResult.Failed($"不明な変換フォーマット ({formatKind})");

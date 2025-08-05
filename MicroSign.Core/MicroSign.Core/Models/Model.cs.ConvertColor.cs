@@ -6,6 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MicroSign.Core.Models.AnimationDatas;
+using MicroSign.Core.Models.IndexColors;
 
 namespace MicroSign.Core.Models
 {
@@ -465,9 +466,16 @@ namespace MicroSign.Core.Models
             byte[]? outputData = null;
             byte[]? outputImage = null;
             int outputImageStride = CommonConsts.Collection.Empty;
+            //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+            //----------
+            IndexColorCollection? colors = null;
+            //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
             {
                 //画像データを出力データに変換
-                var convertColorImplResult = this.ConvertColorImpl(image, redBits, greenBits, blueBits);
+                //TODO: 2025.08.05:既存のConvertColorImplへ分岐 >>>>> ここから
+                //var convertColorImplResult = this.ConvertColorImpl(image, redBits, greenBits, blueBits);
+                var convertColorImplResult = this.ConvertColorImpl(image);
+                //TODO: 2025.08.05:既存のConvertColorImplへ分岐 <<<<< ここまで
                 if (convertColorImplResult.IsSuccess)
                 {
                     //成功した場合は処理続行
@@ -504,6 +512,21 @@ namespace MicroSign.Core.Models
 
                 //出力画像ストライド取得
                 outputImageStride = convertColorImplResult.OutputImageStride;
+
+                //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //----------
+                //カラーパレット取得
+                colors = convertColorImplResult.Colors;
+                if (colors == null)
+                {
+                    //無効の場合は終了
+                    return ConvertResult.Failed("カラーパレット無効");
+                }
+                else
+                {
+                    //有効の場合は処理続行
+                }
+                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
             }
 
             //2023.10.16:CS)杉原バイナリデータとして保存
@@ -512,7 +535,7 @@ namespace MicroSign.Core.Models
             {
                 //@@ ヘッダ(uint16 x 8のサイズ)
                 //バージョン(uint16)
-                bw.Write((UInt16)100); //TODO:後で定数定義する
+                bw.Write((UInt16)MicroSignConsts.Versions.V110);
 
                 //マトリクスLED
                 {
@@ -529,6 +552,51 @@ namespace MicroSign.Core.Models
                     bw.Write((UInt16)0);
                 }
 
+                //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //----------
+                //パレット
+                {
+                    // >> パレット数(uint16)
+                    int palleteCount = colors.Count;
+                    bw.Write((UInt16)palleteCount);
+
+                    // >> パレット
+                    for (int i = CommonConsts.Index.First; i < palleteCount; i += CommonConsts.Index.Step)
+                    {
+                        //インデックスカラー取得
+                        int b = MicroSignConsts.RGB.Black;
+                        int g = MicroSignConsts.RGB.Black;
+                        int r = MicroSignConsts.RGB.Black;
+                        int a = MicroSignConsts.RGB.Black;
+                        IndexColor color = colors[i];
+                        if (color == null)
+                        {
+                            //無効の場合初期値のままとする
+                        }
+                        else
+                        {
+                            //有効の場合
+                            b = color.B;
+                            g = color.G;
+                            r = color.R;
+                            a = color.A;
+                        }
+
+                        // >> B(8bit)
+                        bw.Write((Byte)b);
+
+                        // >> G(8bit)
+                        bw.Write((Byte)g);
+
+                        // >> R(8bit)
+                        bw.Write((Byte)r);
+
+                        // >> A(8bit)
+                        bw.Write((Byte)a);
+                    }
+                }
+                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
+
                 //画像
                 {
                     // >> 横ピクセルビット数(uint16)
@@ -543,6 +611,13 @@ namespace MicroSign.Core.Models
                         case OutputColorFormatKind.Color64:
                             bw.Write((UInt16)OutputColorFormatKind.Color64);
                             break;
+
+                        //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                        //----------
+                        case OutputColorFormatKind.IndexColor:
+                            bw.Write((UInt16)OutputColorFormatKind.IndexColor);
+                            break;
+                        //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
 
                         default:
                             //それ以外はすべて256にする
@@ -562,7 +637,7 @@ namespace MicroSign.Core.Models
 
                     // >> アニメーションセルサイズ(uint16) 現在は(+0=X, +1=Y, +2=表示期間の3のみ)
                     // >> 将来の拡張で高度なアニメーションを作るときは増えると思います
-                    bw.Write((UInt16)3); //TODO:後で定数定義する
+                    bw.Write((UInt16)MicroSignConsts.Animations.CellSize.FixedSize);
 
                     //空き
                     bw.Write((UInt16)0);
@@ -878,6 +953,114 @@ namespace MicroSign.Core.Models
 
             //終了
             return (true, outputData, outputImage, imagePixelStride);
+        }
+
+        /// <summary>
+        /// 色変換実装
+        /// </summary>
+        /// <param name="image">変換する画像</param>
+        /// <returns>色変換実装結果</returns>
+        /// <remarks>
+        /// 2025.08.05:CS)土田:インデックスカラー対応
+        /// </remarks>
+        private (bool IsSuccess, byte[]? OutputData, byte[]? OutputImage, int OutputImageStride, IndexColorCollection? Colors) ConvertColorImpl(BitmapSource? image)
+        {
+            //変換する画像の有効判定
+            if (image == null)
+            {
+                //無効の場合は何もせずに終了
+                return (false, null, null, CommonConsts.Collection.Empty, null);
+            }
+            else
+            {
+                //有効の場合は処理続行
+            }
+
+            //画像ピクセル取得
+            // >> 検証済の値を取得
+            int imagePixelWidth = image.PixelWidth;
+            int imagePixelHeight = image.PixelHeight;
+
+            //画像フォーマットを変換
+            // >> https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/graphics-multimedia/how-to-convert-a-bitmapsource-to-a-different-pixelformat?view=netframeworkdesktop-4.8&viewFallbackFrom=netdesktop-6.0
+            FormatConvertedBitmap newFormatedBitmapSource = new FormatConvertedBitmap();
+            newFormatedBitmapSource.BeginInit();
+            newFormatedBitmapSource.Source = image;
+            newFormatedBitmapSource.DestinationFormat = PixelFormats.Bgra32;
+            newFormatedBitmapSource.EndInit();
+            newFormatedBitmapSource.Freeze();
+
+            //1ピクセルのバイト数
+            // >> RGBA 32bit固定の書き方 32/8=4になります
+            // >> ほかのピクセルフォーマットに対応する場合はここのコードを変更してください
+            int byteParPixel = newFormatedBitmapSource.DestinationFormat.BitsPerPixel / CommonConsts.BitCount.BYTE;
+
+            //画像のストライドを計算
+            int imagePixelStride = imagePixelWidth * byteParPixel;
+
+            //画像取得
+            int bgra32Size = imagePixelStride * imagePixelHeight;
+            byte[] bgra32 = new byte[bgra32Size];
+            newFormatedBitmapSource.CopyPixels(bgra32, imagePixelStride, CommonConsts.Index.First);
+
+            //変換後の画像生成先
+            // >> インデックスカラー版では元画像をそのまま使う
+            byte[] outputImage = bgra32;
+
+            //出力データ生成先
+            int outputSize = imagePixelHeight * imagePixelWidth;
+            byte[] outputData = new byte[outputSize];
+
+            //パレット生成先
+            IndexColorCollection colors = new IndexColorCollection();
+
+            //Y座標ループ
+            for (int y = CommonConsts.Index.First; y < imagePixelHeight; y += CommonConsts.Index.Step)
+            {
+                //X軸ループ
+                for (int x = CommonConsts.Index.First; x < imagePixelWidth; x += CommonConsts.Index.Step)
+                {
+                    //インデックス計算
+                    int index = (y * imagePixelStride) + (x * byteParPixel);
+                    int blueIndex = index;
+                    int greenIndex = blueIndex + CommonConsts.Index.Step;
+                    int redIndex = greenIndex + CommonConsts.Index.Step;
+                    int alphaIndex = redIndex + CommonConsts.Index.Step;
+
+                    //透明値
+                    int alphaValue = bgra32[alphaIndex];
+
+                    //色値
+                    int B = this.CalcColor(bgra32[blueIndex], alphaValue);
+                    int G = this.CalcColor(bgra32[greenIndex], alphaValue);
+                    int R = this.CalcColor(bgra32[redIndex], alphaValue);
+
+                    //インデックスカラー生成
+                    IndexColor color = new IndexColor(alphaValue, R, G, B);
+
+                    //パレット登録
+                    // >> 色が重複する場合、先に登録されている色のインデックスが返る
+                    int colorIndex = colors.AddColor(color);
+                    if (colorIndex == CommonConsts.Index.Invalid)
+                    {
+                        //パレット登録失敗の場合は変換失敗
+                        return (false, null, null, CommonConsts.Collection.Empty, null);
+                    }
+                    else
+                    {
+                        //パレット登録成功の場合は続行
+                    }
+
+                    //パレット番号を変換後データ設定先に設定
+                    {
+                        int i = (y * imagePixelWidth) + x;
+                        outputData[i] = (byte)colorIndex;
+                    }
+                }
+            }
+
+            //終了
+            return (true, outputData, outputImage, imagePixelStride, colors);
         }
     }
 }

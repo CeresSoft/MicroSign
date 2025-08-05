@@ -365,7 +365,7 @@ namespace MicroSign.Core.ViewModels
             /// <summary>
             /// 変換フォーマット初期値
             /// </summary>
-            public const FormatKinds FormatKind = FormatKinds.Color256;
+            public const FormatKinds FormatKind = FormatKinds.IndexColor;
         }
 
         /// <summary>
@@ -387,6 +387,9 @@ namespace MicroSign.Core.ViewModels
         /// <summary>
         /// 変換フォーマット
         /// </summary>
+        /// <remarks>
+        /// 2025.08.05:CS)土田:インデックスカラー対応で初期値を変更
+        /// </remarks>
         public FormatKinds FormatKind
         {
             get
