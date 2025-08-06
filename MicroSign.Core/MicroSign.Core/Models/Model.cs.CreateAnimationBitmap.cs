@@ -345,13 +345,17 @@ namespace MicroSign.Core.Models
             // >> 画像サイズを2の累乗にする必要があるので計算方法を変更
             int columnCount = CommonConsts.Count.Zero;
             int rowCount = CommonConsts.Count.Zero;
+            //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 >>>>> ここから
+            //----------
+            int maxColumnCount = CommonConsts.Count.Zero;
+            //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 <<<<< ここまで
             {
                 // >> Arduino側の仕様で、行を増やすと上段行の位置から下段行の位置を引くテーブルが大きくなるので
                 // >> なるべく横方向に連結する
 
                 //画像のピクセル数から横に並べられる最大列数を計算
                 int widthMax = Model.Consts.ImagePixelSizeDic.Keys.Max();
-                int maxColumnCount = widthMax / imageWidth;
+                maxColumnCount = widthMax / imageWidth;
                 if (maxColumnCount < CommonConsts.Collection.One)
                 {
                     //1枚未満(=0枚)の場合は処理出来ないので終了
@@ -381,22 +385,27 @@ namespace MicroSign.Core.Models
                 }
 
                 //行数が確定したので列数を計算
-                columnCount = normalizeAnimationImageCount / rowCount;
+                //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 >>>>> ここから
+                //columnCount = normalizeAnimationImageCount / rowCount;
 
-                //列数の計算で端数が切り捨てされている可能性があるので
-                //全体数が足りているか判定
-                {
-                    int totalCount = columnCount * rowCount;
-                    if (totalCount < normalizeAnimationImageCount)
-                    {
-                        //数が足りていない場合は列数を1つ増やす(=除算で切り捨てされている)
-                        columnCount += CommonConsts.Collection.Step;
-                    }
-                    else
-                    {
-                        //数が足りている場合はそのまま
-                    }
-                }
+                ////列数の計算で端数が切り捨てされている可能性があるので
+                ////全体数が足りているか判定
+                //{
+                //    int totalCount = columnCount * rowCount;
+                //    if (totalCount < normalizeAnimationImageCount)
+                //    {
+                //        //数が足りていない場合は列数を1つ増やす(=除算で切り捨てされている)
+                //        columnCount += CommonConsts.Collection.Step;
+                //    }
+                //    else
+                //    {
+                //        //数が足りている場合はそのまま
+                //    }
+                //}
+                //----------
+                // >> すべての列を使用する
+                columnCount = maxColumnCount;
+                //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 <<<<< ここまで
             }
             //マージ後の画像サイズを計算
             int margeImageWicth = this.NormalizeImageSize(imageWidth * columnCount);
@@ -503,6 +512,49 @@ namespace MicroSign.Core.Models
                         r += CommonConsts.Index.Step;
                     }
                 }
+
+                //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 >>>>> ここから
+                //----------
+                //余白を最後のフレームで埋める
+                // >> WriteableBitmapは何も書き込まないと透明(ARGBすべて0)のままとなる
+                //    アニメーション画像に透明が含まれない場合、マージ画像全体の色数は
+                //    [アニメーション画像で使用した色] + [WriteableBitmapの初期色]
+                //    となり、不要な1色が増えてしまう
+                //最大行数を計算
+                int maxRowCount = margeImageHeight / imageHeight;
+
+                //マージ画像の最大フレーム数を計算
+                int maxFrameCount = maxColumnCount * maxRowCount;
+
+                //描画済みのフレームの次から、残りのフレームを埋める
+                for (int i = normalizeAnimationImageCount; i < maxFrameCount; i += CommonConsts.Index.Step)
+                {
+                    //マージ画像先に設定
+                    // >> X位置
+                    int x = c * imageWidth;
+                    // >> Y位置
+                    int y = r * imageHeight;
+                    // >> マージ画像に描写
+                    // >> >> bgra32には最後のフレームのデータが残っている
+                    {
+                        Int32Rect rect = new Int32Rect(x, y, imageWidth, imageHeight);
+                        margeBitmap.WritePixels(rect, bgra32, imagePixelStride, CommonConsts.Index.First);
+                    }
+
+                    //画像マージ先位置更新
+                    c += CommonConsts.Index.Step;
+                    if (c < columnCount)
+                    {
+                        //範囲内の場合はそのまま
+                    }
+                    else
+                    {
+                        //範囲外になったら1行下にする
+                        c = CommonConsts.Index.First;
+                        r += CommonConsts.Index.Step;
+                    }
+                }
+                //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 <<<<< ここまで
             }
 
             //アニメーションデータコレクション生成

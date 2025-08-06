@@ -81,17 +81,8 @@ namespace MicroSign.Core.Models.IndexColors
                 return palleteIndex;
             }
 
-            //色数有効判定
+            //色数取得
             int count = this.Count;
-            if (count < MicroSignConsts.RGB.MaxIndexColorCount)
-            {
-                //最大色数未満の場合は続行
-            }
-            else
-            {
-                //これ以上登録できないので追加せずに終了
-                return CommonConsts.Index.Invalid;
-            }
 
             //新規登録
             this.Add(color);
