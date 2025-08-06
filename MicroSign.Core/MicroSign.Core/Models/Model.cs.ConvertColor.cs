@@ -172,7 +172,11 @@ namespace MicroSign.Core.Models
             int outputImageStride = CommonConsts.Collection.Empty;
             {
                 //画像データを出力データに変換
-                var convertColorImplResult = this.ConvertColorImpl(image, redBits, greenBits, blueBits);
+                //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //var convertColorImplResult = this.ConvertColorImpl(image, redBits, greenBits, blueBits);
+                //----------
+                var convertColorImplResult = this.ConvertColorImpl(image);
+                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
                 if (convertColorImplResult.IsSuccess)
                 {
                     //成功した場合は処理続行
@@ -472,10 +476,11 @@ namespace MicroSign.Core.Models
             //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
             {
                 //画像データを出力データに変換
-                //TODO: 2025.08.05:既存のConvertColorImplへ分岐 >>>>> ここから
+                //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
                 //var convertColorImplResult = this.ConvertColorImpl(image, redBits, greenBits, blueBits);
+                //----------
                 var convertColorImplResult = this.ConvertColorImpl(image);
-                //TODO: 2025.08.05:既存のConvertColorImplへ分岐 <<<<< ここまで
+                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
                 if (convertColorImplResult.IsSuccess)
                 {
                     //成功した場合は処理続行

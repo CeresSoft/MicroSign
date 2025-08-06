@@ -26,14 +26,17 @@ namespace MicroSign.Core.Models
                 case FormatKinds.TestColor256:
                     return ConvertResult.Failed($"アニメーション画像に変換できない変換フォーマットです ({formatKind})");
 
-                case FormatKinds.Color64:
-                    return this.ConvertAnimationColor64(animationImages, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
-
-                case FormatKinds.Color256:
-                    return this.ConvertAnimationColor256(animationImages, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
-
                 //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //case FormatKinds.Color64:
+                //    return this.ConvertAnimationColor64(animationImages, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+
+                //case FormatKinds.Color256:
+                //    return this.ConvertAnimationColor256(animationImages, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
                 //----------
+                case FormatKinds.Color64:
+                case FormatKinds.Color256:
+                    return ConvertResult.Failed($"フォーマット'{formatKind}'は現在のバージョンでは非対応です");
+
                 case FormatKinds.IndexColor:
                     return this.ConvertAnimationIndexColor(animationImages, name, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
                 //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで

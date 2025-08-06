@@ -81,23 +81,29 @@ namespace MicroSign.Core.Models
         {
             switch(formatKind)
             {
-                case FormatKinds.HighSpeed:
-                    return this.ConvertHighSpeed(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
-
-                case FormatKinds.Color64:
-                    return this.ConvertColor64(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
-
-                case FormatKinds.Color256:
-                    return this.ConvertColor256(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
-
-                case FormatKinds.TestColor64:
-                    return this.ConvertTestColor64(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
-
-                case FormatKinds.TestColor256:
-                    return this.ConvertTestColor256(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
-
                 //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //case FormatKinds.HighSpeed:
+                //    return this.ConvertHighSpeed(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+
+                //case FormatKinds.Color64:
+                //    return this.ConvertColor64(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+
+                //case FormatKinds.Color256:
+                //    return this.ConvertColor256(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+
+                //case FormatKinds.TestColor64:
+                //    return this.ConvertTestColor64(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+
+                //case FormatKinds.TestColor256:
+                //    return this.ConvertTestColor256(image, name, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
                 //----------
+                case FormatKinds.HighSpeed:
+                case FormatKinds.Color64:
+                case FormatKinds.Color256:
+                case FormatKinds.TestColor64:
+                case FormatKinds.TestColor256:
+                    return ConvertResult.Failed($"フォーマット'{formatKind}'は現在のバージョンでは非対応です");
+
                 case FormatKinds.IndexColor:
                     return this.ConvertIndexColor(image, name, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
                 //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
