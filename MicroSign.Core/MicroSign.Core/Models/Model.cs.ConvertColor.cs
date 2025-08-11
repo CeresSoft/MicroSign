@@ -557,13 +557,138 @@ namespace MicroSign.Core.Models
                     bw.Write((UInt16)0);
                 }
 
-                //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                //2025.08.11:CS)杉原:インデックスカラー対応修正 >>>>> ここから
+                ////2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                ////----------
+                ////パレット
+                //{
+                //    // >> パレット数(uint16)
+                //    int palleteCount = colors.Count;
+                //    bw.Write((UInt16)palleteCount);
+                //
+                //    // >> パレット
+                //    for (int i = CommonConsts.Index.First; i < palleteCount; i += CommonConsts.Index.Step)
+                //    {
+                //        //インデックスカラー取得
+                //        int b = MicroSignConsts.RGB.Black;
+                //        int g = MicroSignConsts.RGB.Black;
+                //        int r = MicroSignConsts.RGB.Black;
+                //        int a = MicroSignConsts.RGB.Black;
+                //        IndexColor color = colors[i];
+                //        if (color == null)
+                //        {
+                //            //無効の場合初期値のままとする
+                //        }
+                //        else
+                //        {
+                //            //有効の場合
+                //            b = color.B;
+                //            g = color.G;
+                //            r = color.R;
+                //            a = color.A;
+                //        }
+                //
+                //        // >> B(8bit)
+                //        bw.Write((Byte)b);
+                //
+                //        // >> G(8bit)
+                //        bw.Write((Byte)g);
+                //
+                //        // >> R(8bit)
+                //        bw.Write((Byte)r);
+                //
+                //        // >> A(8bit)
+                //        bw.Write((Byte)a);
+                //    }
+                //}
+                ////2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
                 //----------
-                //パレット
+                //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここから
+
+                //画像
+                {
+                    // >> 横ピクセルビット数(uint16)
+                    bw.Write((UInt16)imageWidthBits);
+
+                    // >> 横ピクセルビット数(uint16)
+                    bw.Write((UInt16)imageHeightBits);
+
+                    //2025.08.11:CS)杉原:インデックスカラー対応修正 >>>>> ここから
+                    //----------
+                    // >> パレット数
+                    int palleteCount = CommonConsts.Collection.Empty;
+                    //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここから
+
+                    // >> フォーマット(uint16)
+                    switch (formatKind)
+                    {
+                        case OutputColorFormatKind.Color64:
+                            bw.Write((UInt16)OutputColorFormatKind.Color64);
+                            break;
+
+                        //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
+                        //----------
+                        case OutputColorFormatKind.IndexColor:
+                            bw.Write((UInt16)OutputColorFormatKind.IndexColor);
+                            //2025.08.11:CS)杉原:インデックスカラー対応修正 >>>>> ここから
+                            //----------
+                            palleteCount = colors.Count;
+                            //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここから
+                            break;
+                        //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
+
+                        default:
+                            //それ以外はすべて256にする
+                            bw.Write((UInt16)OutputColorFormatKind.Color256);
+                            break;
+                    }
+
+                    //2025.08.11:CS)杉原:インデックスカラー対応修正 >>>>> ここから
+                    ////空き
+                    //bw.Write((UInt16)0);
+                    //----------
+                    // >> パレット数
+                    bw.Write((UInt16)palleteCount);
+                    //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここから
+                }
+
+                //アニメーション
+                {
+                    // >> アニメーション数(uint16)
+                    bw.Write((UInt16)animationDataCount);
+
+                    // >> アニメーションセルサイズ(uint16) 現在は(+0=X, +1=Y, +2=表示期間の3のみ)
+                    // >> 将来の拡張で高度なアニメーションを作るときは増えると思います
+                    bw.Write((UInt16)MicroSignConsts.Animations.CellSize.FixedSize);
+
+                    //空き
+                    bw.Write((UInt16)0);
+
+                    //空き
+                    bw.Write((UInt16)0);
+                }
+
+                //空き領域
+                {
+                    //空き
+                    bw.Write((UInt16)0);
+
+                    //空き
+                    bw.Write((UInt16)0);
+
+                    //空き
+                    bw.Write((UInt16)0);
+
+                    //空き
+                    bw.Write((UInt16)0);
+                }
+
+                //2025.08.11:CS)杉原:インデックスカラー対応修正 >>>>> ここから
+                //----------
+                //パレット書込
                 {
                     // >> パレット数(uint16)
                     int palleteCount = colors.Count;
-                    bw.Write((UInt16)palleteCount);
 
                     // >> パレット
                     for (int i = CommonConsts.Index.First; i < palleteCount; i += CommonConsts.Index.Step)
@@ -600,71 +725,7 @@ namespace MicroSign.Core.Models
                         bw.Write((Byte)a);
                     }
                 }
-                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
-
-                //画像
-                {
-                    // >> 横ピクセルビット数(uint16)
-                    bw.Write((UInt16)imageWidthBits);
-
-                    // >> 横ピクセルビット数(uint16)
-                    bw.Write((UInt16)imageHeightBits);
-
-                    // >> フォーマット(uint16)
-                    switch (formatKind)
-                    {
-                        case OutputColorFormatKind.Color64:
-                            bw.Write((UInt16)OutputColorFormatKind.Color64);
-                            break;
-
-                        //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
-                        //----------
-                        case OutputColorFormatKind.IndexColor:
-                            bw.Write((UInt16)OutputColorFormatKind.IndexColor);
-                            break;
-                        //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
-
-                        default:
-                            //それ以外はすべて256にする
-                            bw.Write((UInt16)OutputColorFormatKind.Color256);
-                            break;
-                    }
-
-                    //空き
-                    bw.Write((UInt16)0);
-
-                }
-
-                //アニメーション
-                {
-                    // >> アニメーション数(uint16)
-                    bw.Write((UInt16)animationDataCount);
-
-                    // >> アニメーションセルサイズ(uint16) 現在は(+0=X, +1=Y, +2=表示期間の3のみ)
-                    // >> 将来の拡張で高度なアニメーションを作るときは増えると思います
-                    bw.Write((UInt16)MicroSignConsts.Animations.CellSize.FixedSize);
-
-                    //空き
-                    bw.Write((UInt16)0);
-
-                    //空き
-                    bw.Write((UInt16)0);
-                }
-
-                //空き領域
-                {
-                    //空き
-                    bw.Write((UInt16)0);
-
-                    //空き
-                    bw.Write((UInt16)0);
-
-                    //空き
-                    bw.Write((UInt16)0);
-
-                    //空き
-                    bw.Write((UInt16)0);
-                }
+                //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここから
 
                 //出力データを書込み
                 bw.Write(outputData);
