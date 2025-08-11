@@ -616,7 +616,7 @@ namespace MicroSign.Core.Models
                     //2025.08.11:CS)杉原:インデックスカラー対応修正 >>>>> ここから
                     //----------
                     // >> パレット数
-                    int palleteCount = CommonConsts.Collection.Empty;
+                    int paletteCount = CommonConsts.Collection.Empty;
                     //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここから
 
                     // >> フォーマット(uint16)
@@ -632,7 +632,7 @@ namespace MicroSign.Core.Models
                             bw.Write((UInt16)OutputColorFormatKind.IndexColor);
                             //2025.08.11:CS)杉原:インデックスカラー対応修正 >>>>> ここから
                             //----------
-                            palleteCount = colors.Count;
+                            paletteCount = colors.Count;
                             //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここから
                             break;
                         //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
@@ -648,7 +648,7 @@ namespace MicroSign.Core.Models
                     //bw.Write((UInt16)0);
                     //----------
                     // >> パレット数
-                    bw.Write((UInt16)palleteCount);
+                    bw.Write((UInt16)paletteCount);
                     //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここから
                 }
 
@@ -688,10 +688,10 @@ namespace MicroSign.Core.Models
                 //パレット書込
                 {
                     // >> パレット数(uint16)
-                    int palleteCount = colors.Count;
+                    int paletteCount = colors.Count;
 
                     // >> パレット
-                    for (int i = CommonConsts.Index.First; i < palleteCount; i += CommonConsts.Index.Step)
+                    for (int i = CommonConsts.Index.First; i < paletteCount; i += CommonConsts.Index.Step)
                     {
                         //インデックスカラー取得
                         int b = MicroSignConsts.RGB.Black;
