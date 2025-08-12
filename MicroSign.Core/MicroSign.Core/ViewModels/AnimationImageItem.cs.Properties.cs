@@ -55,7 +55,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 画像パス
         /// <summary>
         /// 初期値
@@ -105,7 +104,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 画像
         /// <summary>
         /// 初期値
@@ -155,7 +153,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 表示期間(秒)
         /// <summary>
         /// 初期値
@@ -205,7 +202,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 画像種類
         /// <summary>
         /// 初期値
@@ -255,7 +251,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 画像範囲X
         /// <summary>
         /// 初期値
@@ -308,7 +303,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 画像範囲Y
         /// <summary>
         /// 初期値
@@ -361,7 +355,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 画像範囲横幅
         /// <summary>
         /// 初期値
@@ -414,7 +407,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 画像範囲縦幅
         /// <summary>
         /// 初期値
@@ -467,7 +459,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 描写先X
         /// <summary>
         /// 初期値
@@ -520,7 +511,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 描写先Y
         /// <summary>
         /// 初期値
@@ -573,7 +563,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 透明色
         /// <summary>
         /// 初期値
@@ -629,105 +618,6 @@ namespace MicroSign.Core.ViewModels
 
 
 
-        #region 変換後画像データ
-        /// <summary>
-        /// 初期値
-        /// </summary>
-        public static new partial class InitializeValues
-        {
-            /// <summary>
-            /// 変換後画像データ初期値
-            /// </summary>
-            public const byte[]? OutputData = null;
-        }
-
-        /// <summary>
-        /// プロパティ名
-        /// </summary>
-        public static new partial class PropertyNames
-        {
-            /// <summary>
-            /// 変換後画像データプロパティ名
-            /// </summary>
-            public const string OutputData = "OutputData";
-        }
-
-        /// <summary>
-        /// 変換後画像データ保持変数
-        /// </summary>
-        protected byte[]? _OutputData = InitializeValues.OutputData;
-
-        /// <summary>
-        /// 変換後画像データ
-        /// </summary>
-        public byte[]? OutputData
-        {
-            get
-            {
-                return this._OutputData;
-            }
-            set
-            {
-                byte[]? now = this._OutputData;
-                if (now == value)
-                {
-                    return;
-                }
-                this._OutputData = value;
-                this.RaisePropertyChanged();
-            }
-        }
-        #endregion
-
-        #region 変換後プレビュー画像
-        /// <summary>
-        /// 初期値
-        /// </summary>
-        public static new partial class InitializeValues
-        {
-            /// <summary>
-            /// 変換後プレビュー画像初期値
-            /// </summary>
-            public const BitmapSource? PreviewImage = null;
-        }
-
-        /// <summary>
-        /// プロパティ名
-        /// </summary>
-        public static new partial class PropertyNames
-        {
-            /// <summary>
-            /// 変換後プレビュー画像プロパティ名
-            /// </summary>
-            public const string PreviewImage = "PreviewImage";
-        }
-
-        /// <summary>
-        /// 変換後プレビュー画像保持変数
-        /// </summary>
-        protected BitmapSource? _PreviewImage = InitializeValues.PreviewImage;
-
-        /// <summary>
-        /// 変換後プレビュー画像
-        /// </summary>
-        public BitmapSource? PreviewImage
-        {
-            get
-            {
-                return this._PreviewImage;
-            }
-            set
-            {
-                BitmapSource? now = this._PreviewImage;
-                if (now == value)
-                {
-                    return;
-                }
-                this._PreviewImage = value;
-                this.RaisePropertyChanged();
-            }
-        }
-        #endregion
 
 
 
@@ -783,7 +673,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 選択フォントサイズ
         /// <summary>
         /// 初期値
@@ -836,7 +725,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 選択フォント色
         /// <summary>
         /// 初期値
@@ -889,7 +777,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 表示文章
         /// <summary>
         /// 初期値

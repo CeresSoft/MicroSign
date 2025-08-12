@@ -70,46 +70,56 @@ namespace MicroSign
                     CommonLogger.Info($"画像ファイル読込\npath='{imagePath}'");
                 }
 
-                //2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
-                //----------
-                //読み込みと同時に変換する
-                MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
-                if (convertImageResult.IsSuccess)
-                {
-                    //成功の場合は続行
-                    CommonLogger.Debug($"画像ファイル変換成功");
-                }
-                else
-                {
-                    //変換失敗の場合は終了
-                    this.ShowError(CommonLogger.Error($"画像ファイルの変換に失敗しました\npath='{imagePath}'"));
-                    return;
-                }
-                //2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
-
-                //アニメーション画像アイテムを生成
-                //2023.12.24:CS)杉原:アニメーション画像アイテム種類追加 >>>>> ここから
-                //AnimationImageItem animationImageItem = new AnimationImageItem()
+                //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                ////2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
+                ////----------
+                ////読み込みと同時に変換する
+                //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
+                //if (convertImageResult.IsSuccess)
                 //{
-                //    Name = System.IO.Path.GetFileName(imagePath),
-                //    Path = imagePath,
-                //    Image = image,
-                //    DisplayPeriod = defaultDisplayPeriod,
-                //    //2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
-                //    //----------
-                //    OutputData = convertImageResult.OutputData,
-                //    PreviewImage = convertImageResult.PreviewImage,
-                //    //2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
-                //};
+                //    //成功の場合は続行
+                //    CommonLogger.Debug($"画像ファイル変換成功");
+                //}
+                //else
+                //{
+                //    //変換失敗の場合は終了
+                //    this.ShowError(CommonLogger.Error($"画像ファイルの変換に失敗しました\npath='{imagePath}'"));
+                //    return;
+                //}
+                ////2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
+                //
+                ////アニメーション画像アイテムを生成
+                ////2023.12.24:CS)杉原:アニメーション画像アイテム種類追加 >>>>> ここから
+                ////AnimationImageItem animationImageItem = new AnimationImageItem()
+                ////{
+                ////    Name = System.IO.Path.GetFileName(imagePath),
+                ////    Path = imagePath,
+                ////    Image = image,
+                ////    DisplayPeriod = defaultDisplayPeriod,
+                ////    //2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
+                ////    //----------
+                ////    OutputData = convertImageResult.OutputData,
+                ////    PreviewImage = convertImageResult.PreviewImage,
+                ////    //2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
+                ////};
+                ////----------
+                //AnimationImageItem animationImageItem = AnimationImageItem.FromImageFile(
+                //    defaultDisplayPeriod,
+                //    imagePath,
+                //    image,
+                //    convertImageResult.OutputData,
+                //    convertImageResult.PreviewImage
+                //    );
+                ////2023.12.24:CS)杉原:アニメーション画像アイテム種類追加 <<<<< ここまで
                 //----------
+                // >> プレビュー画像が不要になったので変換した画像も不要となりました
+                //アニメーション画像アイテムを生成
                 AnimationImageItem animationImageItem = AnimationImageItem.FromImageFile(
                     defaultDisplayPeriod,
                     imagePath,
-                    image,
-                    convertImageResult.OutputData,
-                    convertImageResult.PreviewImage
+                    image
                     );
-                //2023.12.24:CS)杉原:アニメーション画像アイテム種類追加 <<<<< ここまで
+                //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
 
                 //2024.04.30:CS)杉原:リリース向けの機能追加 >>>>> ここから
                 //----------

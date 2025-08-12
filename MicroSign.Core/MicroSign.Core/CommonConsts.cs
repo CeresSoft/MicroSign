@@ -532,5 +532,47 @@ namespace MicroSign.Core
 
 
         }
+
+        /// <summary>
+        /// パレット関連
+        /// </summary>
+        /// <remarks>
+        /// 2025.08.11:CS)杉原:インデックスカラー対応修正
+        /// </remarks>
+        public static class  Palettes
+        {
+            /// <summary>
+            /// パレット数
+            /// </summary>
+            public static class Count
+            {
+                /// <summary>
+                /// 空
+                /// </summary>
+                public static readonly int Zero = 0;
+
+                /// <summary>
+                /// 最小値
+                /// </summary>
+                public static readonly int Min = 1;
+
+                /// <summary>
+                /// 最大値
+                /// </summary>
+                public static readonly int Max = 256;
+            }
+
+            /// <summary>
+            /// 色関連
+            /// </summary>
+            public static class Colors
+            {
+                /// <summary>
+                /// アルファの最大値
+                /// </summary>
+                public static readonly int AlphaMax = 255;
+            }
+
+        }
     }
 }

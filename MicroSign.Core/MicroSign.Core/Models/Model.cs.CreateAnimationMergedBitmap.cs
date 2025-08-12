@@ -9,15 +9,16 @@ using System.Security.Policy;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 
 namespace MicroSign.Core.Models
 {
     partial class Model
     {
         /// <summary>
-        /// アニメーション用画像生成結果
+        /// アニメーション用マージ画像生成結果
         /// </summary>
-        private struct CreateAnimationBitmapResult
+        private struct CreateAnimationMergedBitmapResult
         {
             /// <summary>
             /// 成功フラグ
@@ -46,7 +47,7 @@ namespace MicroSign.Core.Models
             /// <param name="message">メッセージ</param>
             /// <param name="margeImage">マージ画像</param>
             /// <param name="animationDatas">アニメーションデータ</param>
-            private CreateAnimationBitmapResult(bool isSuccess, string message, WriteableBitmap? margeImage, AnimationDataCollection? animationDatas)
+            private CreateAnimationMergedBitmapResult(bool isSuccess, string message, WriteableBitmap? margeImage, AnimationDataCollection? animationDatas)
             {
                 this.IsSuccess = isSuccess;
                 this.Message = message;
@@ -59,9 +60,9 @@ namespace MicroSign.Core.Models
             /// </summary>
             /// <param name="message">メッセージ</param>
             /// <returns></returns>
-            public static CreateAnimationBitmapResult Failed(string message)
+            public static CreateAnimationMergedBitmapResult Failed(string message)
             {
-                CreateAnimationBitmapResult result = new CreateAnimationBitmapResult(false, message, null, null);
+                CreateAnimationMergedBitmapResult result = new CreateAnimationMergedBitmapResult(false, message, null, null);
                 return result;
             }
 
@@ -71,23 +72,38 @@ namespace MicroSign.Core.Models
             /// <param name="margeImage">マージ画像</param>
             /// <param name="animationDatas">アニメーションデータ</param>
             /// <returns></returns>
-            public static CreateAnimationBitmapResult Success(WriteableBitmap? margeImage, AnimationDataCollection? animationDatas)
+            public static CreateAnimationMergedBitmapResult Success(WriteableBitmap? margeImage, AnimationDataCollection? animationDatas)
             {
-                CreateAnimationBitmapResult result = new CreateAnimationBitmapResult(true, string.Empty, margeImage, animationDatas);
+                CreateAnimationMergedBitmapResult result = new CreateAnimationMergedBitmapResult(true, string.Empty, margeImage, animationDatas);
                 return result;
             }
         }
 
+        //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+        ///// <summary>
+        ///// アニメーション用画像生成
+        ///// </summary>
+        ///// <param name="animationImages">アニメーション画像コレクション</param>
+        ///// <param name="formatKind">出力色形式</param>
+        ///// <param name="redBits">Rビット数</param>
+        ///// <param name="greenBits">Gビット数</param>
+        ///// <param name="blueBits">Bビット数</param>
+        ///// <returns></returns>
+        //private CreateAnimationBitmapResult CreateAnimationBitmap(AnimationImageItemCollection animationImages, OutputColorFormatKind formatKind, int redBits, int greenBits, int blueBits)
+        //----------
         /// <summary>
-        /// アニメーション用画像生成
+        /// アニメーション用マージ画像生成
         /// </summary>
         /// <param name="animationImages">アニメーション画像コレクション</param>
-        /// <param name="formatKind">出力色形式</param>
-        /// <param name="redBits">Rビット数</param>
-        /// <param name="greenBits">Gビット数</param>
-        /// <param name="blueBits">Bビット数</param>
-        /// <returns></returns>
-        private CreateAnimationBitmapResult CreateAnimationBitmap(AnimationImageItemCollection animationImages, OutputColorFormatKind formatKind, int redBits, int greenBits, int blueBits)
+        /// <returns>アニメーション用画像生成結果</returns>
+        /// <remarks>
+        /// 重複を除いた全画像をマージしたアニメーション用画像を生成します
+        /// 
+        /// 2025.08.12:CS)杉原:パレット処理の流れを変更
+        /// 不要なパラメータを削除しました
+        /// </remarks>
+        private CreateAnimationMergedBitmapResult CreateAnimationMergedBitmap(AnimationImageItemCollection animationImages)
+        //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
         {
             //アニメーション画像コレクションの全要素数取得
             int allAnimationImageCount = CommonUtils.GetCount(animationImages);
@@ -98,7 +114,7 @@ namespace MicroSign.Core.Models
             else
             {
                 //それ以外の場合は無効なので終了
-                return CreateAnimationBitmapResult.Failed("アニメーション画像がありません");
+                return CreateAnimationMergedBitmapResult.Failed("アニメーション画像がありません");
             }
 
             //先頭の画像サイズを取得
@@ -111,7 +127,7 @@ namespace MicroSign.Core.Models
                 if (animationImage == null)
                 {
                     //無効の場合は即終了
-                    return CreateAnimationBitmapResult.Failed("先頭のアニメーション画像が無効です");
+                    return CreateAnimationMergedBitmapResult.Failed("先頭のアニメーション画像が無効です");
                 }
                 else
                 {
@@ -123,7 +139,7 @@ namespace MicroSign.Core.Models
                 if (bmp == null)
                 {
                     //無効の場合は即終了
-                    return CreateAnimationBitmapResult.Failed("先頭の画像が無効です");
+                    return CreateAnimationMergedBitmapResult.Failed("先頭の画像が無効です");
                 }
                 else
                 {
@@ -143,7 +159,7 @@ namespace MicroSign.Core.Models
                 else
                 {
                     //無効の場合は即終了
-                    return CreateAnimationBitmapResult.Failed(validateImageResult.ErrorMessage);
+                    return CreateAnimationMergedBitmapResult.Failed(validateImageResult.ErrorMessage);
                 }
             }
 
@@ -157,7 +173,7 @@ namespace MicroSign.Core.Models
                 if (animationImage == null)
                 {
                     //無効の場合は即終了
-                    return CreateAnimationBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]が無効です");
+                    return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]が無効です");
                 }
                 else
                 {
@@ -187,7 +203,7 @@ namespace MicroSign.Core.Models
                 if(bmp == null)
                 {
                     //画像が無効の場合は終了
-                    return CreateAnimationBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]の画像が無効です");
+                    return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]の画像が無効です");
                 }
                 else
                 {
@@ -209,7 +225,7 @@ namespace MicroSign.Core.Models
                     else
                     {
                         //異なる場合は処理出来ないので失敗で終了
-                        return CreateAnimationBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]が基準横幅と異なります(基準={imageWidth}, 画像={width})");
+                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]が基準横幅と異なります(基準={imageWidth}, 画像={width})");
                     }
 
                     // >> 縦幅
@@ -220,28 +236,41 @@ namespace MicroSign.Core.Models
                     else
                     {
                         //異なる場合は処理出来ないので失敗で終了
-                        return CreateAnimationBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]が基準縦幅と異なります(基準={imageHeight}, 画像={height})");
+                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]が基準縦幅と異なります(基準={imageHeight}, 画像={height})");
                     }
                 }
 
                 //画像データを変換
                 byte[]? outputData = null;
                 {
-                    //2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
-                    ////画像データを出力データに変換
-                    //var convertColorImplResult = this.ConvertColorImpl(bmp, redBits, greenBits, blueBits);
-                    //if (convertColorImplResult.IsSuccess)
-                    //{
-                    //    //成功した場合は処理続行
-                    //}
-                    //else
-                    //{
-                    //    //失敗した場合は終了
-                    //    return CreateAnimationBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]の色変換失敗");
-                    //}
-
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                    ////2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
+                    //////画像データを出力データに変換
+                    ////var convertColorImplResult = this.ConvertColorImpl(bmp, redBits, greenBits, blueBits);
+                    ////if (convertColorImplResult.IsSuccess)
+                    ////{
+                    ////    //成功した場合は処理続行
+                    ////}
+                    ////else
+                    ////{
+                    ////    //失敗した場合は終了
+                    ////    return CreateAnimationBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]の色変換失敗");
+                    ////}
+                    ////
+                    //////出力データ取得
+                    ////outputData = convertColorImplResult.OutputData;
+                    ////if (outputData == null)
+                    ////{
+                    ////    //無効の場合は終了
+                    ////    return CreateAnimationBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]の出力データ無効");
+                    ////}
+                    ////else
+                    ////{
+                    ////    //有効の場合は処理続行
+                    ////}
+                    ////----------
                     ////出力データ取得
-                    //outputData = convertColorImplResult.OutputData;
+                    //outputData = animationImage.OutputData;
                     //if (outputData == null)
                     //{
                     //    //無効の場合は終了
@@ -251,19 +280,30 @@ namespace MicroSign.Core.Models
                     //{
                     //    //有効の場合は処理続行
                     //}
+                    ////2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
                     //----------
-                    //出力データ取得
-                    outputData = animationImage.OutputData;
-                    if (outputData == null)
+                    ConvertBitmapToBgra32Result ret = this.ConvertBitmapToBgra32(bmp);
+                    if(ret.IsSuccess)
                     {
-                        //無効の場合は終了
-                        return CreateAnimationBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]の出力データ無効");
+                        //成功の場合は結果を取得
+                        // >> BGRA32の場合はストライド=横ピクセル数x4なので不要
+                        outputData = ret.OutputImage;
                     }
                     else
                     {
-                        //有効の場合は処理続行
+                        //失敗した場合は終了
+                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]の画像データ取得に失敗 (理由={ret.Message})");
                     }
-                    //2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
+                    if(outputData == null)
+                    {
+                        //出力データが無効の場合は終了
+                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像[No.{CommonConsts.Index.ToCollection(i)}]の画像データ取得に失敗 (理由=出力データ無効)");
+                    }
+                    else
+                    {
+                        //出力データ有効の場合は処理続行
+                    }
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
                 }
 
                 //アニメーション画像を登録
@@ -283,7 +323,7 @@ namespace MicroSign.Core.Models
             else
             {
                 //それ以外の場合は無効なので終了
-                return CreateAnimationBitmapResult.Failed("有効なアニメーション画像がありません");
+                return CreateAnimationMergedBitmapResult.Failed("有効なアニメーション画像がありません");
             }
 
             //2023.10.17:CS)杉原:2の累乗にする必要がある >>>>> ここから
@@ -359,7 +399,7 @@ namespace MicroSign.Core.Models
                 if (maxColumnCount < CommonConsts.Collection.One)
                 {
                     //1枚未満(=0枚)の場合は処理出来ないので終了
-                    return CreateAnimationBitmapResult.Failed("並べられる画像がありません");
+                    return CreateAnimationMergedBitmapResult.Failed("並べられる画像がありません");
                 }
                 else
                 {
@@ -418,7 +458,7 @@ namespace MicroSign.Core.Models
             if (Model.Consts.MaxImageDataSize < margeImageSize)
             {
                 //最大画像データサイズを超える場合は終了
-                return CreateAnimationBitmapResult.Failed($"マージ後画像データサイズが最大値{Model.Consts.MaxImageDataSize / CommonConsts.Values.Size.M}Mbytebyteを超えています");
+                return CreateAnimationMergedBitmapResult.Failed($"マージ後画像データサイズが最大値{Model.Consts.MaxImageDataSize / CommonConsts.Values.Size.M}Mbytebyteを超えています");
             }
             else
             {
@@ -454,7 +494,7 @@ namespace MicroSign.Core.Models
                     if (animationImagePoinr == null)
                     {
                         //無効の場合は即終了
-                        return CreateAnimationBitmapResult.Failed($"アニメーション画像位置(No.{CommonConsts.Index.ToCount(i)})が無効です");
+                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像位置(No.{CommonConsts.Index.ToCount(i)})が無効です");
                     }
                     else
                     {
@@ -466,7 +506,7 @@ namespace MicroSign.Core.Models
                     if (bmp == null)
                     {
                         //無効の場合は即終了
-                        return CreateAnimationBitmapResult.Failed($"アニメーション画像位置(No.{CommonConsts.Index.ToCount(i)})の画像が無効です");
+                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像位置(No.{CommonConsts.Index.ToCount(i)})の画像が無効です");
                     }
                     else
                     {
@@ -566,7 +606,7 @@ namespace MicroSign.Core.Models
                 if(animationImage == null)
                 {
                     //無効の場合は即終了
-                    return CreateAnimationBitmapResult.Failed($"アニメーション画像(No.{CommonConsts.Index.ToCount(i)})が無効です");
+                    return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像(No.{CommonConsts.Index.ToCount(i)})が無効です");
                 }
                 else
                 {
@@ -587,7 +627,7 @@ namespace MicroSign.Core.Models
                 if (animationImagePoint == null)
                 {
                     //無効の場合は速終了
-                    return CreateAnimationBitmapResult.Failed($"アニメーション画像(No.{CommonConsts.Index.ToCount(i)})に対応する位置が取得出来ませんでした");
+                    return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像(No.{CommonConsts.Index.ToCount(i)})に対応する位置が取得出来ませんでした");
                 }
                 else
                 {
@@ -627,7 +667,7 @@ namespace MicroSign.Core.Models
             }
 
             //ここまで来たら成功
-            return CreateAnimationBitmapResult.Success(margeBitmap, animationDatas);
+            return CreateAnimationMergedBitmapResult.Success(margeBitmap, animationDatas);
         }
 
         /// <summary>

@@ -6,11 +6,59 @@ namespace MicroSign.Core.ViewModels
     partial class MainWindowViewModel
     {
         /// <summary>
+        /// アニメーション設定読込結果
+        /// </summary>
+        public struct LoadAnimationResult
+        {
+            /// <summary>
+            /// 成功フラグ
+            /// </summary>
+            public readonly bool IsSuccess;
+
+            /// <summary>
+            /// エラーメッセージ
+            /// </summary>
+            public readonly string? ErrorMessage;
+            
+            /// <summary>
+            /// コンストラクタ
+            /// </summary>
+            /// <param name="isSuccess"></param>
+            /// <param name="errorMessage"></param>
+            private LoadAnimationResult(bool isSuccess, string? errorMessage)
+            {
+                this.IsSuccess = isSuccess;
+                this.ErrorMessage = errorMessage;
+            }
+
+            /// <summary>
+            /// 失敗
+            /// </summary>
+            /// <param name="errorMessage"></param>
+            /// <returns></returns>
+            public static LoadAnimationResult Failed(string? errorMessage)
+            {
+                LoadAnimationResult result = new LoadAnimationResult(false, errorMessage);
+                return result;
+            }
+
+            /// <summary>
+            /// 成功
+            /// </summary>
+            /// <returns></returns>
+            public static LoadAnimationResult Success()
+            {
+                LoadAnimationResult result = new LoadAnimationResult(true, null);
+                return result;
+            }
+        }
+
+        /// <summary>
         /// アニメーション設定読込
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public (bool IsSuccess, string ErrorMessage) LoadAnimation(string path)
+        public LoadAnimationResult LoadAnimation(string path)
         {
             //読込
             var retLoad = this.Model.LoadAnimation(path);
@@ -21,15 +69,15 @@ namespace MicroSign.Core.ViewModels
             else
             {
                 //失敗の場合は終了
-                return (false, retLoad.ErrorMessage);
+                return LoadAnimationResult.Failed(retLoad.ErrorMessage);
             }
 
             //保存設定を取得
-            AnimationSaveSetting? saveSetting = retLoad.saveSetting;
+            AnimationSaveSetting? saveSetting = retLoad.SaveSetting;
             if (saveSetting == null)
             {
                 //無効の場合は終了
-                return (false, CommonLogger.Warn("読込したアニメーション設定が無効です"));
+                return LoadAnimationResult.Failed(CommonLogger.Warn("読込したアニメーション設定が無効です"));
             }
             else
             {
@@ -42,7 +90,7 @@ namespace MicroSign.Core.ViewModels
             if (baseDir == null)
             {
                 //ベースディレクトリが無効の場合は終了
-                return (false, CommonLogger.Warn($"読込パスのディレクトリが取得出来ません"));
+                return LoadAnimationResult.Failed(CommonLogger.Warn($"読込パスのディレクトリが取得出来ません"));
             }
             else
             {
@@ -54,7 +102,7 @@ namespace MicroSign.Core.ViewModels
             if (newList == null)
             {
                 //無効の場合は終了
-                return (false, CommonLogger.Warn("読込したアニメーションが無効です"));
+                return LoadAnimationResult.Failed(CommonLogger.Warn("読込したアニメーションが無効です"));
             }
             else
             {
@@ -79,7 +127,7 @@ namespace MicroSign.Core.ViewModels
                 else
                 {
                     //サイズが無効の場合は終了
-                    return (false, CommonLogger.Warn($"マトリクスLEDサイズ有効 (Width={matrixLedWidth}, height={matrixLedHeight})"));
+                    return LoadAnimationResult.Failed(CommonLogger.Warn($"マトリクスLEDサイズ有効 (Width={matrixLedWidth}, height={matrixLedHeight})"));
                 }
             }
 
@@ -144,7 +192,7 @@ namespace MicroSign.Core.ViewModels
             }
 
             //ここまで来たら成功
-            return (true, string.Empty);
+            return LoadAnimationResult.Success();
         }
     }
 }

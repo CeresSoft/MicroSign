@@ -309,33 +309,44 @@ namespace MicroSign.Core.ViewModels
                             CommonLogger.Debug($"画像ファイル読込成功  (path='{savePath}')");
                         }
 
-                        //2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
+                        //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                        ////2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
+                        ////----------
+                        ////読み込みと同時に変換する
+                        //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ConvertAnimationImage(image);
+                        //if (convertImageResult.IsSuccess)
+                        //{
+                        //    //成功の場合は続行
+                        //    CommonLogger.Debug($"画像ファイル変換成功");
+                        //}
+                        //else
+                        //{
+                        //    //変換失敗の場合は終了
+                        //    string msg = $"画像ファイルの変換に失敗しました (path='{savePath}')";
+                        //    CommonLogger.Warn(msg);
+                        //    return LoadGifAnimationResult.Failed(msg);
+                        //}
+                        ////2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
+                        //
+                        ////アニメーション画像アイテム生成
+                        //AnimationImageItem animationImageItem = AnimationImageItem.FromImageFile
+                        //(
+                        //    displayPeriod,
+                        //    savePath,
+                        //    image,
+                        //    convertImageResult.OutputData,
+                        //    convertImageResult.PreviewImage
+                        //);
                         //----------
-                        //読み込みと同時に変換する
-                        MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ConvertAnimationImage(image);
-                        if (convertImageResult.IsSuccess)
-                        {
-                            //成功の場合は続行
-                            CommonLogger.Debug($"画像ファイル変換成功");
-                        }
-                        else
-                        {
-                            //変換失敗の場合は終了
-                            string msg = $"画像ファイルの変換に失敗しました (path='{savePath}')";
-                            CommonLogger.Warn(msg);
-                            return LoadGifAnimationResult.Failed(msg);
-                        }
-                        //2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
-
+                        // >> プレビュー画像が不要になったので変換した画像も不要となりました
                         //アニメーション画像アイテム生成
                         AnimationImageItem animationImageItem = AnimationImageItem.FromImageFile
                         (
                             displayPeriod,
                             savePath,
-                            image,
-                            convertImageResult.OutputData,
-                            convertImageResult.PreviewImage
+                            image
                         );
+                        //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
 
                         //リストに追加
                         this.AddAnimationImage(animationImageItem);

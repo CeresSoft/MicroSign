@@ -132,7 +132,7 @@ namespace MicroSign.Core.Models.AnimationImagePoints
             }
 
             //配列が同じか判定
-            return outputData.SequenceEqual(OutputData);
+            return outputData.SequenceEqual(this.OutputData);
         }
 
         //2023.12.24:CS)杉原:テキストの場合画像パスが無いので出力データだけで判定する >>>>> ここから
