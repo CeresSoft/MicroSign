@@ -1,26 +1,16 @@
-﻿using MicroSign.Core.ViewModels;
-using MicroSign.Core;
+﻿using MicroSign.Core;
+using MicroSign.Core.Navigations;
+using MicroSign.Core.Navigations.Enums;
+using MicroSign.Core.ViewModels;
+using MicroSign.Core.Views.Pages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using MicroSign.Core.Navigations;
-using MicroSign.Core.Navigations.Enums;
-using MicroSign.Core.Views.Overlaps;
-using MicroSign.Core.Views.Pages;
-using System.Windows.Interop;
-using System.Text.RegularExpressions;
+using static MicroSign.Core.Models.Model;
 
 namespace MicroSign
 {
@@ -44,153 +34,11 @@ namespace MicroSign
         {
             InitializeComponent();
 
-
             //ビットマップを拡大表示したときにグラデーションにならないようにする
             RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
 
             //アニメーションタイマーのイベント設定
             this._AnimationTimer.Tick += this._AnimationTimer_Tick;
-        }
-
-        /// <summary>
-        /// 情報表示
-        /// </summary>
-        /// <param name="message"></param>
-        private void ShowInfo(string message)
-        {
-            this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.InfoMessageBox(message, this.Title));
-        }
-
-        /// <summary>
-        /// 警告表示
-        /// </summary>
-        /// <param name="message"></param>
-        private void ShowWarning(string message)
-        {
-            this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.WarnMessageBox(message, this.Title));
-        }
-
-        /// <summary>
-        /// エラー表示
-        /// </summary>
-        /// <param name="message"></param>
-        private void ShowError(string message)
-        {
-            this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.WarnMessageBox(message, this.Title));
-        }
-
-        /// <summary>
-        /// エラー表示
-        /// </summary>
-        /// <param name="message">メッセージ</param>
-        /// <param name="error">例外</param>
-        private void ShowError(string message, Exception error)
-        {
-            //例外はnull許容型ではないのでnullを渡すとコンパイル時に警告になるが
-            //コンパイルエラーではないので無視すれば渡せる
-            //よってnullチェックは行う
-            if (error == null)
-            {
-                //例外が無効の場合は直接呼出し
-                this.ShowError(message);
-            }
-            else
-            {
-                //例外が有効の場合はメッセージの後ろに連結
-                string msg = $"{message}\n{error}";
-                this.ShowError(msg);
-            }
-        }
-
-        /// <summary>
-        /// 画像読込
-        /// </summary>
-        /// <param name="title">タイトル</param>
-        /// <returns></returns>
-        private string? SelectImagePath(string title)
-        {
-            //読込イメージ選択
-            string imagePath;
-            {
-                Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-
-                //タイトル
-                dialog.Title = title;
-
-                // Default file name
-                dialog.FileName = "";
-
-                // Default file extension
-                dialog.DefaultExt = ".png";
-
-                // Filter files by extension
-                dialog.Filter = "Image(*.png,*.jpg,*.jpeg,*.bmp)|*.png;*.jpg;*.jpeg;*.bmp|すべてのファイル (*.*)|*.*";
-
-                //表示
-                bool ret = dialog.ShowDialog(this) ?? false;
-                if (ret)
-                {
-                    //選択した場合は処理続行
-                }
-                else
-                {
-                    //選択しなかった場合は終了
-                    return null;
-                }
-
-                //画像パス取得
-                imagePath = dialog.FileName;
-            }
-
-            //終了
-            return imagePath;
-        }
-
-        /// <summary>
-        /// 画像複数読込
-        /// </summary>
-        /// <param name="title">タイトル</param>
-        /// <returns></returns>
-        private string[]? MultiSelectImagePath(string title)
-        {
-            //読込イメージ選択
-            string[]? imagePath = null;
-            {
-                Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-
-                //タイトル
-                dialog.Title = title;
-
-                // Default file name
-                dialog.FileName = "";
-
-                // Default file extension
-                dialog.DefaultExt = ".png";
-
-                // Filter files by extension
-                dialog.Filter = "Image(*.png,*.jpg,*.jpeg,*.bmp)|*.png;*.jpg;*.jpeg;*.bmp|すべてのファイル (*.*)|*.*";
-
-                //複数選択
-                dialog.Multiselect = true;
-
-                //表示
-                bool ret = dialog.ShowDialog(this) ?? false;
-                if (ret)
-                {
-                    //選択した場合は処理続行
-                }
-                else
-                {
-                    //選択しなかった場合は終了
-                    return null;
-                }
-
-                //画像パス取得
-                imagePath = dialog.FileNames;
-            }
-
-            //終了
-            return imagePath;
         }
 
         /// <summary>
@@ -420,30 +268,42 @@ namespace MicroSign
                     //デフォルトの表示期間を取得
                     double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
 
-                    //画像変換
-                    MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
-                    if (convertImageResult.IsSuccess)
-                    {
-                        //成功の場合は続行
-                        CommonLogger.Debug($"画像変換成功");
-                    }
-                    else
-                    {
-                        //変換失敗の場合は終了
-                        this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
-                        return;
-                    }
-
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                    ////画像変換
+                    //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
+                    //if (convertImageResult.IsSuccess)
+                    //{
+                    //    //成功の場合は続行
+                    //    CommonLogger.Debug($"画像変換成功");
+                    //}
+                    //else
+                    //{
+                    //    //変換失敗の場合は終了
+                    //    this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
+                    //    return;
+                    //}
+                    //
+                    ////アニメーション画像アイテムを生成
+                    //AnimationImageItem animationImageItem = AnimationImageItem.FromText(
+                    //    defaultDisplayPeriod,
+                    //    selectFontSize,
+                    //    selectFontColor,
+                    //    displayText,
+                    //    image,
+                    //    convertImageResult.OutputData,
+                    //    convertImageResult.PreviewImage
+                    //    );
+                    //----------
+                    // >> プレビュー画像が不要になったので変換した画像も不要となりました
                     //アニメーション画像アイテムを生成
                     AnimationImageItem animationImageItem = AnimationImageItem.FromText(
                         defaultDisplayPeriod,
                         selectFontSize,
                         selectFontColor,
                         displayText,
-                        image,
-                        convertImageResult.OutputData,
-                        convertImageResult.PreviewImage
+                        image
                         );
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
 
                     //リストに追加
                     this.ViewModel.AddAnimationImage(animationImageItem);
@@ -521,6 +381,57 @@ namespace MicroSign
             {
                 //無効の場合は何もせずに終了
                 CommonLogger.Warn($"アニメーション画像削除確認の結果が判定できませんでした (ret={result})");
+            }
+        }
+
+        /// <summary>
+        /// 全アニメーション画像削除ボタン
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RemoveAllAnimationImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //確認画面
+                this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("全アニメーション画像を削除します。\nよろしいですか?", this.Title), null, this.RemoveAllAnimationImageButton_Retrun);
+            }
+            catch (Exception ex)
+            {
+                this.ShowError(CommonLogger.Error("アニメーション画像削除で例外発生"), ex);
+            }
+        }
+
+        /// <summary>
+        /// アニメーション画像削除確認結果
+        /// </summary>
+        /// <param name="callArgs">呼出引数(=AnimationImageItem)</param>
+        /// <param name="result">戻り値(=MicroSign.Core.Navigations.Enums.NavigationResultKind)</param>
+        private void RemoveAllAnimationImageButton_Retrun(object? callArgs, object? result)
+        {
+            if (result is MicroSign.Core.Navigations.Enums.NavigationResultKind resultKind)
+            {
+                //呼出時の引数の選択アニメーションを取得
+                AnimationImageItem? selectedAnimationImage = callArgs as AnimationImageItem;
+
+                //確認結果により分岐
+                switch (resultKind)
+                {
+                    case NavigationResultKind.Success:
+                        //成功(=Yes)の場合
+                        //>> 選択アイテムを削除
+                        this.ViewModel.RemoveAllAnimationImage();
+                        break;
+
+                    default:
+                        //それ以外の場合は何もしない
+                        break;
+                }
+            }
+            else
+            {
+                //無効の場合は何もせずに終了
+                CommonLogger.Warn($"全アニメーション画像削除確認の結果が判定できませんでした (ret={result})");
             }
         }
 
@@ -647,7 +558,11 @@ namespace MicroSign
 
                 //アニメーション変換開始
                 {
-                    var ret = this.ViewModel.ConvertAnimation();
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                    //var ret = this.ViewModel.ConvertAnimation();
+                    //----------
+                    MainWindowViewModel.ConvertAnimationResult ret = this.ViewModel.ConvertAnimation();
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
                     if (ret.IsSuccess)
                     {
                         //成功の場合
@@ -656,7 +571,11 @@ namespace MicroSign
                     else
                     {
                         //失敗の場合
-                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像の変換に失敗しました。\n理由={ret.Code}"));
+                        //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                        //this.ShowWarning(CommonLogger.Warn($"アニメーション画像の変換に失敗しました。\n理由={ret.Code}"));
+                        //----------
+                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像の変換に失敗しました。\n理由={ret.Message}"));
+                        //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
                     }
                 }
             }
@@ -716,7 +635,7 @@ namespace MicroSign
 
                 //アニメーション設定保存
                 {
-                    var ret = this.ViewModel.SaveAnimation(savePath);
+                    MicroSign.Core.Models.Model.SaveAnimationResult ret = this.ViewModel.SaveAnimation(savePath);
                     if (ret.IsSuccess)
                     {
                         //成功の場合
@@ -725,7 +644,7 @@ namespace MicroSign
                     else
                     {
                         //失敗した場合
-                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像設定を保存に失敗しました\n{ret.ErrorMessage}"));
+                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像設定を保存に失敗しました\n{ret.Message}"));
                     }
                 }
             }
@@ -770,7 +689,7 @@ namespace MicroSign
 
                 //アニメーション設定読込
                 {
-                    var ret = this.ViewModel.LoadAnimation(loadPath);
+                    MainWindowViewModel.LoadAnimationResult ret = this.ViewModel.LoadAnimation(loadPath);
                     if(ret.IsSuccess)
                     {
                         //成功した場合は処理続行
@@ -1224,29 +1143,40 @@ namespace MicroSign
                     //デフォルトの表示期間を取得
                     double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
 
-                    //画像変換
-                    MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
-                    if (convertImageResult.IsSuccess)
-                    {
-                        //成功の場合は続行
-                        CommonLogger.Debug($"画像変換成功");
-                    }
-                    else
-                    {
-                        //変換失敗の場合は終了
-                        this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
-                        return;
-                    }
-
-                    //アニメーション画像を変更する
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                    ////画像変換
+                    //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
+                    //if (convertImageResult.IsSuccess)
+                    //{
+                    //    //成功の場合は続行
+                    //    CommonLogger.Debug($"画像変換成功");
+                    //}
+                    //else
+                    //{
+                    //    //変換失敗の場合は終了
+                    //    this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
+                    //    return;
+                    //}
+                    //
+                    ////アニメーション画像を変更する
+                    //animationImage.UpdateText(
+                    //    selectFontSize,
+                    //    selectFontColor,
+                    //    displayText,
+                    //    image,
+                    //    convertImageResult.OutputData,
+                    //    convertImageResult.PreviewImage
+                    //    );
+                    //----------
+                    // >> プレビュー画像が不要になったので変換した画像も不要となりました
+                    //アニメーション画像アイテムを更新
                     animationImage.UpdateText(
                         selectFontSize,
                         selectFontColor,
                         displayText,
-                        image,
-                        convertImageResult.OutputData,
-                        convertImageResult.PreviewImage
+                        image
                         );
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
                 }
                 else
                 {
@@ -1362,285 +1292,46 @@ namespace MicroSign
         }
 
         /// <summary>
-        /// ドロップされたファイルの一覧を取得結果
+        /// 画像読込ボタン
         /// </summary>
-        private struct GetDropImageFilesResult
-        {
-            /// <summary>
-            /// 成功フラグ
-            /// </summary>
-            public readonly bool IsSucess;
-
-            /// <summary>
-            /// メッセージ
-            /// </summary>
-            public readonly string Message;
-
-            /// <summary>
-            /// ドロップされた画像ファイルの一覧
-            /// </summary>
-            public readonly string[]? DropImageFiles;
-
-            /// <summary>
-            /// コンストラクタ
-            /// </summary>
-            /// <param name="isSuccess">成功フラグ</param>
-            /// <param name="message">メッセージ</param>
-            /// <param name="dropImageFiles">ドロップされた画像ファイルの一覧</param>
-            private GetDropImageFilesResult(bool isSuccess, string message, string[]? dropImageFiles)
-            {
-                this.IsSucess = isSuccess;
-                this.Message = message;
-                this.DropImageFiles = dropImageFiles;
-            }
-
-            /// <summary>
-            /// 失敗
-            /// </summary>
-            /// <param name="message">メッセージ</param>
-            /// <returns></returns>
-            public static GetDropImageFilesResult Failed(string message)
-            {
-                GetDropImageFilesResult result = new GetDropImageFilesResult(false, message, null);
-                return result;
-            }
-
-            /// <summary>
-            /// 成功
-            /// </summary>
-            /// <param name="dropImageFiles">ドロップされた画像ファイルの一覧</param>
-            /// <returns></returns>
-            public static GetDropImageFilesResult Success(string[]? dropImageFiles)
-            {
-                GetDropImageFilesResult result = new GetDropImageFilesResult(true, string.Empty, dropImageFiles);
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// ドロップされたファイルの一覧を取得
-        /// </summary>
+        /// <param name="sender"></param>
         /// <param name="e"></param>
-        /// <returns></returns>
-        private GetDropImageFilesResult GetDropImageFiles(DragEventArgs e)
+        private void GifLoadButton_Click(object sender, RoutedEventArgs e)
         {
-            //ファイルのドロップか判定
+            try
             {
-                bool isFiles = e.Data.GetDataPresent(DataFormats.FileDrop);
-                if (isFiles)
+                //画像パスを取得
+                string? imagePath = this.SelectGifPath("GIF読込");
                 {
-                    //ファイルの場合は処理続行
-                }
-                else
-                {
-                    //それ以外は処理できないので終了
-                    return GetDropImageFilesResult.Failed("ファイル以外のものがドロップされました");
-                }
-            }
-
-            //ファイルの一覧を取得
-            string[]? files = e.Data.GetData(DataFormats.FileDrop) as string[];
-            if (files == null)
-            {
-                //処理すべきファイルがないので終了
-                return GetDropImageFilesResult.Failed("ファイル一覧がnullでした");
-            }
-            else
-            {
-                //有効の場合は処理続行
-            }
-
-            //ファイル数を取得
-            int n = files.Length;
-            if (CommonConsts.Collection.Empty < n)
-            {
-                //有効の場合は処理続行
-                CommonLogger.Debug($"ドロップファイル数={n}");
-            }
-            else
-            {
-                //処理すべきファイルがないので終了
-                return GetDropImageFilesResult.Failed("ファイル一覧が空でした");
-            }
-
-            //画像ファイルを抽出
-            List<string> dropImageFiles = new List<string>();
-            for (int i = CommonConsts.Index.First; i < n; i += CommonConsts.Index.Step)
-            {
-                //画像ファイル判定
-                // >> ファイル名取得
-                string file = files[i];
-                
-                // >> 拡張子判定
-                try
-                {
-                    Match m = App.Consts.Files.VaridExtensions.Match(file);
-                    if(m.Success)
+                    bool isNull = string.IsNullOrEmpty(imagePath);
+                    if (isNull)
                     {
-                        //成功の場合はリストに追加
-                        dropImageFiles.Add(file);
-                    }
-                    else
-                    {
-                        //失敗の場合は何もしない
-                    }
-                }
-                catch(Exception ex)
-                {
-                    //例外は握りつぶす
-                    CommonLogger.Warn($"ドロップされたファイルの拡張子判定で例外発生 path='{file}'", ex);
-                }
-            }
-
-            //抽出したファイルが存在するか判定
-            {
-                int m = dropImageFiles.Count;
-                if(CommonConsts.Collection.Empty < m)
-                {
-                    //存在する場合は処理続行
-                    CommonLogger.Debug($"画像ファイル数={m}");
-                }
-                else
-                {
-                    //存在しない場合は失敗を返す
-                    return GetDropImageFilesResult.Failed("画像ファイルが存在しません");
-                }
-            }
-
-            //ここまで来たら成功で返す
-            {
-                string[] dropImageFileArray = dropImageFiles.ToArray();
-                return GetDropImageFilesResult.Success(dropImageFileArray);
-            }
-        }
-
-        /// <summary>
-        /// アニメーション画像追加
-        /// </summary>
-        /// <param name="imagePaths">追加するアニメーション画像一覧</param>
-        protected void AddAnimationImages(string[]? imagePaths)
-        {
-            //アニメーション画像一覧有効判定
-            if (imagePaths == null)
-            {
-                //無効の場合は終了
-                CommonLogger.Warn("追加するアニメーション画像一覧が無効です");
-                return;
-            }
-            else
-            {
-                //有効の場合は処理続行
-            }
-
-            //ファイル数を取得
-            int count = imagePaths.Length;
-            if (CommonConsts.Collection.Empty < count)
-            {
-                //1件以上場合は処理続行
-            }
-            else
-            {
-                //0件の場合は終了
-                CommonLogger.Warn("追加するアニメーション画像一覧が空です");
-                return;
-            }
-
-            //デフォルトの表示期間を取得
-            double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
-
-            //2024.04.30:CS)杉原:リリース向けの機能追加 >>>>> ここから
-            //----------
-            // >> そのうちスクロール機能を入れようと思って画像サイズは2の累乗であればなんでも良い仕様にしていましたが
-            // >> パネルが128x32の設定なのに64x64の画像を追加して変換できてしまうのは少々わかりにくい
-            // >> とりあえずパネルのサイズと異なるサイズの画像が有った場合は変換できないようにします
-            //設定されているパネルサイズを取得
-            int panelWidth = this.ViewModel.MatrixLedWidth;
-            int panelHeight = this.ViewModel.MatrixLedHeight;
-            //2024.04.30:CS)杉原:リリース向けの機能追加 <<<<< ここまで
-
-
-            //ファイル名でソートしながら読込
-            IOrderedEnumerable<string> sortedImagePaths = imagePaths.OrderBy(x => x);
-            foreach (string imagePath in sortedImagePaths)
-            {
-                //画像を読込
-                BitmapImage? image = this.ViewModel.GetImage(imagePath);
-                if (image == null)
-                {
-                    //取得出来なかった場合は終了
-                    this.ShowError(CommonLogger.Error($"画像ファイルの読込に失敗しました\npath='{imagePath}'"));
-                    return;
-                }
-                else
-                {
-                    //有効の場合は処理続行
-                    CommonLogger.Info($"画像ファイル読込\npath='{imagePath}'");
-                }
-
-                //2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
-                //----------
-                //読み込みと同時に変換する
-                MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
-                if (convertImageResult.IsSuccess)
-                {
-                    //成功の場合は続行
-                    CommonLogger.Debug($"画像ファイル変換成功");
-                }
-                else
-                {
-                    //変換失敗の場合は終了
-                    this.ShowError(CommonLogger.Error($"画像ファイルの変換に失敗しました\npath='{imagePath}'"));
-                    return;
-                }
-                //2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
-
-                //アニメーション画像アイテムを生成
-                //2023.12.24:CS)杉原:アニメーション画像アイテム種類追加 >>>>> ここから
-                //AnimationImageItem animationImageItem = new AnimationImageItem()
-                //{
-                //    Name = System.IO.Path.GetFileName(imagePath),
-                //    Path = imagePath,
-                //    Image = image,
-                //    DisplayPeriod = defaultDisplayPeriod,
-                //    //2023.11.30:CS)土田:プレビュー表示の改造 >>>>> ここから
-                //    //----------
-                //    OutputData = convertImageResult.OutputData,
-                //    PreviewImage = convertImageResult.PreviewImage,
-                //    //2023.11.30:CS)土田:プレビュー表示の改造 <<<<< ここまで
-                //};
-                //----------
-                AnimationImageItem animationImageItem = AnimationImageItem.FromImageFile(
-                    defaultDisplayPeriod,
-                    imagePath,
-                    image,
-                    convertImageResult.OutputData,
-                    convertImageResult.PreviewImage
-                    );
-                //2023.12.24:CS)杉原:アニメーション画像アイテム種類追加 <<<<< ここまで
-
-                //2024.04.30:CS)杉原:リリース向けの機能追加 >>>>> ここから
-                //----------
-                // >> そのうちスクロール機能を入れようと思って画像サイズは2の累乗であればなんでも良い仕様にしていましたが
-                // >> パネルが128x32の設定なのに64x64の画像を追加して変換できてしまうのは少々わかりにくい
-                // >> とりあえずパネルのサイズと異なるサイズの画像が有った場合は変換できないようにします
-                {
-                    //アニメーション画像が有効の場合適合するか判定
-                    bool isFit = animationImageItem.IsFit(panelWidth, panelHeight);
-                    if (isFit)
-                    {
-                        //適合した場合は処理続行
-                    }
-                    else
-                    {
-                        //適合しない場合は失敗にする
-                        this.ShowWarning(CommonLogger.Warn($"パネルサイズに適合しない画像です\npath='{imagePath}'"));
+                        //取得出来なかった場合は終了
                         return;
                     }
+                    else
+                    {
+                        //有効の場合は処理続行
+                    }
                 }
-                //2024.04.30:CS)杉原:リリース向けの機能追加 <<<<< ここまで
 
-                //リストに追加
-                this.ViewModel.AddAnimationImage(animationImageItem);
+                //GIFアニメーション読込
+                {
+                    var ret = this.ViewModel.LoadGifAnimation(imagePath);
+                    if (ret.IsSuccess)
+                    {
+                        //成功した場合は処理続行
+                    }
+                    else
+                    {
+                        //失敗した場合はメッセージボックス表示
+                        this.ShowWarning(CommonLogger.Warn($"GIFアニメーション設定の読込に失敗しました\n失敗理由：{ret.ErrorMessage}"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.ShowError(CommonLogger.Error("読込で例外発生"), ex);
             }
         }
 

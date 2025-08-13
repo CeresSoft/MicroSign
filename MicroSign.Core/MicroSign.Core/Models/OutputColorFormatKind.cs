@@ -20,5 +20,10 @@ namespace MicroSign.Core.Models
         /// 256色
         /// </summary>
         Color256 = 256,
+
+        /// <summary>
+        /// インデックスカラー
+        /// </summary>
+        IndexColor = 0xFFFF,
     }
 }

@@ -56,12 +56,17 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-                    <Grid Style="{StaticResource InputGridStyle}" Width="80">
+                    <Grid Style="{StaticResource InputGridStyle}" Width="180">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition Height="{StaticResource InputLineSpaceGridLength}"/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="{StaticResource InputLineSpaceGridLength}"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
                         <Button x:Name="AnimationLoadButton" Click="AnimationLoadButton_Click" ToolTip="保存したアニメーション画像を読込ます" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource OperationButtonStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -72,6 +77,7 @@
                                 <TextBlock Text="開く" Grid.Column="1"/>
                             </Grid>
                         </Button>
+                        
                         <Button x:Name="AnimationSaveButton" Click="AnimationSaveButton_Click" ToolTip="登録されているアニメーション画像を保存します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource OperationButtonStyle}" Grid.Row="2">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -82,6 +88,18 @@
                                 <TextBlock Text="保存" Grid.Column="1"/>
                             </Grid>
                         </Button>
+
+                        <Button Grid.Column="2" Grid.RowSpan="3" x:Name="GifLoadButton" Click="GifLoadButton_Click" ToolTip="GIFアニメーションを読込します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource OperationButtonStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE8E5;" Style="{StaticResource IconButtonIconTextBlockStyle}"/>
+                                <TextBlock Text="GIF読込" Grid.Column="1"/>
+                            </Grid>
+                        </Button>
+
                     </Grid>
 
                     <Border Style="{StaticResource VerticalSplitStyle}"/>
@@ -207,21 +225,18 @@
                         <ColumnDefinition Width="80"/>
                         <ColumnDefinition Width="2"/>
                         <ColumnDefinition Width="80"/>
-                        <ColumnDefinition Width="2"/>
-                        <ColumnDefinition Width="80"/>
-                        <ColumnDefinition Width="6"/>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition Width="2"/>
+                        <ColumnDefinition/>
                         <ColumnDefinition Width="40"/>
                         <ColumnDefinition/>
-                        <ColumnDefinition Width="2"/>
                         <ColumnDefinition Width="100"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="2"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Button x:Name="AddAnimationImageButton" Click="AddAnimationImageButton_Click" ToolTip="アニメーション画像を登録します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}" Background="{StaticResource Accent.Foreground}">
+                    <Button x:Name="AddAnimationImageButton" Grid.Row="0" Grid.Column="0" Click="AddAnimationImageButton_Click" ToolTip="アニメーション画像を登録します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}" Background="{StaticResource Accent.Foreground}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -231,7 +246,8 @@
                             <TextBlock Text="追加" Grid.Column="1"/>
                         </Grid>
                     </Button>
-                    <Button x:Name="AddAnimationTextButton" Grid.Column="2"  Click="AddAnimationTextButton_Click" ToolTip="アニメーションに文字を登録します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}" Background="{StaticResource Accent.Foreground}">
+                    
+                    <Button x:Name="AddAnimationTextButton" Grid.Row="2" Grid.Column="0"  Click="AddAnimationTextButton_Click" ToolTip="アニメーションに文字を登録します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}" Background="{StaticResource Accent.Foreground}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -241,7 +257,8 @@
                             <TextBlock Text="文字" Grid.Column="1"/>
                         </Grid>
                     </Button>
-                    <Button x:Name="RemoveAnimationImageButton" Grid.Column="4" Click="RemoveAnimationImageButton_Click" ToolTip="選択しているアニメーション画像を削除します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}">
+                    
+                    <Button x:Name="RemoveAnimationImageButton" Grid.Row="0" Grid.Column="2" Click="RemoveAnimationImageButton_Click" ToolTip="選択しているアニメーション画像を削除します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -251,13 +268,27 @@
                             <TextBlock Text="削除" Grid.Column="1"/>
                         </Grid>
                     </Button>
-                    <Button x:Name="UpAnimationImageButton" Click="UpAnimationImageButton_Click" ToolTip="選択しているアニメーション画像を上(前)に移動します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}" Grid.Column="6">
+
+                    <Button x:Name="RemoveAllAnimationImageButton" Grid.Row="2" Grid.Column="2" Click="RemoveAllAnimationImageButton_Click" ToolTip="選択しているアニメーション画像を削除します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xE738;" Style="{StaticResource IconButtonIconTextBlockStyle}"/>
+                            <TextBlock Text="全削除" Grid.Column="1"/>
+                        </Grid>
+                    </Button>
+
+                    <Button x:Name="UpAnimationImageButton" Grid.Row="0" Grid.Column="4" Click="UpAnimationImageButton_Click" ToolTip="選択しているアニメーション画像を上(前)に移動します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}">
                         <TextBlock Text="&#xE74A;" Style="{StaticResource IconButtonIconTextBlockStyle}"/>
                     </Button>
-                    <Button x:Name="DownAnimationImageButton" Click="DownAnimationImageButton_Click" ToolTip="選択しているアニメーション画像を下(後)に移動します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}" Grid.Column="8">
+
+                    <Button x:Name="DownAnimationImageButton" Grid.Row="2" Grid.Column="4" Click="DownAnimationImageButton_Click" ToolTip="選択しているアニメーション画像を下(後)に移動します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}">
                         <TextBlock Text="&#xE74B;" Style="{StaticResource IconButtonIconTextBlockStyle}"/>
                     </Button>
-                    <Button x:Name="RefreshButton" Click="RefreshButton_Click" ToolTip="登録されているアニメーション画像の画像を再取得します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}" Grid.Column="11">
+                    
+                    <Button x:Name="RefreshButton" Grid.Row="0" Grid.Column="6" Click="RefreshButton_Click" ToolTip="登録されているアニメーション画像の画像を再取得します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource AnimationEditButtonStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -349,8 +380,10 @@
                         <ColumnDefinition Width="80"/>
                     </Grid.ColumnDefinitions>
 
+                    <!--2025.08.12:CS)杉原:変換結果削除 ここから
                     <RadioButton x:Name="OriginalTabButton" Style="{StaticResource TabRadioButtonStyle}" Content="オリジナル" Grid.Column="1" IsChecked="True"/>
                     <RadioButton x:Name="PreviewTabButton" Style="{StaticResource TabRadioButtonStyle}" Content="変換結果" Grid.Column="3"/>
+                    ここまで -->
                 </Grid>
                 <Grid Background="{StaticResource Group.Background}" Grid.Row="2">
                     <Grid.ColumnDefinitions>
@@ -366,7 +399,9 @@
 
                     <!--<Image x:Name="LoadImage" Grid.Row="1" Source="{Binding LoadImage}" Grid.Column="1"/>-->
                     <Image x:Name="SelectedOriginalImage" Source="{Binding SelectedAnimationImageItem.Image}" Grid.Row="1" Grid.Column="1" Visibility="{Binding IsChecked, Converter={StaticResource TrueVisibleValueConverter}, ElementName=OriginalTabButton}"/>
+                    <!--2025.08.12:CS)杉原:変換結果削除 ここから
                     <Image x:Name="SelectedPreviewImage" Source="{Binding SelectedAnimationImageItem.PreviewImage}" Grid.Row="1" Grid.Column="1" Visibility="{Binding IsChecked, Converter={StaticResource TrueVisibleValueConverter}, ElementName=PreviewTabButton}"/>
+                    ここまで -->
                 </Grid>
             </Grid>
 

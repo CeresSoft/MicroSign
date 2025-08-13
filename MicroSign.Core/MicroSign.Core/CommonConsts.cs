@@ -498,5 +498,81 @@ namespace MicroSign.Core
             /// </summary>
             public static System.Windows.Point Zero = new System.Windows.Point(0, 0);
         }
+
+        /// <summary>
+        /// 時間関連
+        /// </summary>
+        public static class Time
+        {
+            /// <summary>
+            /// GIFの遅延時間単位(1単位=10ms)
+            /// </summary>
+            public const int GifUnitTime = 10;
+
+            /// <summary>
+            /// ゼロ値
+            /// </summary>
+            public const int Zero = 0;
+        }
+
+        /// <summary>
+        /// ファイル関連
+        /// </summary>
+        public static class File
+        {
+            /// <summary>
+            /// ゼロプレース
+            /// </summary>
+            public static readonly string ZeroPrace = "0";
+
+            /// <summary>
+            /// PNGファイルフォーマット
+            /// </summary>
+            public static readonly string PngFileFormat = "{0}.png";
+
+
+        }
+
+        /// <summary>
+        /// パレット関連
+        /// </summary>
+        /// <remarks>
+        /// 2025.08.11:CS)杉原:インデックスカラー対応修正
+        /// </remarks>
+        public static class  Palettes
+        {
+            /// <summary>
+            /// パレット数
+            /// </summary>
+            public static class Count
+            {
+                /// <summary>
+                /// 空
+                /// </summary>
+                public static readonly int Zero = 0;
+
+                /// <summary>
+                /// 最小値
+                /// </summary>
+                public static readonly int Min = 1;
+
+                /// <summary>
+                /// 最大値
+                /// </summary>
+                public static readonly int Max = 256;
+            }
+
+            /// <summary>
+            /// 色関連
+            /// </summary>
+            public static class Colors
+            {
+                /// <summary>
+                /// アルファの最大値
+                /// </summary>
+                public static readonly int AlphaMax = 255;
+            }
+
+        }
     }
 }
