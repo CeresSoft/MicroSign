@@ -469,209 +469,218 @@ namespace MicroSign.Core.Models
                 //最大画像データサイズ以内の場合は続行
             }
 
-            //マージ画像生成先
-            WriteableBitmap margeBitmap = new WriteableBitmap(margeImageWicth, margeImageHeight, CommonConsts.DPIs.DIP, CommonConsts.DPIs.DIP, PixelFormats.Bgra32, null);
-
-            //画像をマージ
+            try
             {
-                //1ピクセルのバイト数
-                // >> RGBA 32bit固定の書き方 32/8=4になります
-                // >> ほかのピクセルフォーマットに対応する場合はここのコードを変更してください
-                int byteParPixel = PixelFormats.Bgra32.BitsPerPixel / CommonConsts.BitCount.BYTE;
 
-                //アニメーション画像のバイナリデータ取得先バッファを生成
-                int imagePixelStride = imageWidth * byteParPixel;
-                int bgra32Size = imagePixelStride * imageHeight;
-                byte[] bgra32 = new byte[bgra32Size];
+                //マージ画像生成先
+                WriteableBitmap margeBitmap = new WriteableBitmap(margeImageWicth, margeImageHeight, CommonConsts.DPIs.DIP, CommonConsts.DPIs.DIP, PixelFormats.Bgra32, null);
 
-                //画像の行位置
-                int r = CommonConsts.Index.First;
-
-                //画像の列位置
-                int c = CommonConsts.Index.First;
-
-                //アニメーション画像でループ
-                for (int i = CommonConsts.Index.First; i < normalizeAnimationImageCount; i += CommonConsts.Index.Step)
+                //画像をマージ
                 {
-                    //アニメーション画像位置(=重複を除いたアニメーション画像)を取得
-                    AnimationImagePoint animationImagePoinr = animationImagePoints[i];
-                    if (animationImagePoinr == null)
+                    //1ピクセルのバイト数
+                    // >> RGBA 32bit固定の書き方 32/8=4になります
+                    // >> ほかのピクセルフォーマットに対応する場合はここのコードを変更してください
+                    int byteParPixel = PixelFormats.Bgra32.BitsPerPixel / CommonConsts.BitCount.BYTE;
+
+                    //アニメーション画像のバイナリデータ取得先バッファを生成
+                    int imagePixelStride = imageWidth * byteParPixel;
+                    int bgra32Size = imagePixelStride * imageHeight;
+                    byte[] bgra32 = new byte[bgra32Size];
+
+                    //画像の行位置
+                    int r = CommonConsts.Index.First;
+
+                    //画像の列位置
+                    int c = CommonConsts.Index.First;
+
+                    //アニメーション画像でループ
+                    for (int i = CommonConsts.Index.First; i < normalizeAnimationImageCount; i += CommonConsts.Index.Step)
+                    {
+                        //アニメーション画像位置(=重複を除いたアニメーション画像)を取得
+                        AnimationImagePoint animationImagePoinr = animationImagePoints[i];
+                        if (animationImagePoinr == null)
+                        {
+                            //無効の場合は即終了
+                            return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像位置(No.{CommonConsts.Index.ToCount(i)})が無効です");
+                        }
+                        else
+                        {
+                            //有効の場合は処理続行
+                        }
+
+                        //画像を取得
+                        BitmapSource? bmp = animationImagePoinr.SourceImage;
+                        if (bmp == null)
+                        {
+                            //無効の場合は即終了
+                            return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像位置(No.{CommonConsts.Index.ToCount(i)})の画像が無効です");
+                        }
+                        else
+                        {
+                            //有効の場合は処理続行
+                        }
+
+                        //画像フォーマットをBgra32に変換
+                        // >> https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/graphics-multimedia/how-to-convert-a-bitmapsource-to-a-different-pixelformat?view=netframeworkdesktop-4.8&viewFallbackFrom=netdesktop-6.0
+                        FormatConvertedBitmap newFormatedBitmapSource = new FormatConvertedBitmap();
+                        newFormatedBitmapSource.BeginInit();
+                        newFormatedBitmapSource.Source = bmp;
+                        newFormatedBitmapSource.DestinationFormat = PixelFormats.Bgra32;
+                        newFormatedBitmapSource.EndInit();
+                        newFormatedBitmapSource.Freeze();
+
+                        //画像取得
+                        newFormatedBitmapSource.CopyPixels(bgra32, imagePixelStride, CommonConsts.Index.First);
+
+                        //マージ画像先に設定
+                        // >> X位置
+                        int x = c * imageWidth;
+                        // >> Y位置
+                        int y = r * imageHeight;
+                        // >> マージ画像に描写
+                        {
+                            Int32Rect rect = new Int32Rect(x, y, imageWidth, imageHeight);
+                            margeBitmap.WritePixels(rect, bgra32, imagePixelStride, CommonConsts.Index.First);
+                        }
+
+                        //アニメーション画像位置の画像開始位置を設定
+                        animationImagePoinr.SetPoint(x, y);
+
+                        //画像マージ先位置更新
+                        c += CommonConsts.Index.Step;
+                        if (c < columnCount)
+                        {
+                            //範囲内の場合はそのまま
+                        }
+                        else
+                        {
+                            //範囲外になったら1行下にする
+                            c = CommonConsts.Index.First;
+                            r += CommonConsts.Index.Step;
+                        }
+                    }
+
+                    //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 >>>>> ここから
+                    //----------
+                    //余白を最後のフレームで埋める
+                    // >> WriteableBitmapは何も書き込まないと透明(ARGBすべて0)のままとなる
+                    //    アニメーション画像に透明が含まれない場合、マージ画像全体の色数は
+                    //    [アニメーション画像で使用した色] + [WriteableBitmapの初期色]
+                    //    となり、不要な1色が増えてしまう
+                    //最大行数を計算
+                    int maxRowCount = margeImageHeight / imageHeight;
+
+                    //マージ画像の最大フレーム数を計算
+                    int maxFrameCount = maxColumnCount * maxRowCount;
+
+                    //描画済みのフレームの次から、残りのフレームを埋める
+                    for (int i = normalizeAnimationImageCount; i < maxFrameCount; i += CommonConsts.Index.Step)
+                    {
+                        //マージ画像先に設定
+                        // >> X位置
+                        int x = c * imageWidth;
+                        // >> Y位置
+                        int y = r * imageHeight;
+                        // >> マージ画像に描写
+                        // >> >> bgra32には最後のフレームのデータが残っている
+                        {
+                            Int32Rect rect = new Int32Rect(x, y, imageWidth, imageHeight);
+                            margeBitmap.WritePixels(rect, bgra32, imagePixelStride, CommonConsts.Index.First);
+                        }
+
+                        //画像マージ先位置更新
+                        c += CommonConsts.Index.Step;
+                        if (c < columnCount)
+                        {
+                            //範囲内の場合はそのまま
+                        }
+                        else
+                        {
+                            //範囲外になったら1行下にする
+                            c = CommonConsts.Index.First;
+                            r += CommonConsts.Index.Step;
+                        }
+                    }
+                    //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 <<<<< ここまで
+                }
+
+                //アニメーションデータコレクション生成
+                AnimationDataCollection animationDatas = new AnimationDataCollection();
+                for (int i = CommonConsts.Index.First; i < allAnimationImageCount; i += CommonConsts.Index.Step)
+                {
+                    //アニメーション画像を取得
+                    AnimationImageItem animationImage = animationImages[i];
+                    if (animationImage == null)
                     {
                         //無効の場合は即終了
-                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像位置(No.{CommonConsts.Index.ToCount(i)})が無効です");
+                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像(No.{CommonConsts.Index.ToCount(i)})が無効です");
                     }
                     else
                     {
                         //有効の場合は処理続行
                     }
 
-                    //画像を取得
-                    BitmapSource? bmp = animationImagePoinr.SourceImage;
-                    if (bmp == null)
+                    //画像パスを取得
+                    // >> nullでも良い。次のアニメーション画像位置の検索でnullになります
+                    string? imagePath = animationImage.Path;
+
+                    //対応するアニメーション画像位置を検索
+                    //2023.12.24:CS)杉原:テキストの場合画像パスが無いので出力データだけで判定する >>>>> ここから
+                    //AnimationImagePoint? animationImagePoint = animationImagePoints.FindAnimationImagePoint(imagePath);
+                    //----------
+                    AnimationImagePoint? animationImagePoint = animationImagePoints.FindAnimationImagePoint(animationImage);
+                    //2023.12.24:CS)杉原:テキストの場合画像パスが無いので出力データだけで判定する <<<<< ここまで
+
+                    if (animationImagePoint == null)
                     {
-                        //無効の場合は即終了
-                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像位置(No.{CommonConsts.Index.ToCount(i)})の画像が無効です");
+                        //無効の場合は速終了
+                        return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像(No.{CommonConsts.Index.ToCount(i)})に対応する位置が取得出来ませんでした");
                     }
                     else
                     {
                         //有効の場合は処理続行
                     }
 
-                    //画像フォーマットをBgra32に変換
-                    // >> https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/graphics-multimedia/how-to-convert-a-bitmapsource-to-a-different-pixelformat?view=netframeworkdesktop-4.8&viewFallbackFrom=netdesktop-6.0
-                    FormatConvertedBitmap newFormatedBitmapSource = new FormatConvertedBitmap();
-                    newFormatedBitmapSource.BeginInit();
-                    newFormatedBitmapSource.Source = bmp;
-                    newFormatedBitmapSource.DestinationFormat = PixelFormats.Bgra32;
-                    newFormatedBitmapSource.EndInit();
-                    newFormatedBitmapSource.Freeze();
+                    //アニメーション画像位置を取得
+                    int x = animationImagePoint.X;
+                    int y = animationImagePoint.Y;
 
-                    //画像取得
-                    newFormatedBitmapSource.CopyPixels(bgra32, imagePixelStride, CommonConsts.Index.First);
-
-                    //マージ画像先に設定
-                    // >> X位置
-                    int x = c * imageWidth;
-                    // >> Y位置
-                    int y = r * imageHeight;
-                    // >> マージ画像に描写
+                    //表示秒数をミリ秒で取得
+                    TimeSpan ts = TimeSpan.FromSeconds(animationImage.DisplayPeriod);
+                    int displayPeriodMilliSecond = (int)ts.TotalMilliseconds;
+                    // >> 最小値判定
+                    if (displayPeriodMilliSecond < MicroSignConsts.DisplayPeriods.Min)
                     {
-                        Int32Rect rect = new Int32Rect(x, y, imageWidth, imageHeight);
-                        margeBitmap.WritePixels(rect, bgra32, imagePixelStride, CommonConsts.Index.First);
-                    }
-
-                    //アニメーション画像位置の画像開始位置を設定
-                    animationImagePoinr.SetPoint(x, y);
-
-                    //画像マージ先位置更新
-                    c += CommonConsts.Index.Step;
-                    if (c < columnCount)
-                    {
-                        //範囲内の場合はそのまま
+                        //最小値未満は最小値にする
+                        displayPeriodMilliSecond = MicroSignConsts.DisplayPeriods.Min;
                     }
                     else
                     {
-                        //範囲外になったら1行下にする
-                        c = CommonConsts.Index.First;
-                        r += CommonConsts.Index.Step;
+                        //それ以外は処理続行
                     }
-                }
-
-                //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 >>>>> ここから
-                //----------
-                //余白を最後のフレームで埋める
-                // >> WriteableBitmapは何も書き込まないと透明(ARGBすべて0)のままとなる
-                //    アニメーション画像に透明が含まれない場合、マージ画像全体の色数は
-                //    [アニメーション画像で使用した色] + [WriteableBitmapの初期色]
-                //    となり、不要な1色が増えてしまう
-                //最大行数を計算
-                int maxRowCount = margeImageHeight / imageHeight;
-
-                //マージ画像の最大フレーム数を計算
-                int maxFrameCount = maxColumnCount * maxRowCount;
-
-                //描画済みのフレームの次から、残りのフレームを埋める
-                for (int i = normalizeAnimationImageCount; i < maxFrameCount; i += CommonConsts.Index.Step)
-                {
-                    //マージ画像先に設定
-                    // >> X位置
-                    int x = c * imageWidth;
-                    // >> Y位置
-                    int y = r * imageHeight;
-                    // >> マージ画像に描写
-                    // >> >> bgra32には最後のフレームのデータが残っている
+                    // >> 最大値判定
+                    if (MicroSignConsts.DisplayPeriods.Max < displayPeriodMilliSecond)
                     {
-                        Int32Rect rect = new Int32Rect(x, y, imageWidth, imageHeight);
-                        margeBitmap.WritePixels(rect, bgra32, imagePixelStride, CommonConsts.Index.First);
-                    }
-
-                    //画像マージ先位置更新
-                    c += CommonConsts.Index.Step;
-                    if (c < columnCount)
-                    {
-                        //範囲内の場合はそのまま
+                        //最大値超過は最大値にする
+                        displayPeriodMilliSecond = MicroSignConsts.DisplayPeriods.Max;
                     }
                     else
                     {
-                        //範囲外になったら1行下にする
-                        c = CommonConsts.Index.First;
-                        r += CommonConsts.Index.Step;
+                        //それ以外は処理続行
                     }
+
+                    //アニメーションデータに追加
+                    animationDatas.AddAnimation(x, y, displayPeriodMilliSecond);
                 }
-                //2025.08.06:CS)土田:マージ画像にインデックスカラー以外が残る問題の修正 <<<<< ここまで
+
+                //ここまで来たら成功
+                return CreateAnimationMergedBitmapResult.Success(margeBitmap, animationDatas);
             }
-
-            //アニメーションデータコレクション生成
-            AnimationDataCollection animationDatas = new AnimationDataCollection();
-            for(int i = CommonConsts.Index.First; i < allAnimationImageCount; i+= CommonConsts.Index.Step)
+            catch (Exception ex)
             {
-                //アニメーション画像を取得
-                AnimationImageItem animationImage = animationImages[i];
-                if(animationImage == null)
-                {
-                    //無効の場合は即終了
-                    return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像(No.{CommonConsts.Index.ToCount(i)})が無効です");
-                }
-                else
-                {
-                    //有効の場合は処理続行
-                }
-
-                //画像パスを取得
-                // >> nullでも良い。次のアニメーション画像位置の検索でnullになります
-                string? imagePath = animationImage.Path;
-
-                //対応するアニメーション画像位置を検索
-                //2023.12.24:CS)杉原:テキストの場合画像パスが無いので出力データだけで判定する >>>>> ここから
-                //AnimationImagePoint? animationImagePoint = animationImagePoints.FindAnimationImagePoint(imagePath);
-                //----------
-                AnimationImagePoint? animationImagePoint = animationImagePoints.FindAnimationImagePoint(animationImage);
-                //2023.12.24:CS)杉原:テキストの場合画像パスが無いので出力データだけで判定する <<<<< ここまで
-
-                if (animationImagePoint == null)
-                {
-                    //無効の場合は速終了
-                    return CreateAnimationMergedBitmapResult.Failed($"アニメーション画像(No.{CommonConsts.Index.ToCount(i)})に対応する位置が取得出来ませんでした");
-                }
-                else
-                {
-                    //有効の場合は処理続行
-                }
-
-                //アニメーション画像位置を取得
-                int x = animationImagePoint.X;
-                int y = animationImagePoint.Y;
-
-                //表示秒数をミリ秒で取得
-                TimeSpan ts = TimeSpan.FromSeconds(animationImage.DisplayPeriod);
-                int displayPeriodMilliSecond = (int)ts.TotalMilliseconds;
-                // >> 最小値判定
-                if (displayPeriodMilliSecond < MicroSignConsts.DisplayPeriods.Min)
-                {
-                    //最小値未満は最小値にする
-                    displayPeriodMilliSecond = MicroSignConsts.DisplayPeriods.Min;
-                }
-                else
-                {
-                    //それ以外は処理続行
-                }
-                // >> 最大値判定
-                if (MicroSignConsts.DisplayPeriods.Max < displayPeriodMilliSecond)
-                {
-                    //最大値超過は最大値にする
-                    displayPeriodMilliSecond = MicroSignConsts.DisplayPeriods.Max;
-                }
-                else
-                {
-                    //それ以外は処理続行
-                }
-
-                //アニメーションデータに追加
-                animationDatas.AddAnimation(x, y, displayPeriodMilliSecond);
+                //例外は握りつぶす
+                return CreateAnimationMergedBitmapResult.Failed(CommonLogger.Warn("マージ画像生成で例外発生", ex));
             }
-
-            //ここまで来たら成功
-            return CreateAnimationMergedBitmapResult.Success(margeBitmap, animationDatas);
         }
 
         /// <summary>

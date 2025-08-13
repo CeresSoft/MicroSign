@@ -96,43 +96,51 @@ namespace MicroSign.Core.Models
                 //有効の場合は処理続行
             }
 
-            //GifBitmapEncoderを作成する
-            GifBitmapEncoder encoder = new GifBitmapEncoder();
-
-            //ビットマップフレームを作成
-            BitmapFrame bmpFrame = BitmapFrame.Create(image);
-
-            //GifBitmapEncoderにビットマップフレームを追加
-            encoder.Frames.Add(bmpFrame);
-
-            //変換
-            using (MemoryStream ms = new MemoryStream())
+            try
             {
-                //GifBitmapEncoderをメモリーストリームに保存
-                encoder.Save(ms);
+                //GifBitmapEncoderを作成する
+                GifBitmapEncoder encoder = new GifBitmapEncoder();
 
-                //メモリーストリームを先頭に移動
-                ms.Seek(CommonConsts.Index.First, SeekOrigin.Begin);
+                //ビットマップフレームを作成
+                BitmapFrame bmpFrame = BitmapFrame.Create(image);
 
-                //メモリーストリームからBitmapSourceを生成
-                BitmapImage colorReductionimage = new BitmapImage();
+                //GifBitmapEncoderにビットマップフレームを追加
+                encoder.Frames.Add(bmpFrame);
 
-                // >> https://pierre3.hatenablog.com/entry/2015/10/25/001207
-                // >> BitmapImage.StreamSourceに渡したStreamは解除できない(=nullを渡しても解除できない)ので
-                // >>  Streamをラップし、ラップしたStreamのDispose
-                using (ImageDataStream ids = new ImageDataStream(ms))
+                //変換
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    colorReductionimage.BeginInit();
-                    colorReductionimage.CacheOption = BitmapCacheOption.OnLoad;
-                    colorReductionimage.CreateOptions = BitmapCreateOptions.None;
-                    colorReductionimage.StreamSource = ids;
+                    //GifBitmapEncoderをメモリーストリームに保存
+                    encoder.Save(ms);
 
-                    colorReductionimage.EndInit();
-                    colorReductionimage.Freeze();
+                    //メモリーストリームを先頭に移動
+                    ms.Seek(CommonConsts.Index.First, SeekOrigin.Begin);
+
+                    //メモリーストリームからBitmapSourceを生成
+                    BitmapImage colorReductionimage = new BitmapImage();
+
+                    // >> https://pierre3.hatenablog.com/entry/2015/10/25/001207
+                    // >> BitmapImage.StreamSourceに渡したStreamは解除できない(=nullを渡しても解除できない)ので
+                    // >>  Streamをラップし、ラップしたStreamのDispose
+                    using (ImageDataStream ids = new ImageDataStream(ms))
+                    {
+                        colorReductionimage.BeginInit();
+                        colorReductionimage.CacheOption = BitmapCacheOption.OnLoad;
+                        colorReductionimage.CreateOptions = BitmapCreateOptions.None;
+                        colorReductionimage.StreamSource = ids;
+
+                        colorReductionimage.EndInit();
+                        colorReductionimage.Freeze();
+                    }
+
+                    //終了
+                    return ConvertBitmapColorReductionResult.Success(colorReductionimage);
                 }
-
-                //終了
-                return ConvertBitmapColorReductionResult.Success(colorReductionimage);
+            }
+            catch (Exception ex)
+            {
+                //例外は握りつぶす
+                return ConvertBitmapColorReductionResult.Failed(CommonLogger.Warn("減色処理で例外発生", ex));
             }
         }
     }

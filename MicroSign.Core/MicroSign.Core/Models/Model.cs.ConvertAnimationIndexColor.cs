@@ -754,110 +754,118 @@ namespace MicroSign.Core.Models
                 //有効の場合は処理続行
             }
 
-            //画像ピクセル取得
-            // >> 検証済の値を取得
-            int imagePixelWidth = image.PixelWidth;
-            int imagePixelHeight = image.PixelHeight;
-
-            //画像フォーマットを変換
-            // >> https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/graphics-multimedia/how-to-convert-a-bitmapsource-to-a-different-pixelformat?view=netframeworkdesktop-4.8&viewFallbackFrom=netdesktop-6.0
-            FormatConvertedBitmap newFormatedBitmapSource = new FormatConvertedBitmap();
-            newFormatedBitmapSource.BeginInit();
-            newFormatedBitmapSource.Source = image;
-            newFormatedBitmapSource.DestinationFormat = PixelFormats.Bgra32;
-            newFormatedBitmapSource.EndInit();
-            newFormatedBitmapSource.Freeze();
-
-            //1ピクセルのバイト数
-            // >> RGBA 32bit固定の書き方 32/8=4になります
-            // >> ほかのピクセルフォーマットに対応する場合はここのコードを変更してください
-            int byteParPixel = newFormatedBitmapSource.DestinationFormat.BitsPerPixel / CommonConsts.BitCount.BYTE;
-
-            //画像のストライドを計算
-            int imagePixelStride = imagePixelWidth * byteParPixel;
-
-            //画像取得
-            int bgra32Size = imagePixelStride * imagePixelHeight;
-            byte[] bgra32 = new byte[bgra32Size];
-            newFormatedBitmapSource.CopyPixels(bgra32, imagePixelStride, CommonConsts.Index.First);
-
-            //変換後の画像生成先
-            // >> インデックスカラー版では元画像をそのまま使う
-            byte[] outputImage = bgra32;
-
-            //出力データ生成先
-            int outputSize = imagePixelHeight * imagePixelWidth;
-            byte[] outputData = new byte[outputSize];
-
-            //パレット生成先
-            IndexColorCollection colors = new IndexColorCollection();
-
-            //Y座標ループ
-            for (int y = CommonConsts.Index.First; y < imagePixelHeight; y += CommonConsts.Index.Step)
+            try
             {
-                //X軸ループ
-                for (int x = CommonConsts.Index.First; x < imagePixelWidth; x += CommonConsts.Index.Step)
+                //画像ピクセル取得
+                // >> 検証済の値を取得
+                int imagePixelWidth = image.PixelWidth;
+                int imagePixelHeight = image.PixelHeight;
+
+                //画像フォーマットを変換
+                // >> https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/graphics-multimedia/how-to-convert-a-bitmapsource-to-a-different-pixelformat?view=netframeworkdesktop-4.8&viewFallbackFrom=netdesktop-6.0
+                FormatConvertedBitmap newFormatedBitmapSource = new FormatConvertedBitmap();
+                newFormatedBitmapSource.BeginInit();
+                newFormatedBitmapSource.Source = image;
+                newFormatedBitmapSource.DestinationFormat = PixelFormats.Bgra32;
+                newFormatedBitmapSource.EndInit();
+                newFormatedBitmapSource.Freeze();
+
+                //1ピクセルのバイト数
+                // >> RGBA 32bit固定の書き方 32/8=4になります
+                // >> ほかのピクセルフォーマットに対応する場合はここのコードを変更してください
+                int byteParPixel = newFormatedBitmapSource.DestinationFormat.BitsPerPixel / CommonConsts.BitCount.BYTE;
+
+                //画像のストライドを計算
+                int imagePixelStride = imagePixelWidth * byteParPixel;
+
+                //画像取得
+                int bgra32Size = imagePixelStride * imagePixelHeight;
+                byte[] bgra32 = new byte[bgra32Size];
+                newFormatedBitmapSource.CopyPixels(bgra32, imagePixelStride, CommonConsts.Index.First);
+
+                //変換後の画像生成先
+                // >> インデックスカラー版では元画像をそのまま使う
+                byte[] outputImage = bgra32;
+
+                //出力データ生成先
+                int outputSize = imagePixelHeight * imagePixelWidth;
+                byte[] outputData = new byte[outputSize];
+
+                //パレット生成先
+                IndexColorCollection colors = new IndexColorCollection();
+
+                //Y座標ループ
+                for (int y = CommonConsts.Index.First; y < imagePixelHeight; y += CommonConsts.Index.Step)
                 {
-                    //インデックス計算
-                    int index = (y * imagePixelStride) + (x * byteParPixel);
-                    int blueIndex = index;
-                    int greenIndex = blueIndex + CommonConsts.Index.Step;
-                    int redIndex = greenIndex + CommonConsts.Index.Step;
-                    int alphaIndex = redIndex + CommonConsts.Index.Step;
-
-                    //透明値
-                    int alphaValue = bgra32[alphaIndex];
-                    int redValue = bgra32[redIndex];
-                    int greenValue = bgra32[greenIndex];
-                    int blueValue = bgra32[blueIndex];
-
-                    //色値
-                    // >> アルファが効いた状態にする
-                    int B = this.CalcColor(blueValue, alphaValue);
-                    int G = this.CalcColor(greenValue, alphaValue);
-                    int R = this.CalcColor(redValue, alphaValue);
-                    int A = CommonConsts.Palettes.Colors.AlphaMax;  //アルファは常に最大値(=無効)にする
-
-                    //インデックスカラー生成
-                    IndexColor color = new IndexColor(A, R, G, B);
-
-                    //パレット登録
-                    // >> 色が重複する場合、先に登録されている色のインデックスが返る
-                    int colorIndex = colors.AddColor(color);
-                    if (colorIndex < CommonConsts.Index.First)
+                    //X軸ループ
+                    for (int x = CommonConsts.Index.First; x < imagePixelWidth; x += CommonConsts.Index.Step)
                     {
-                        //パレット登録失敗の場合は変換失敗
-                        return ConvertAnimationIndexColor_GetColorDataResult.Failed($"色インデックスが無効 (index={colorIndex})");
-                    }
-                    else
-                    {
-                        //パレット登録成功の場合は続行
-                    }
+                        //インデックス計算
+                        int index = (y * imagePixelStride) + (x * byteParPixel);
+                        int blueIndex = index;
+                        int greenIndex = blueIndex + CommonConsts.Index.Step;
+                        int redIndex = greenIndex + CommonConsts.Index.Step;
+                        int alphaIndex = redIndex + CommonConsts.Index.Step;
 
-                    //インデックス最大値判定
-                    if (colorIndex < CommonConsts.Palettes.Count.Max)
-                    {
-                        //パレット最大値未満の場合は処理続行
-                    }
-                    else
-                    {
-                        //パレット最大値以上の場合はエラー
-                        return ConvertAnimationIndexColor_GetColorDataResult.Failed($"色インデックスが最大値超過です (index={colorIndex})");
-                    }
+                        //透明値
+                        int alphaValue = bgra32[alphaIndex];
+                        int redValue = bgra32[redIndex];
+                        int greenValue = bgra32[greenIndex];
+                        int blueValue = bgra32[blueIndex];
 
-                    //パレット番号を変換後データ設定先に設定
-                    {
-                        //データの位置を計算
-                        int i = (y * imagePixelWidth) + x;
+                        //色値
+                        // >> アルファが効いた状態にする
+                        int B = this.CalcColor(blueValue, alphaValue);
+                        int G = this.CalcColor(greenValue, alphaValue);
+                        int R = this.CalcColor(redValue, alphaValue);
+                        int A = CommonConsts.Palettes.Colors.AlphaMax;  //アルファは常に最大値(=無効)にする
 
-                        //インデックス設定
-                        outputData[i] = (byte)colorIndex;
+                        //インデックスカラー生成
+                        IndexColor color = new IndexColor(A, R, G, B);
+
+                        //パレット登録
+                        // >> 色が重複する場合、先に登録されている色のインデックスが返る
+                        int colorIndex = colors.AddColor(color);
+                        if (colorIndex < CommonConsts.Index.First)
+                        {
+                            //パレット登録失敗の場合は変換失敗
+                            return ConvertAnimationIndexColor_GetColorDataResult.Failed($"色インデックスが無効 (index={colorIndex})");
+                        }
+                        else
+                        {
+                            //パレット登録成功の場合は続行
+                        }
+
+                        //インデックス最大値判定
+                        if (colorIndex < CommonConsts.Palettes.Count.Max)
+                        {
+                            //パレット最大値未満の場合は処理続行
+                        }
+                        else
+                        {
+                            //パレット最大値以上の場合はエラー
+                            return ConvertAnimationIndexColor_GetColorDataResult.Failed($"色インデックスが最大値超過です (index={colorIndex})");
+                        }
+
+                        //パレット番号を変換後データ設定先に設定
+                        {
+                            //データの位置を計算
+                            int i = (y * imagePixelWidth) + x;
+
+                            //インデックス設定
+                            outputData[i] = (byte)colorIndex;
+                        }
                     }
                 }
-            }
 
-            //ここまで来たら成功で終了
-            return ConvertAnimationIndexColor_GetColorDataResult.Success(outputData, colors);
+                //ここまで来たら成功で終了
+                return ConvertAnimationIndexColor_GetColorDataResult.Success(outputData, colors);
+            }
+            catch (Exception ex)
+            {
+                //例外は握りつぶす
+                return ConvertAnimationIndexColor_GetColorDataResult.Failed(CommonLogger.Warn("色インデックス作成で例外発生", ex));
+            }
         }
     }
 }

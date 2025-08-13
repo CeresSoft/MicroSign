@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace MicroSign.Core.Models
@@ -96,35 +97,43 @@ namespace MicroSign.Core.Models
                 //有効の場合は処理続行
             }
 
-            //画像ピクセル取得
-            // >> 検証済の値を取得
-            int imagePixelWidth = image.PixelWidth;
-            int imagePixelHeight = image.PixelHeight;
+            try
+            {
+                //画像ピクセル取得
+                // >> 検証済の値を取得
+                int imagePixelWidth = image.PixelWidth;
+                int imagePixelHeight = image.PixelHeight;
 
-            //画像フォーマットを変換
-            // >> https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/graphics-multimedia/how-to-convert-a-bitmapsource-to-a-different-pixelformat?view=netframeworkdesktop-4.8&viewFallbackFrom=netdesktop-6.0
-            FormatConvertedBitmap newFormatedBitmapSource = new FormatConvertedBitmap();
-            newFormatedBitmapSource.BeginInit();
-            newFormatedBitmapSource.Source = image;
-            newFormatedBitmapSource.DestinationFormat = PixelFormats.Bgra32;
-            newFormatedBitmapSource.EndInit();
-            newFormatedBitmapSource.Freeze();
+                //画像フォーマットを変換
+                // >> https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/graphics-multimedia/how-to-convert-a-bitmapsource-to-a-different-pixelformat?view=netframeworkdesktop-4.8&viewFallbackFrom=netdesktop-6.0
+                FormatConvertedBitmap newFormatedBitmapSource = new FormatConvertedBitmap();
+                newFormatedBitmapSource.BeginInit();
+                newFormatedBitmapSource.Source = image;
+                newFormatedBitmapSource.DestinationFormat = PixelFormats.Bgra32;
+                newFormatedBitmapSource.EndInit();
+                newFormatedBitmapSource.Freeze();
 
-            //1ピクセルのバイト数
-            // >> RGBA 32bit固定の書き方 32/8=4になります
-            // >> ほかのピクセルフォーマットに対応する場合はここのコードを変更してください
-            int byteParPixel = newFormatedBitmapSource.DestinationFormat.BitsPerPixel / CommonConsts.BitCount.BYTE;
+                //1ピクセルのバイト数
+                // >> RGBA 32bit固定の書き方 32/8=4になります
+                // >> ほかのピクセルフォーマットに対応する場合はここのコードを変更してください
+                int byteParPixel = newFormatedBitmapSource.DestinationFormat.BitsPerPixel / CommonConsts.BitCount.BYTE;
 
-            //画像のストライドを計算
-            int imagePixelStride = imagePixelWidth * byteParPixel;
+                //画像のストライドを計算
+                int imagePixelStride = imagePixelWidth * byteParPixel;
 
-            //画像取得
-            int bgra32Size = imagePixelStride * imagePixelHeight;
-            byte[] bgra32 = new byte[bgra32Size];
-            newFormatedBitmapSource.CopyPixels(bgra32, imagePixelStride, CommonConsts.Index.First);
+                //画像取得
+                int bgra32Size = imagePixelStride * imagePixelHeight;
+                byte[] bgra32 = new byte[bgra32Size];
+                newFormatedBitmapSource.CopyPixels(bgra32, imagePixelStride, CommonConsts.Index.First);
 
-            //終了
-            return ConvertBitmapToBgra32Result.Success(bgra32, imagePixelStride);
+                //終了
+                return ConvertBitmapToBgra32Result.Success(bgra32, imagePixelStride);
+            }
+            catch(Exception ex)
+            {
+                //例外は握りつぶす
+                return ConvertBitmapToBgra32Result.Failed(CommonLogger.Warn("BGRA32取得で例外発生", ex));
+            }
         }
     }
 }
