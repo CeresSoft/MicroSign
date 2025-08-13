@@ -7,6 +7,56 @@ namespace MicroSign.Core.Models
     partial class Model
     {
         /// <summary>
+        /// アニメーション保存結果
+        /// </summary>
+        /// <remarks>
+        /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
+        /// </remarks>
+        public struct SaveAnimationResult
+        {
+            /// <summary>
+            /// 成功フラグ
+            /// </summary>
+            public readonly bool IsSuccess;
+
+            /// <summary>
+            /// メッセージ
+            /// </summary>
+            public readonly string? Message;
+
+            /// <summary>
+            /// コンストラクタ
+            /// </summary>
+            /// <param name="isSuccess">成功フラグ</param>
+            /// <param name="message">メッセージ</param>
+            private SaveAnimationResult(bool isSuccess, string? message)
+            {
+                this.IsSuccess = isSuccess;
+            }
+
+            /// <summary>
+            ///  変換失敗
+            /// </summary>
+            /// <param name="message">メッセージ</param>
+            /// <returns></returns>
+            public static SaveAnimationResult Failed(string message)
+            {
+                SaveAnimationResult result = new SaveAnimationResult(false, message);
+                return result;
+            }
+
+            /// <summary>
+            /// 成功
+            /// </summary>
+            /// <returns></returns>
+            public static SaveAnimationResult Success()
+            {
+                SaveAnimationResult result = new SaveAnimationResult(true, null);
+                return result;
+            }
+        }
+
+        /// <summary>
         /// アニメーション保存
         /// </summary>
         /// <param name="path">保存先パス</param>
@@ -16,8 +66,8 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedHeight">マトリクスLED縦幅</param>
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
         /// <param name="defaultDisplayPeriod">デフォルト表示期間(秒)</param>
-        /// <returns></returns>
-        public (bool IsSuccess, string ErrorMessage) SaveAnimation(string path, string? name, AnimationImageItemCollection animationDatas, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double defaultDisplayPeriod)
+        /// <returns>アニメーション保存結果</returns>
+        public SaveAnimationResult SaveAnimation(string path, string? name, AnimationImageItemCollection animationDatas, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double defaultDisplayPeriod)
         {
             //保存先パス有効判定
             {
@@ -25,7 +75,7 @@ namespace MicroSign.Core.Models
                 if(isNull)
                 {
                     //無効の場合は終了
-                    return (false, "保存先パスが無効です");
+                    return SaveAnimationResult.Failed("保存先パスが無効です");
                 }
                 else
                 {
@@ -42,7 +92,7 @@ namespace MicroSign.Core.Models
             else
             {
                 //無効の場合は終了
-                return (false, "アニメーション画像が空です");
+                return SaveAnimationResult.Failed("アニメーション画像が空です");
             }
 
             //保存パスのディレクト入り部分を取得
@@ -129,13 +179,13 @@ namespace MicroSign.Core.Models
                 else
                 {
                     //失敗した場合は終了
-                    return (false, "保存に失敗しました");
+                    return SaveAnimationResult.Failed("保存に失敗しました");
                 }
             }
 
 
             //ここまで来たら成功
-            return (true, string.Empty);
+            return SaveAnimationResult.Success();
         }
     }
 }

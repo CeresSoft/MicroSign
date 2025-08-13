@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MicroSign.Core
 {
@@ -205,6 +201,17 @@ namespace MicroSign.Core
             /// version 1.1.0
             /// </summary>
             public const int V110 = 110;
+        }
+
+        /// <summary>
+        /// ファイル出力時のデータ
+        /// </summary>
+        public static class FileData
+        {
+            /// <summary>
+            /// 空き
+            /// </summary>
+            public static readonly int Reserve = 0;
         }
 
         /// <summary>

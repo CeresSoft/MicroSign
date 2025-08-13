@@ -138,7 +138,8 @@ namespace MicroSign.Core.Models
                     else
                     {
                         //失敗の場合は終了
-                        return LoadAnimationResult.Failed(ret.Message);
+                        string msg = $"アニメーション画像アイテム読込失敗 ({ret.Message})";
+                        return LoadAnimationResult.Failed(msg);
                     }
 
                     // >> アニメーション画像コレクションに追加

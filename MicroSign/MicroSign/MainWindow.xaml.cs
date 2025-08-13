@@ -635,7 +635,7 @@ namespace MicroSign
 
                 //アニメーション設定保存
                 {
-                    var ret = this.ViewModel.SaveAnimation(savePath);
+                    MicroSign.Core.Models.Model.SaveAnimationResult ret = this.ViewModel.SaveAnimation(savePath);
                     if (ret.IsSuccess)
                     {
                         //成功の場合
@@ -644,7 +644,7 @@ namespace MicroSign
                     else
                     {
                         //失敗した場合
-                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像設定を保存に失敗しました\n{ret.ErrorMessage}"));
+                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像設定を保存に失敗しました\n{ret.Message}"));
                     }
                 }
             }

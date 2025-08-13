@@ -71,7 +71,7 @@ namespace MicroSign.Core.Models.IndexColors
         {
             //登録済み判定
             int palleteIndex = this.GetSameColorIndex(color);
-            if (palleteIndex == CommonConsts.Index.Invalid)
+            if (palleteIndex < CommonConsts.Index.First)
             {
                 //未登録の場合は続行
             }
@@ -82,13 +82,15 @@ namespace MicroSign.Core.Models.IndexColors
             }
 
             //色数取得
-            int count = this.Count;
+            // >> 色追加前に取得すると、色追加後のIndexとなることを利用
+            // >> >> 色追加後の「index = this.Count - 1」と同じ
+            int index = this.Count;
 
             //新規登録
             this.Add(color);
 
-            //追加した色のインデックス(=Count)を返して終了
-            return count;
+            //追加した色のインデックスを返して終了
+            return index;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MicroSign.Core.Models;
+using MicroSign.Core.Models.AnimationDatas;
 using System.Windows.Media.Imaging;
 
 namespace MicroSign.Core.ViewModels
@@ -56,305 +57,10 @@ namespace MicroSign.Core.ViewModels
         }
         #endregion
 
-        #region 変換画像
-        /// <summary>
-        /// 初期値
-        /// </summary>
-        public static new partial class InitializeValues
-        {
-            /// <summary>
-            /// 変換画像初期値
-            /// </summary>
-            public const WriteableBitmap? ConvertImage = null;
-        }
 
-        /// <summary>
-        /// プロパティ名
-        /// </summary>
-        public static new partial class PropertyNames
-        {
-            /// <summary>
-            /// 変換画像プロパティ名
-            /// </summary>
-            public const string ConvertImage = "ConvertImage";
-        }
 
-        /// <summary>
-        /// 変換画像保持変数
-        /// </summary>
-        protected WriteableBitmap? _ConvertImage = InitializeValues.ConvertImage;
 
-        /// <summary>
-        /// 変換画像
-        /// </summary>
-        public WriteableBitmap? ConvertImage
-        {
-            get
-            {
-                return this._ConvertImage;
-            }
-            set
-            {
-                WriteableBitmap? now = this._ConvertImage;
-                if (now == value)
-                {
-                    return;
-                }
-                this._ConvertImage = value;
-                this.RaisePropertyChanged();
-            }
-        }
-        #endregion
 
-        #region クラス名
-        /// <summary>
-        /// 初期値
-        /// </summary>
-        public static new partial class InitializeValues
-        {
-            /// <summary>
-            /// クラス名初期値
-            /// </summary>
-            public const string? Name = "MatrixLedImage";
-        }
-
-        /// <summary>
-        /// プロパティ名
-        /// </summary>
-        public static new partial class PropertyNames
-        {
-            /// <summary>
-            /// クラス名プロパティ名
-            /// </summary>
-            public const string Name = "Name";
-        }
-
-        /// <summary>
-        /// クラス名保持変数
-        /// </summary>
-        protected string? _Name = InitializeValues.Name;
-
-        /// <summary>
-        /// クラス名
-        /// </summary>
-        public string? Name
-        {
-            get
-            {
-                return this._Name;
-            }
-            set
-            {
-                string? now = this._Name;
-                if (now == value)
-                {
-                    return;
-                }
-                this._Name = value;
-                this.RaisePropertyChanged();
-            }
-        }
-        #endregion
-
-        #region 赤閾値
-        /// <summary>
-        /// 初期値
-        /// </summary>
-        public static new partial class InitializeValues
-        {
-            /// <summary>
-            /// 赤閾値初期値
-            /// </summary>
-            public const int RedThreshold = 128;
-        }
-
-        /// <summary>
-        /// プロパティ名
-        /// </summary>
-        public static new partial class PropertyNames
-        {
-            /// <summary>
-            /// 赤閾値プロパティ名
-            /// </summary>
-            public const string RedThreshold = "RedThreshold";
-        }
-
-        /// <summary>
-        /// 赤閾値保持変数
-        /// </summary>
-        protected int _RedThreshold = InitializeValues.RedThreshold;
-
-        /// <summary>
-        /// 赤閾値
-        /// </summary>
-        public int RedThreshold
-        {
-            get
-            {
-                return this._RedThreshold;
-            }
-            set
-            {
-                int now = this._RedThreshold;
-                if (now == value)
-                {
-                    return;
-                }
-                this._RedThreshold = value;
-                this.RaisePropertyChanged();
-            }
-        }
-        #endregion
-
-        #region 緑閾値
-        /// <summary>
-        /// 初期値
-        /// </summary>
-        public static new partial class InitializeValues
-        {
-            /// <summary>
-            /// 緑閾値初期値
-            /// </summary>
-            public const int GreenThreshold = 128;
-        }
-
-        /// <summary>
-        /// プロパティ名
-        /// </summary>
-        public static new partial class PropertyNames
-        {
-            /// <summary>
-            /// 緑閾値プロパティ名
-            /// </summary>
-            public const string GreenThreshold = "GreenThreshold";
-        }
-
-        /// <summary>
-        /// 緑閾値保持変数
-        /// </summary>
-        protected int _GreenThreshold = InitializeValues.GreenThreshold;
-
-        /// <summary>
-        /// 緑閾値
-        /// </summary>
-        public int GreenThreshold
-        {
-            get
-            {
-                return this._GreenThreshold;
-            }
-            set
-            {
-                int now = this._GreenThreshold;
-                if (now == value)
-                {
-                    return;
-                }
-                this._GreenThreshold = value;
-                this.RaisePropertyChanged();
-            }
-        }
-        #endregion
-
-        #region 青閾値
-        /// <summary>
-        /// 初期値
-        /// </summary>
-        public static new partial class InitializeValues
-        {
-            /// <summary>
-            /// 青閾値初期値
-            /// </summary>
-            public const int BlueThreshold = 128;
-        }
-
-        /// <summary>
-        /// プロパティ名
-        /// </summary>
-        public static new partial class PropertyNames
-        {
-            /// <summary>
-            /// 青閾値プロパティ名
-            /// </summary>
-            public const string BlueThreshold = "BlueThreshold";
-        }
-
-        /// <summary>
-        /// 青閾値保持変数
-        /// </summary>
-        protected int _BlueThreshold = InitializeValues.BlueThreshold;
-
-        /// <summary>
-        /// 青閾値
-        /// </summary>
-        public int BlueThreshold
-        {
-            get
-            {
-                return this._BlueThreshold;
-            }
-            set
-            {
-                int now = this._BlueThreshold;
-                if (now == value)
-                {
-                    return;
-                }
-                this._BlueThreshold = value;
-                this.RaisePropertyChanged();
-            }
-        }
-        #endregion
-
-        #region 変換コード
-        /// <summary>
-        /// 初期値
-        /// </summary>
-        public static new partial class InitializeValues
-        {
-            /// <summary>
-            /// 変換コード初期値
-            /// </summary>
-            public const string? Code = null;
-        }
-
-        /// <summary>
-        /// プロパティ名
-        /// </summary>
-        public static new partial class PropertyNames
-        {
-            /// <summary>
-            /// 変換コードプロパティ名
-            /// </summary>
-            public const string Code = "Code";
-        }
-
-        /// <summary>
-        /// 変換コード保持変数
-        /// </summary>
-        protected string? _Code = InitializeValues.Code;
-
-        /// <summary>
-        /// 変換コード
-        /// </summary>
-        public string? Code
-        {
-            get
-            {
-                return this._Code;
-            }
-            set
-            {
-                string? now = this._Code;
-                if (now == value)
-                {
-                    return;
-                }
-                this._Code = value;
-                this.RaisePropertyChanged();
-            }
-        }
-        #endregion
 
         #region 変換フォーマット
         /// <summary>
@@ -408,7 +114,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region アニメーション画像コレクション
         /// <summary>
         /// プロパティ名
@@ -447,7 +152,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region 選択アニメーション画像
         /// <summary>
         /// 初期値
@@ -497,7 +201,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region マトリクスLED横幅
         /// <summary>
         /// 初期値
@@ -547,7 +250,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region マトリクスLED縦幅
         /// <summary>
         /// 初期値
@@ -597,7 +299,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region マトリクスLED明るさ
         /// <summary>
         /// 初期値
@@ -647,7 +348,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region アニメーション再生中
         /// <summary>
         /// 初期値
@@ -697,7 +397,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region デフォルト表示期間(秒)
         /// <summary>
         /// 初期値
@@ -747,7 +446,6 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
-
         #region アニメーション名
         /// <summary>
         /// 初期値
@@ -793,6 +491,110 @@ namespace MicroSign.Core.ViewModels
                     return;
                 }
                 this._AnimationName = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
+        #region アニメーション用マージ画像
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// アニメーション用マージ画像初期値
+            /// </summary>
+            public const BitmapSource? AnimationMergedBitmap = null;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// アニメーション用マージ画像プロパティ名
+            /// </summary>
+            public const string AnimationMergedBitmap = "AnimationMergedBitmap";
+        }
+
+        /// <summary>
+        /// アニメーション用マージ画像保持変数
+        /// </summary>
+        protected BitmapSource? _AnimationMergedBitmap = InitializeValues.AnimationMergedBitmap;
+
+        /// <summary>
+        /// アニメーション用マージ画像
+        /// </summary>
+        /// <remarks>
+        /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加。全アニメーション画像をマージした画像
+        /// </remarks>
+        public BitmapSource? AnimationMergedBitmap
+        {
+            get
+            {
+                return this._AnimationMergedBitmap;
+            }
+            set
+            {
+                BitmapSource? now = this._AnimationMergedBitmap;
+                if (now == value)
+                {
+                    return;
+                }
+                this._AnimationMergedBitmap = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
+        #region アニメーションデータ
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// アニメーションデータ初期値
+            /// </summary>
+            public const AnimationDataCollection? AnimationDatas = null;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// アニメーションデータプロパティ名
+            /// </summary>
+            public const string AnimationDatas = "AnimationDatas";
+        }
+
+        /// <summary>
+        /// アニメーションデータ保持変数
+        /// </summary>
+        protected AnimationDataCollection? _AnimationDatas = InitializeValues.AnimationDatas;
+
+        /// <summary>
+        /// アニメーションデータ
+        /// </summary>
+        /// <remarks>
+        /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加。アニメーション用マージ画像上で表示する範囲を指定するデータ
+        /// </remarks>
+        public AnimationDataCollection? AnimationDatas
+        {
+            get
+            {
+                return this._AnimationDatas;
+            }
+            set
+            {
+                AnimationDataCollection? now = this._AnimationDatas;
+                if (now == value)
+                {
+                    return;
+                }
+                this._AnimationDatas = value;
                 this.RaisePropertyChanged();
             }
         }

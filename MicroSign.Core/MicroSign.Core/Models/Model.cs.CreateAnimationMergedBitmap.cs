@@ -2,14 +2,10 @@
 using MicroSign.Core.Models.AnimationImagePoints;
 using MicroSign.Core.ViewModels;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 
 namespace MicroSign.Core.Models
 {
@@ -28,7 +24,7 @@ namespace MicroSign.Core.Models
             /// <summary>
             /// メッセージ
             /// </summary>
-            public string Message;
+            public string? Message;
 
             /// <summary>
             /// マージした画像
@@ -47,7 +43,7 @@ namespace MicroSign.Core.Models
             /// <param name="message">メッセージ</param>
             /// <param name="margeImage">マージ画像</param>
             /// <param name="animationDatas">アニメーションデータ</param>
-            private CreateAnimationMergedBitmapResult(bool isSuccess, string message, WriteableBitmap? margeImage, AnimationDataCollection? animationDatas)
+            private CreateAnimationMergedBitmapResult(bool isSuccess, string? message, WriteableBitmap? margeImage, AnimationDataCollection? animationDatas)
             {
                 this.IsSuccess = isSuccess;
                 this.Message = message;
@@ -74,7 +70,7 @@ namespace MicroSign.Core.Models
             /// <returns></returns>
             public static CreateAnimationMergedBitmapResult Success(WriteableBitmap? margeImage, AnimationDataCollection? animationDatas)
             {
-                CreateAnimationMergedBitmapResult result = new CreateAnimationMergedBitmapResult(true, string.Empty, margeImage, animationDatas);
+                CreateAnimationMergedBitmapResult result = new CreateAnimationMergedBitmapResult(true, null, margeImage, animationDatas);
                 return result;
             }
         }
@@ -95,6 +91,8 @@ namespace MicroSign.Core.Models
         /// アニメーション用マージ画像生成
         /// </summary>
         /// <param name="animationImages">アニメーション画像コレクション</param>
+        /// <param name="matrixLedWidth">マトリクスLED横ドット数</param>
+        /// <param name="matrixLedHeight">マトリクスLED縦ドット数</param>
         /// <returns>アニメーション用画像生成結果</returns>
         /// <remarks>
         /// 重複を除いた全画像をマージしたアニメーション用画像を生成します
@@ -102,7 +100,7 @@ namespace MicroSign.Core.Models
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更
         /// 不要なパラメータを削除しました
         /// </remarks>
-        private CreateAnimationMergedBitmapResult CreateAnimationMergedBitmap(AnimationImageItemCollection animationImages)
+        private CreateAnimationMergedBitmapResult CreateAnimationMergedBitmap(AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight)
         //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
         {
             //アニメーション画像コレクションの全要素数取得
@@ -117,51 +115,57 @@ namespace MicroSign.Core.Models
                 return CreateAnimationMergedBitmapResult.Failed("アニメーション画像がありません");
             }
 
-            //先頭の画像サイズを取得
-            // >> 先頭の画像を基準に残りの画像が同じサイズか判定します
-            int imageWidth = CommonConsts.Values.Zero.I;
-            int imageHeight = CommonConsts.Values.Zero.I;
-            {
-                //先頭のアニメーション画像を取得
-                AnimationImageItem animationImage = animationImages[CommonConsts.Index.First];
-                if (animationImage == null)
-                {
-                    //無効の場合は即終了
-                    return CreateAnimationMergedBitmapResult.Failed("先頭のアニメーション画像が無効です");
-                }
-                else
-                {
-                    //有効の場合は処理続行
-                }
-
-                //画像を取得
-                BitmapSource? bmp = animationImage.Image;
-                if (bmp == null)
-                {
-                    //無効の場合は即終了
-                    return CreateAnimationMergedBitmapResult.Failed("先頭の画像が無効です");
-                }
-                else
-                {
-                    //有効の場合は処理続行
-                }
-
-                //ピクセルサイズ取得
-                imageWidth = bmp.PixelWidth;
-                imageHeight = bmp.PixelHeight;
-
-                //画像サイズが有効判定
-                ValidateImageSizeResult validateImageResult = this.ValidateImageSize(imageWidth, imageHeight);
-                if (validateImageResult.IsValid)
-                {
-                    //有効の場合は処理続行
-                }
-                else
-                {
-                    //無効の場合は即終了
-                    return CreateAnimationMergedBitmapResult.Failed(validateImageResult.ErrorMessage);
-                }
-            }
+            //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+            ////先頭の画像サイズを取得
+            //// >> 先頭の画像を基準に残りの画像が同じサイズか判定します
+            //int imageWidth = CommonConsts.Values.Zero.I;
+            //int imageHeight = CommonConsts.Values.Zero.I;
+            //{
+            //    //先頭のアニメーション画像を取得
+            //    AnimationImageItem animationImage = animationImages[CommonConsts.Index.First];
+            //    if (animationImage == null)
+            //    {
+            //        //無効の場合は即終了
+            //        return CreateAnimationMergedBitmapResult.Failed("先頭のアニメーション画像が無効です");
+            //    }
+            //    else
+            //    {
+            //        //有効の場合は処理続行
+            //    }
+            //
+            //    //画像を取得
+            //    BitmapSource? bmp = animationImage.Image;
+            //    if (bmp == null)
+            //    {
+            //        //無効の場合は即終了
+            //        return CreateAnimationMergedBitmapResult.Failed("先頭の画像が無効です");
+            //    }
+            //    else
+            //    {
+            //        //有効の場合は処理続行
+            //    }
+            //
+            //    //ピクセルサイズ取得
+            //    imageWidth = bmp.PixelWidth;
+            //    imageHeight = bmp.PixelHeight;
+            //
+            //    //画像サイズが有効判定
+            //    ValidateImageSizeResult validateImageResult = this.ValidateImageSize(imageWidth, imageHeight);
+            //    if (validateImageResult.IsValid)
+            //    {
+            //        //有効の場合は処理続行
+            //    }
+            //    else
+            //    {
+            //        //無効の場合は即終了
+            //        return CreateAnimationMergedBitmapResult.Failed(validateImageResult.ErrorMessage);
+            //    }
+            //}
+            //----------
+            // >> LEDパネルのサイズを基準にする
+            int imageWidth = matrixLedWidth;
+            int imageHeight = matrixLedHeight;
+            //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
 
             //重複画像を除く
             // >> 辞書で作成しようとしたが、辞書だと順番が保持されないのでListにしました

@@ -11,7 +11,7 @@ namespace MicroSign.Core.Models
         /// <remarks>
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
         /// </remarks>
-        private struct ConvertBitmapToBgra32Result
+        public struct ConvertBitmapToBgra32Result
         {
             /// <summary>
             /// 成功フラグ
@@ -76,14 +76,14 @@ namespace MicroSign.Core.Models
         }
 
         /// <summary>
-        /// BitmapSourceをBGRA32のバイト配列に結果
+        /// BitmapSourceをBGRA32のバイト配列に変換
         /// </summary>
         /// <param name="image">変換する画像</param>
         /// <returns>BitmapSourceをBGRA32のバイト配列に結果</returns>
         /// <remarks>
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
         /// </remarks>
-        private ConvertBitmapToBgra32Result ConvertBitmapToBgra32(BitmapSource? image)
+        public ConvertBitmapToBgra32Result ConvertBitmapToBgra32(BitmapSource? image)
         {
             //変換する画像の有効判定
             if (image == null)

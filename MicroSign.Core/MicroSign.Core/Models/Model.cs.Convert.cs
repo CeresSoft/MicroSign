@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using MicroSign.Core.Models.AnimationDatas;
 
 namespace MicroSign.Core.Models
 {
@@ -18,19 +19,6 @@ namespace MicroSign.Core.Models
             public readonly bool IsSuccess;
 
             /// <summary>
-            /// 変換画像
-            /// </summary>
-            public readonly WriteableBitmap? ConvertImage;
-
-            //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
-            ///// <summary>
-            ///// コード
-            ///// </summary>
-            //public readonly string Code;
-            //----------
-            //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
-
-            /// <summary>
             /// メッセージ
             /// </summary>
             /// <remarks>
@@ -41,20 +29,55 @@ namespace MicroSign.Core.Models
             /// </remarks>
             public readonly string? Message;
 
+            //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+            ///// <summary>
+            ///// 変換画像
+            ///// </summary>
+            //public readonly WriteableBitmap? ConvertImage;
+            //----------
+            //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
+
+            /// <summary>
+            /// アニメーション用マージ画像
+            /// </summary>
+            /// <remarks>
+            /// 2025.08.12:CS)杉原:パレット処理の流れを変更で
+            /// 引数の「変換画像」を「アニメーション用マージ画像」に名称変更しました
+            /// </remarks>
+            public readonly BitmapSource? AnimationMergedBitmap;
+
+            /// <summary>
+            /// アニメーションデータ
+            /// </summary>
+            /// <remarks>
+            /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
+            /// </remarks>
+            public readonly AnimationDataCollection? AnimationDatas;
+
+            //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+            ///// <summary>
+            ///// コード
+            ///// </summary>
+            //public readonly string Code;
+            //----------
+            //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
+
             /// <summary>
             /// コンストラクタ
             /// </summary>
             /// <param name="isSuccess">成功フラグ</param>
+            /// <param name="message">メッセージ</param>
             /// <param name="convertImage">変換画像</param>
-            /// <param name="message"></param>
-            private ConvertResult(bool isSuccess, WriteableBitmap? convertImage, string? message)
+            /// <param name="animationDatas">アニメーションデータ</param>
+            private ConvertResult(bool isSuccess, string? message, BitmapSource? animationMergedBitmap, AnimationDataCollection? animationDatas)
             {
                 this.IsSuccess = isSuccess;
-                this.ConvertImage = convertImage;
+                this.AnimationMergedBitmap = animationMergedBitmap;
                 //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
                 //this.Code = code;
                 //----------
                 this.Message = message;
+                this.AnimationDatas = animationDatas;
                 //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
             }
 
@@ -65,7 +88,7 @@ namespace MicroSign.Core.Models
             /// <returns></returns>
             public static ConvertResult Failed(string message)
             {
-                ConvertResult result = new ConvertResult(false, null, message);
+                ConvertResult result = new ConvertResult(false, message, null, null);
                 return result;
             }
 
@@ -88,15 +111,18 @@ namespace MicroSign.Core.Models
             /// <summary>
             /// 成功
             /// </summary>
-            /// <param name="convertImage">変換画像</param>
+            /// <param name="animationMergedBitmap">アニメーション用マージ画像</param>
+            /// <param name="animationDatas">アニメーションデータ</param>
             /// <returns></returns>
             /// <remarks>
             /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
             /// 引数の「コード」を削除しました
+            /// 引数の「変換画像」を「アニメーション用マージ画像」に名称変更しました
+            /// 引数の「アニメーションデータ」を追加しました
             /// </remarks>
-            public static ConvertResult Sucess(WriteableBitmap? convertImage)
+            public static ConvertResult Sucess(BitmapSource? animationMergedBitmap, AnimationDataCollection? animationDatas)
             {
-                ConvertResult result = new ConvertResult(true, convertImage, null);
+                ConvertResult result = new ConvertResult(true, null, animationMergedBitmap, animationDatas);
                 return result;
             }
         }

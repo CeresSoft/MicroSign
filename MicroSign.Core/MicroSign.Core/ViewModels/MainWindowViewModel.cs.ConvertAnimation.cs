@@ -1,4 +1,5 @@
 ﻿using MicroSign.Core.Models.PanelConfigs;
+using System.Xml.Linq;
 
 namespace MicroSign.Core.ViewModels
 {
@@ -61,13 +62,17 @@ namespace MicroSign.Core.ViewModels
         /// <returns>アニメーション変換結果</returns>
         public ConvertAnimationResult ConvertAnimation()
         {
-            //クラス名
-            string? name = this.Name;
-
-            //閾値取得
-            int redThreshold = this.RedThreshold;
-            int greenThreshold = this.GreenThreshold;
-            int blueThreshold = this.BlueThreshold;
+            //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+            ////クラス名
+            //string? name = this.Name;
+            //
+            ////閾値取得
+            //int redThreshold = this.RedThreshold;
+            //int greenThreshold = this.GreenThreshold;
+            //int blueThreshold = this.BlueThreshold;
+            //----------
+            // >> 不要なパラメータを削除
+            //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
 
             //フォーマット
             FormatKinds formatKind = this.FormatKind;
@@ -82,12 +87,15 @@ namespace MicroSign.Core.ViewModels
             AnimationImageItemCollection animationImages = this.AnimationImages;
 
             //変換
-            Models.Model.ConvertResult ret = this.Model.ConvertAnimation(name, formatKind, animationImages, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
-            this.ConvertImage = ret.ConvertImage;
             //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+            //Models.Model.ConvertResult ret = this.Model.ConvertAnimation(name, formatKind, animationImages, redThreshold, greenThreshold, blueThreshold, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+            //this.ConvertImage = ret.ConvertImage;
             //this.Code = ret.Code;
             //----------
             // >> 変換コードは無くなりました
+            Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+            this.AnimationMergedBitmap = ret.AnimationMergedBitmap;
+            this.AnimationDatas = ret.AnimationDatas;
             //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
 
             //終了
