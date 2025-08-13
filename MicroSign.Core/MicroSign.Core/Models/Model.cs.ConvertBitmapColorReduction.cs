@@ -80,8 +80,11 @@ namespace MicroSign.Core.Models
         /// <returns>BitmapSource減色結果</returns>
         /// <remarks>
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
-        /// GIFで保存して読込することで256色の画像に変換します
+        /// お手軽にGIFで保存して読込することで256色の画像に変換します
         /// https://learn.microsoft.com/ja-jp/dotnet/api/system.windows.media.imaging.gifbitmapencoder.-ctor?view=windowsdesktop-9.0&devlangs=csharp&f1url=%3FappId%3DDev17IDEF1%26l%3DJA-JP%26k%3Dk(System.Windows.Media.Imaging.GifBitmapEncoder.%23ctor)%3Bk(DevLang-csharp)%26rd%3Dtrue
+        /// >> 2025.08.13:CS)杉原:FormatConvertedBitmapでDestinationFormatをPixelFormats.Indexed8と
+        /// >> 指定する方法を試してみましたが、パレットの指定が必要(=Webセーフカラーなパレットで代用できるが)なことと
+        /// >> Freeze()でで以外が発生したので諦めました
         /// </remarks>
         public ConvertBitmapColorReductionResult ConvertBitmapColorReduction(BitmapSource? image)
         {

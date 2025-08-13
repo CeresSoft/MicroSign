@@ -3,6 +3,7 @@ using MicroSign.Core.Models.IndexColors;
 using MicroSign.Core.ViewModels;
 using System;
 using System.IO;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -98,44 +99,14 @@ namespace MicroSign.Core.Models
                 }
             }
 
-            //GIFで保存して256色に減色する
-            // >> マージ画像が256色超過の場合、「エラーにする」か「減色する」必要がある
-            // >> 初心者ユーザーが256色に減色する作業はまあまあ面倒なので
-            // >> プログラムで減色したビットマップを作成する
-            // >> 256色に減色するにはGIFで保存して復元するのが楽である
-            BitmapSource? margeImage256 = null;
-            {
-                ConvertBitmapColorReductionResult ret = this.ConvertBitmapColorReduction(margeImage);
-                if (ret.IsSuccess)
-                {
-                    //成功した場合は処理続行
-                }
-                else
-                {
-                    //失敗した場合は終了
-                    string msg = $"減色画像の生成に失敗 ({ret.Message})";
-                    return ConvertResult.Failed(msg);
-                }
-
-                //減色画像を取得
-                margeImage256 = ret.ColorReductionImage;
-                if (margeImage == null)
-                {
-                    //無効の場合はエラーで終了
-                    return ConvertResult.Failed("減色画像が無効");
-                }
-                else
-                {
-                    //有効の場合は処理続行
-                }
-            }
-
             //ファイルに保存する
+            BitmapSource? usedImage = null;  //ConvertAnimationIndexColor_SaveToFileで使用した画像
             {
-                ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(margeImage256, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(margeImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
                 if (ret.IsSuccess)
                 {
                     //成功した場合は処理続行
+                    usedImage = ret.UsedImage;
                 }
                 else
                 {
@@ -143,10 +114,12 @@ namespace MicroSign.Core.Models
                     string msg = $"ファイル出力に失敗 ({ret.Message})";
                     return ConvertResult.Failed(msg);
                 }
+
             }
 
             //ここまで来たら成功で終了
-            return ConvertResult.Sucess(margeImage256, animationDatas);
+            // >> ConvertAnimationIndexColor_SaveToFileで使用した画像とアニメーションデータを返す
+            return ConvertResult.Sucess(usedImage, animationDatas);
             //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
         }
 
@@ -161,22 +134,30 @@ namespace MicroSign.Core.Models
             /// <summary>
             /// 成功フラグ
             /// </summary>
-            public bool IsSuccess;
+            public readonly bool IsSuccess;
 
             /// <summary>
             /// メッセージ
             /// </summary>
-            public string? Message;
+            public readonly string? Message;
+
+            /// <summary>
+            /// 使用画像
+            /// </summary>
+            /// <remarks>減色等される場合があるので内部で使用した画像を返す</remarks>
+            public readonly BitmapSource? UsedImage;
 
             /// <summary>
             /// コンストラクタ
             /// </summary>
             /// <param name="isSuccess">成功フラグ</param>
             /// <param name="message">メッセージ</param>
-            private ConvertAnimationIndexColor_SaveToFileResult(bool isSuccess, string? message)
+            /// <param name="usedImage">使用画像</param>
+            private ConvertAnimationIndexColor_SaveToFileResult(bool isSuccess, string? message, BitmapSource? usedImage)
             {
                 this.IsSuccess = isSuccess;
                 this.Message = message;
+                this.UsedImage = usedImage;
             }
 
             /// <summary>
@@ -186,21 +167,21 @@ namespace MicroSign.Core.Models
             /// <returns></returns>
             public static ConvertAnimationIndexColor_SaveToFileResult Failed(string message)
             {
-                ConvertAnimationIndexColor_SaveToFileResult result = new ConvertAnimationIndexColor_SaveToFileResult(false, message);
+                ConvertAnimationIndexColor_SaveToFileResult result = new ConvertAnimationIndexColor_SaveToFileResult(false, message, null);
                 return result;
             }
 
             /// <summary>
             /// 成功
             /// </summary>
+            /// <param name="usedImage">使用画像</param>
             /// <returns></returns>
-            public static ConvertAnimationIndexColor_SaveToFileResult Success()
+            public static ConvertAnimationIndexColor_SaveToFileResult Success(BitmapSource? usedImage)
             {
-                ConvertAnimationIndexColor_SaveToFileResult result = new ConvertAnimationIndexColor_SaveToFileResult(true, null);
+                ConvertAnimationIndexColor_SaveToFileResult result = new ConvertAnimationIndexColor_SaveToFileResult(true, null, usedImage);
                 return result;
             }
         }
-
 
         /// <summary>
         /// インデックスカラーアニメーション変換 - ファイルに保存
@@ -278,6 +259,7 @@ namespace MicroSign.Core.Models
             //byte[]? outputImage = null;
             //int outputImageStride = CommonConsts.Collection.Empty;
             //----------
+            BitmapSource? usedImage = null;
             //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここまで
             //2025.08.05:CS)土田:インデックスカラー対応 >>>>> ここから
             //----------
@@ -290,15 +272,18 @@ namespace MicroSign.Core.Models
                 //----------
                 ConvertAnimationIndexColor_GetColorDataResult convertColorImplResult = this.ConvertAnimationIndexColor_GetColorData(image);
                 //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
-                if (convertColorImplResult.IsSuccess)
+                switch(convertColorImplResult.ResultCode)
                 {
-                    //成功した場合は処理続行
-                }
-                else
-                {
-                    //失敗した場合は終了
-                    string msg = $"色データ取得失敗 ({convertColorImplResult.Message})";
-                    return ConvertAnimationIndexColor_SaveToFileResult.Failed("");
+                    case ConvertAnimationIndexColor_GetColorDataResultCodes.Success:
+                        //成功の場合は処理続行
+                        break;
+
+                    default:
+                        //それ以外は失敗
+                        {
+                            string msg = $"色データ取得失敗 ({convertColorImplResult.Message})";
+                            return ConvertAnimationIndexColor_SaveToFileResult.Failed(msg);
+                        }
                 }
 
                 //出力データ取得
@@ -355,6 +340,18 @@ namespace MicroSign.Core.Models
                     {
                         //最大値以下の場合は処理続行
                     }
+                }
+
+                //使用画像取得
+                usedImage = convertColorImplResult.UsedImage;
+                if (usedImage == null)
+                {
+                    //無効の場合は終了
+                    return ConvertAnimationIndexColor_SaveToFileResult.Failed("使用画像無効");
+                }
+                else
+                {
+                    //有効の場合は処理続行
                 }
                 //2025.08.11:CS)杉原:インデックスカラー対応修正 <<<<< ここまで
             }
@@ -657,7 +654,48 @@ namespace MicroSign.Core.Models
             }
 
             //終了
-            return ConvertAnimationIndexColor_SaveToFileResult.Success();
+            return ConvertAnimationIndexColor_SaveToFileResult.Success(usedImage);
+        }
+
+        /// <summary>
+        /// インデックスカラーアニメーション変換 - 色データ取得結果コード
+        /// </summary>
+        private enum ConvertAnimationIndexColor_GetColorDataResultCodes
+        {
+            /// <summary>
+            /// 成功
+            /// </summary>
+            Success,
+
+            /// <summary>
+            /// 画像無効
+            /// </summary>
+            InvalidImage,
+
+            /// <summary>
+            /// 色インデックス無効
+            /// </summary>
+            InvalidColorIndex,
+
+            /// <summary>
+            /// 色数オーバー
+            /// </summary>
+            ColorOver,
+
+            /// <summary>
+            /// 例外発生
+            /// </summary>
+            CatchException,
+
+            /// <summary>
+            /// 減色処理失敗
+            /// </summary>
+            FailedColorReduction,
+
+            /// <summary>
+            /// 減色画像無効
+            /// </summary>
+            InvalidColorReductionImage,
         }
 
         /// <summary>
@@ -669,9 +707,9 @@ namespace MicroSign.Core.Models
         private struct ConvertAnimationIndexColor_GetColorDataResult
         {
             /// <summary>
-            /// 成功フラグ
+            /// 結果コード
             /// </summary>
-            public readonly bool IsSuccess;
+            public readonly ConvertAnimationIndexColor_GetColorDataResultCodes ResultCode;
 
             /// <summary>
             /// メッセージ
@@ -692,40 +730,49 @@ namespace MicroSign.Core.Models
             public readonly IndexColorCollection? Colors;
 
             /// <summary>
+            /// 使用画像
+            /// </summary>
+            public readonly BitmapSource? UsedImage;
+
+            /// <summary>
             /// コンストラクタ
             /// </summary>
-            /// <param name="isSuccess">成功フラグ</param>
+            /// <param name="resultCode">結果コード</param>
             /// <param name="message">メッセージ</param>
             /// <param name="outputData">出力データ</param>
             /// <param name="colors">色コレクション</param>
-            private ConvertAnimationIndexColor_GetColorDataResult(bool isSuccess, string? message, byte[]? outputData, IndexColorCollection? colors)
+            /// <param name="usedImage">使用画像</param>
+            private ConvertAnimationIndexColor_GetColorDataResult(ConvertAnimationIndexColor_GetColorDataResultCodes resultCode, string? message, byte[]? outputData, IndexColorCollection? colors, BitmapSource? usedImage)
             {
-                this.IsSuccess = isSuccess;
+                this.ResultCode = resultCode;
                 this.Message = message;
                 this.OutputData = outputData;
                 this.Colors = colors;
+                this.UsedImage = usedImage;
             }
 
             /// <summary>
             ///  変換失敗
             /// </summary>
+            /// <param name="resultCode">結果コード</param>
             /// <param name="message">メッセージ</param>
             /// <returns></returns>
-            public static ConvertAnimationIndexColor_GetColorDataResult Failed(string message)
+            public static ConvertAnimationIndexColor_GetColorDataResult Failed(ConvertAnimationIndexColor_GetColorDataResultCodes resultCode, string message)
             {
-                ConvertAnimationIndexColor_GetColorDataResult result = new ConvertAnimationIndexColor_GetColorDataResult(false, message, null, null);
+                ConvertAnimationIndexColor_GetColorDataResult result = new ConvertAnimationIndexColor_GetColorDataResult(resultCode, message, null, null, null);
                 return result;
             }
 
             /// <summary>
             /// 成功
             /// </summary>
+            /// <param name="usedImage">使用画像</param>
             /// <param name="outputData">出力データ</param>
             /// <param name="colors">色コレクション</param>
             /// <returns></returns>
-            public static ConvertAnimationIndexColor_GetColorDataResult Success(byte[]? outputData, IndexColorCollection? colors)
+            public static ConvertAnimationIndexColor_GetColorDataResult Success(BitmapSource? usedImage, byte[]? outputData, IndexColorCollection? colors)
             {
-                ConvertAnimationIndexColor_GetColorDataResult result = new ConvertAnimationIndexColor_GetColorDataResult(true, null, outputData, colors);
+                ConvertAnimationIndexColor_GetColorDataResult result = new ConvertAnimationIndexColor_GetColorDataResult(ConvertAnimationIndexColor_GetColorDataResultCodes.Success, null, outputData, colors, usedImage);
                 return result;
             }
         }
@@ -736,18 +783,85 @@ namespace MicroSign.Core.Models
         /// <param name="image">変換する画像</param>
         /// <returns>色変換実装結果</returns>
         /// <remarks>
+        /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
+        /// </remarks>
+        private ConvertAnimationIndexColor_GetColorDataResult ConvertAnimationIndexColor_GetColorData(BitmapSource? image)
+        {
+            //指定された画像のまま色データ取得実装呼出
+            {
+                ConvertAnimationIndexColor_GetColorDataResult ret = this.ConvertAnimationIndexColor_GetColorDataImpl(image);
+                //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
+                switch (ret.ResultCode)
+                {
+                    case ConvertAnimationIndexColor_GetColorDataResultCodes.ColorOver:
+                        //色数がオーバーした場合は処理続行
+                        break;
+
+                    default:
+                        //それ以外はそのまま終了
+                        // >> ★★ 注意 ★★ 成功の場合もここにきます
+                        return ret;
+                }
+            }
+
+            //色数を256色に減色する
+            // >> マージ画像が256色超過の場合、「エラーにする」か「減色する」必要があるが
+            // >> 初心者ユーザーが256色に減色する作業はまあまあ面倒なので減色したビットマップを作成する
+            // >> ただし色見が変わるなどの弊害がある
+            BitmapSource? image256 = null;
+            {
+                ConvertBitmapColorReductionResult ret = this.ConvertBitmapColorReduction(image);
+                if (ret.IsSuccess)
+                {
+                    //成功した場合は処理続行
+                }
+                else
+                {
+                    //失敗した場合は終了
+                    string msg = $"減色画像の生成に失敗 ({ret.Message})";
+                    return ConvertAnimationIndexColor_GetColorDataResult.Failed(ConvertAnimationIndexColor_GetColorDataResultCodes.FailedColorReduction, msg);
+                }
+
+                //減色画像を取得
+                image256 = ret.ColorReductionImage;
+                if (image256 == null)
+                {
+                    //無効の場合はエラーで終了
+                    return ConvertAnimationIndexColor_GetColorDataResult.Failed(ConvertAnimationIndexColor_GetColorDataResultCodes.InvalidColorReductionImage, "減色画像が無効");
+                }
+                else
+                {
+                    //有効の場合は処理続行
+                }
+            }
+
+            //減色画像で色データ取得実装呼出
+            {
+                ConvertAnimationIndexColor_GetColorDataResult ret = this.ConvertAnimationIndexColor_GetColorDataImpl(image256);
+
+                //無条件にそのまま終了
+                return ret;
+            }
+        }
+
+        /// <summary>
+        /// インデックスカラーアニメーション変換 - 色データ取得実装
+        /// </summary>
+        /// <param name="image">変換する画像</param>
+        /// <returns>色変換実装結果</returns>
+        /// <remarks>
         /// 2025.08.05:CS)土田:インデックスカラー対応
         /// 
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
         /// ConvertColorImpl()を移植(=ConvertColorImpl()は削除)
         /// </remarks>
-        private ConvertAnimationIndexColor_GetColorDataResult ConvertAnimationIndexColor_GetColorData(BitmapSource? image)
+        private ConvertAnimationIndexColor_GetColorDataResult ConvertAnimationIndexColor_GetColorDataImpl(BitmapSource? image)
         {
             //変換する画像の有効判定
             if (image == null)
             {
                 //無効の場合は何もせずに終了
-                return ConvertAnimationIndexColor_GetColorDataResult.Failed("画像が無効");
+                return ConvertAnimationIndexColor_GetColorDataResult.Failed(ConvertAnimationIndexColor_GetColorDataResultCodes.InvalidImage, "画像が無効");
             }
             else
             {
@@ -829,7 +943,7 @@ namespace MicroSign.Core.Models
                         if (colorIndex < CommonConsts.Index.First)
                         {
                             //パレット登録失敗の場合は変換失敗
-                            return ConvertAnimationIndexColor_GetColorDataResult.Failed($"色インデックスが無効 (index={colorIndex})");
+                            return ConvertAnimationIndexColor_GetColorDataResult.Failed(ConvertAnimationIndexColor_GetColorDataResultCodes.InvalidColorIndex, $"色インデックスが無効 (index={colorIndex})");
                         }
                         else
                         {
@@ -844,7 +958,7 @@ namespace MicroSign.Core.Models
                         else
                         {
                             //パレット最大値以上の場合はエラー
-                            return ConvertAnimationIndexColor_GetColorDataResult.Failed($"色インデックスが最大値超過です (index={colorIndex})");
+                            return ConvertAnimationIndexColor_GetColorDataResult.Failed(ConvertAnimationIndexColor_GetColorDataResultCodes.ColorOver, $"色インデックスが最大値超過です (index={colorIndex})");
                         }
 
                         //パレット番号を変換後データ設定先に設定
@@ -859,12 +973,12 @@ namespace MicroSign.Core.Models
                 }
 
                 //ここまで来たら成功で終了
-                return ConvertAnimationIndexColor_GetColorDataResult.Success(outputData, colors);
+                return ConvertAnimationIndexColor_GetColorDataResult.Success(image, outputData, colors);
             }
             catch (Exception ex)
             {
                 //例外は握りつぶす
-                return ConvertAnimationIndexColor_GetColorDataResult.Failed(CommonLogger.Warn("色インデックス作成で例外発生", ex));
+                return ConvertAnimationIndexColor_GetColorDataResult.Failed(ConvertAnimationIndexColor_GetColorDataResultCodes.CatchException, CommonLogger.Warn("色インデックス作成で例外発生", ex));
             }
         }
     }
