@@ -147,7 +147,7 @@ namespace MicroSign.Core.Models
             {
                 //@@ ヘッダ(uint16 x 8のサイズ)
                 //バージョン(uint16)
-                bw.Write((UInt16)100); //TODO:後で定数定義する
+                bw.Write((UInt16)MicroSignConsts.Versions.V110);
 
                 //マトリクスLED
                 {

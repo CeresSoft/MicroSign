@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using static MicroSign.Core.Models.Model;
 
 namespace MicroSign
 {
@@ -32,7 +33,6 @@ namespace MicroSign
         public MainWindow()
         {
             InitializeComponent();
-
 
             //ビットマップを拡大表示したときにグラデーションにならないようにする
             RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
@@ -268,30 +268,42 @@ namespace MicroSign
                     //デフォルトの表示期間を取得
                     double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
 
-                    //画像変換
-                    MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
-                    if (convertImageResult.IsSuccess)
-                    {
-                        //成功の場合は続行
-                        CommonLogger.Debug($"画像変換成功");
-                    }
-                    else
-                    {
-                        //変換失敗の場合は終了
-                        this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
-                        return;
-                    }
-
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                    ////画像変換
+                    //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
+                    //if (convertImageResult.IsSuccess)
+                    //{
+                    //    //成功の場合は続行
+                    //    CommonLogger.Debug($"画像変換成功");
+                    //}
+                    //else
+                    //{
+                    //    //変換失敗の場合は終了
+                    //    this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
+                    //    return;
+                    //}
+                    //
+                    ////アニメーション画像アイテムを生成
+                    //AnimationImageItem animationImageItem = AnimationImageItem.FromText(
+                    //    defaultDisplayPeriod,
+                    //    selectFontSize,
+                    //    selectFontColor,
+                    //    displayText,
+                    //    image,
+                    //    convertImageResult.OutputData,
+                    //    convertImageResult.PreviewImage
+                    //    );
+                    //----------
+                    // >> プレビュー画像が不要になったので変換した画像も不要となりました
                     //アニメーション画像アイテムを生成
                     AnimationImageItem animationImageItem = AnimationImageItem.FromText(
                         defaultDisplayPeriod,
                         selectFontSize,
                         selectFontColor,
                         displayText,
-                        image,
-                        convertImageResult.OutputData,
-                        convertImageResult.PreviewImage
+                        image
                         );
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
 
                     //リストに追加
                     this.ViewModel.AddAnimationImage(animationImageItem);
@@ -546,7 +558,11 @@ namespace MicroSign
 
                 //アニメーション変換開始
                 {
-                    var ret = this.ViewModel.ConvertAnimation();
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                    //var ret = this.ViewModel.ConvertAnimation();
+                    //----------
+                    MainWindowViewModel.ConvertAnimationResult ret = this.ViewModel.ConvertAnimation();
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
                     if (ret.IsSuccess)
                     {
                         //成功の場合
@@ -555,7 +571,11 @@ namespace MicroSign
                     else
                     {
                         //失敗の場合
-                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像の変換に失敗しました。\n理由={ret.Code}"));
+                        //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                        //this.ShowWarning(CommonLogger.Warn($"アニメーション画像の変換に失敗しました。\n理由={ret.Code}"));
+                        //----------
+                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像の変換に失敗しました。\n理由={ret.Message}"));
+                        //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
                     }
                 }
             }
@@ -615,7 +635,7 @@ namespace MicroSign
 
                 //アニメーション設定保存
                 {
-                    var ret = this.ViewModel.SaveAnimation(savePath);
+                    MicroSign.Core.Models.Model.SaveAnimationResult ret = this.ViewModel.SaveAnimation(savePath);
                     if (ret.IsSuccess)
                     {
                         //成功の場合
@@ -624,7 +644,7 @@ namespace MicroSign
                     else
                     {
                         //失敗した場合
-                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像設定を保存に失敗しました\n{ret.ErrorMessage}"));
+                        this.ShowWarning(CommonLogger.Warn($"アニメーション画像設定を保存に失敗しました\n{ret.Message}"));
                     }
                 }
             }
@@ -669,7 +689,7 @@ namespace MicroSign
 
                 //アニメーション設定読込
                 {
-                    var ret = this.ViewModel.LoadAnimation(loadPath);
+                    MainWindowViewModel.LoadAnimationResult ret = this.ViewModel.LoadAnimation(loadPath);
                     if(ret.IsSuccess)
                     {
                         //成功した場合は処理続行
@@ -1123,29 +1143,40 @@ namespace MicroSign
                     //デフォルトの表示期間を取得
                     double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
 
-                    //画像変換
-                    MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
-                    if (convertImageResult.IsSuccess)
-                    {
-                        //成功の場合は続行
-                        CommonLogger.Debug($"画像変換成功");
-                    }
-                    else
-                    {
-                        //変換失敗の場合は終了
-                        this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
-                        return;
-                    }
-
-                    //アニメーション画像を変更する
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+                    ////画像変換
+                    //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
+                    //if (convertImageResult.IsSuccess)
+                    //{
+                    //    //成功の場合は続行
+                    //    CommonLogger.Debug($"画像変換成功");
+                    //}
+                    //else
+                    //{
+                    //    //変換失敗の場合は終了
+                    //    this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
+                    //    return;
+                    //}
+                    //
+                    ////アニメーション画像を変更する
+                    //animationImage.UpdateText(
+                    //    selectFontSize,
+                    //    selectFontColor,
+                    //    displayText,
+                    //    image,
+                    //    convertImageResult.OutputData,
+                    //    convertImageResult.PreviewImage
+                    //    );
+                    //----------
+                    // >> プレビュー画像が不要になったので変換した画像も不要となりました
+                    //アニメーション画像アイテムを更新
                     animationImage.UpdateText(
                         selectFontSize,
                         selectFontColor,
                         displayText,
-                        image,
-                        convertImageResult.OutputData,
-                        convertImageResult.PreviewImage
+                        image
                         );
+                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
                 }
                 else
                 {

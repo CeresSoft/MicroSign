@@ -380,8 +380,10 @@
                         <ColumnDefinition Width="80"/>
                     </Grid.ColumnDefinitions>
 
+                    <!--2025.08.12:CS)杉原:変換結果削除 ここから
                     <RadioButton x:Name="OriginalTabButton" Style="{StaticResource TabRadioButtonStyle}" Content="オリジナル" Grid.Column="1" IsChecked="True"/>
                     <RadioButton x:Name="PreviewTabButton" Style="{StaticResource TabRadioButtonStyle}" Content="変換結果" Grid.Column="3"/>
+                    ここまで -->
                 </Grid>
                 <Grid Background="{StaticResource Group.Background}" Grid.Row="2">
                     <Grid.ColumnDefinitions>
@@ -397,7 +399,9 @@
 
                     <!--<Image x:Name="LoadImage" Grid.Row="1" Source="{Binding LoadImage}" Grid.Column="1"/>-->
                     <Image x:Name="SelectedOriginalImage" Source="{Binding SelectedAnimationImageItem.Image}" Grid.Row="1" Grid.Column="1" Visibility="{Binding IsChecked, Converter={StaticResource TrueVisibleValueConverter}, ElementName=OriginalTabButton}"/>
+                    <!--2025.08.12:CS)杉原:変換結果削除 ここから
                     <Image x:Name="SelectedPreviewImage" Source="{Binding SelectedAnimationImageItem.PreviewImage}" Grid.Row="1" Grid.Column="1" Visibility="{Binding IsChecked, Converter={StaticResource TrueVisibleValueConverter}, ElementName=PreviewTabButton}"/>
+                    ここまで -->
                 </Grid>
             </Grid>
 

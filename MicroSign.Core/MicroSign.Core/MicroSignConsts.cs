@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MicroSign.Core
 {
@@ -102,6 +98,11 @@ namespace MicroSign.Core
             public const int Bit3 = 3;
 
             /// <summary>
+            /// 0-255の8ビット色
+            /// </summary>
+            public const int Bit8 = 8;
+
+            /// <summary>
             /// 64色カラー変換メンバー名
             /// </summary>
             public const string Color64MemberName = "Data64";
@@ -110,6 +111,16 @@ namespace MicroSign.Core
             /// 256色カラー変換メンバー名
             /// </summary>
             public const string Color256MemberName = "Data256";
+
+            /// <summary>
+            /// インデックスカラー変換メンバー名
+            /// </summary>
+            public const string IndexColorMemberName = "DataIndex";
+
+            /// <summary>
+            /// インデックスカラー最大色数
+            /// </summary>
+            public const int MaxIndexColorCount = 256;
 
             /// <summary>
             /// 明るさ
@@ -174,6 +185,50 @@ namespace MicroSign.Core
                 public const int RowPackSize = 2;
             }
 
+        }
+
+        /// <summary>
+        /// バージョン
+        /// </summary>
+        public static class Versions
+        {
+            /// <summary>
+            /// version 1.0.0
+            /// </summary>
+            public const int V100 = 100;
+
+            /// <summary>
+            /// version 1.1.0
+            /// </summary>
+            public const int V110 = 110;
+        }
+
+        /// <summary>
+        /// ファイル出力時のデータ
+        /// </summary>
+        public static class FileData
+        {
+            /// <summary>
+            /// 空き
+            /// </summary>
+            public static readonly int Reserve = 0;
+        }
+
+        /// <summary>
+        /// アニメーション
+        /// </summary>
+        public static class Animations
+        {
+            /// <summary>
+            /// セルサイズ
+            /// </summary>
+            public static class CellSize
+            {
+                /// <summary>
+                /// サイズ固定セル(+0=X, +1=Y, +2=表示期間 =3)
+                /// </summary>
+                public const int FixedSize = 3;
+            }
         }
     }
 }

@@ -29,5 +29,10 @@
         /// 256色テストカラー
         /// </summary>
         TestColor256,
+
+        /// <summary>
+        /// インデックスカラー
+        /// </summary>
+        IndexColor,
     }
 }
