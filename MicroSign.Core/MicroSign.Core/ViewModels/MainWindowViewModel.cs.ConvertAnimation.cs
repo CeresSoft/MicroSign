@@ -81,6 +81,12 @@ namespace MicroSign.Core.ViewModels
             int matrixLedWidth = this.MatrixLedWidth;
             int matrixLedHeight = this.MatrixLedHeight;
             int matrixLedBrightness = this.MatrixLedBrightness;
+            //2025.08.18:CS)土田:ガンマ補正対応で追加 >>>>> ここから
+            //-----
+            int gammaCorrection = this.GammaCorrection;
+            // >> 小数に変換
+            double gamma = gammaCorrection / CommonConsts.Gammas.Magnification;
+            //2025.08.18:CS)土田:ガンマ補正対応で追加 <<<<< ここまで
 
             //アニメーション画像コレクション
             // >> コンストラクタで生成しているのでnullチェック不要
@@ -93,7 +99,11 @@ namespace MicroSign.Core.ViewModels
             //this.Code = ret.Code;
             //----------
             // >> 変換コードは無くなりました
-            Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+            //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 >>>>> ここから
+            //Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+            //-----
+            Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma);
+            //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 <<<<< ここまで
             this.AnimationMergedBitmap = ret.AnimationMergedBitmap;
             this.AnimationDatas = ret.AnimationDatas;
             //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
