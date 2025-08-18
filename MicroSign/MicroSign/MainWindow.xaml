@@ -111,6 +111,8 @@
                             <ColumnDefinition Width="80"/>
                             <ColumnDefinition Width="10"/>
                             <ColumnDefinition Width="110"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="80"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -122,7 +124,7 @@
                             <RowDefinition />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Style="{StaticResource InputHeaderTextBlockStyle}" Text="パネル設定" Grid.ColumnSpan="5"/>
+                        <TextBlock Style="{StaticResource InputHeaderTextBlockStyle}" Text="パネル設定" Grid.ColumnSpan="7"/>
                         <TextBlock Text="ドット数" Grid.ColumnSpan="3" Grid.Row="1"/>
                         <TextBlock Text="横" Grid.Row="3"/>
                         <ComboBox Template="{DynamicResource StandardComboBoxTemplate}" SelectedValue="{Binding MatrixLedWidth, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="Value" Grid.Column="2" Grid.Row="3">
@@ -177,6 +179,17 @@
                             <TextBlock Grid.Column="4" Text="明"/>
                             <Slider Value="{Binding MatrixLedBrightness, Mode=TwoWay}" Maximum="255" LargeChange="32" SmallChange="1" Grid.Column="2"/>
                         </Grid>
+                        <TextBlock Text="ガンマ補正" Grid.Column="6" Grid.Row="1"/>
+                        <ComboBox SelectedValue="{Binding GammaCorrection, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="Value" Grid.Column="6" Grid.Row="3">
+                            <ComboBox.ItemsSource>
+                                <x:Array Type="{x:Type core:SelectValueItem}">
+                                    <core:SelectValueItem Name="補正なし" Value="100"/>
+                                    <core:SelectValueItem Name="弱(1.4)" Value="140"/>
+                                    <core:SelectValueItem Name="中(1.8)" Value="180"/>
+                                    <core:SelectValueItem Name="標準(2.2)" Value="220"/>
+                                </x:Array>
+                            </ComboBox.ItemsSource>
+                        </ComboBox>
                     </Grid>
                     <Border Style="{StaticResource VerticalSplitStyle}"/>
                     <Grid>
