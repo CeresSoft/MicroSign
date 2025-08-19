@@ -571,8 +571,40 @@ namespace MicroSign.Core
                 /// アルファの最大値
                 /// </summary>
                 public static readonly int AlphaMax = 255;
+
+                /// <summary>
+                /// 8bitカラーの最小値
+                /// </summary>
+                public static readonly int Min8bit = 0;
+
+                /// <summary>
+                /// 8bitカラーの最大値
+                /// </summary>
+                public static readonly int Max8bit = 255;
             }
 
+        }
+
+        /// <summary>
+        /// ガンマ補正関連
+        /// </summary>
+        /// <remarks>
+        /// 2025.08.18:CS)土田:ガンマ補正対応で追加
+        /// </remarks>
+        public static class Gammas
+        {
+            /// <summary>
+            /// 倍率
+            /// </summary>
+            /// <remarks>
+            /// 整数から小数へ変換するための係数
+            /// </remarks>
+            public static readonly double Magnification = 100.0;
+
+            /// <summary>
+            /// 四捨五入の値
+            /// </summary>
+            public static readonly double RoundOffValue = 0.5;
         }
     }
 }

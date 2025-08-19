@@ -1537,5 +1537,66 @@ namespace MicroSign.Core
                 return null;
             }
         }
+
+        /// <summary>
+        /// ガンマ補正
+        /// </summary>
+        /// <param name="valueIn">入力値</param>
+        /// <param name="gamma">ガンマ値</param>
+        /// <returns></returns>
+        public static double CorrectGamma(double valueIn, double gamma)
+        {
+            //ガンマ補正
+            // >> Vout = A * Vin^gamma (A=1)
+            double valueOut = Math.Pow(valueIn, gamma);
+            return valueOut;
+        }
+
+        /// <summary>
+        /// ガンマ補正(8bit)
+        /// </summary>
+        /// <param name="value">入力値</param>
+        /// <param name="gamma">ガンマ値</param>
+        /// <returns></returns>
+        public static int CorrectGamma8bit(int value, double gamma)
+        {
+            //入力値を0～1に変換
+            double valueInClamp = value / (double)CommonConsts.Palettes.Colors.AlphaMax;
+
+            //ガンマ補正
+            double valueOutClamp = CommonUtils.CorrectGamma(valueInClamp, gamma);
+
+            //出力値を0～255に変換
+            double valueOut = (valueOutClamp * CommonConsts.Palettes.Colors.AlphaMax);
+
+            //出力値を整数に丸める
+            double valueOutRound = valueOut + CommonConsts.Gammas.RoundOffValue;
+            int result = (int)valueOutRound;
+
+            //出力値有効判定
+            // >> 最小値以上判定
+            if (result < CommonConsts.Palettes.Colors.Min8bit)
+            {
+                //最小値未満の場合、最小値に引き上げる
+                return CommonConsts.Palettes.Colors.Min8bit;
+            }
+            else
+            {
+                //有効の場合は処理続行
+            }
+            // >> 最大値以下判定
+            if (CommonConsts.Palettes.Colors.Max8bit < value)
+            {
+                //最大値超過の場合、最大値に引き下げる
+                return CommonConsts.Palettes.Colors.Max8bit;
+            }
+            else
+            {
+                //有効の場合は処理続行
+            }
+
+            //ここまできたら0～255の有効な整数
+            return result;
+        }
     }
 }
