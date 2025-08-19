@@ -599,6 +599,58 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
+        #region ガンマ補正値
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// ガンマ補正値初期値
+            /// </summary>
+            public const int GammaCorrection = 220;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// ガンマ補正値プロパティ名
+            /// </summary>
+            public const string GammaCorrection = "GammaCorrection";
+        }
+
+        /// <summary>
+        /// ガンマ補正値保持変数
+        /// </summary>
+        protected int _GammaCorrection = InitializeValues.GammaCorrection;
+
+        /// <summary>
+        /// ガンマ補正値
+        /// </summary>
+        /// <remarks>
+        /// 2025.08.18:CS)土田:ガンマ補正対応で追加。ガンマ*100の整数を設定する
+        /// </remarks>
+        public int GammaCorrection
+        {
+            get
+            {
+                return this._GammaCorrection;
+            }
+            set
+            {
+                int now = this._GammaCorrection;
+                if (now == value)
+                {
+                    return;
+                }
+                this._GammaCorrection = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
 
         //「Documents\ViewModelプロパティ作成テンプレート.xlsx」の「MainWindowViewModel」をコピー <<<<< ここまで
     }

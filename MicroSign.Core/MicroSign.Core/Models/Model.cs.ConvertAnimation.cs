@@ -28,11 +28,12 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedWidth">マトリクスLED横ドット数</param>
         /// <param name="matrixLedHeight">マトリクスLED縦ドット数</param>
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
+        /// <param name="gamma">ガンマ値(2025.08.18:CS)土田:ガンマ補正対応で追加)</param>
         /// <returns></returns>
         /// <remarks>
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で不要なパラメータを削除
         /// </remarks>
-        public ConvertResult ConvertAnimation(FormatKinds formatKind, AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness)
+        public ConvertResult ConvertAnimation(FormatKinds formatKind, AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma)
         //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
         {
             switch (formatKind)
@@ -54,7 +55,11 @@ namespace MicroSign.Core.Models
                     return ConvertResult.Failed($"フォーマット'{formatKind}'は現在のバージョンでは非対応です");
 
                 case FormatKinds.IndexColor:
-                    return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                    //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 >>>>> ここから
+                    //return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                    //-----
+                    return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma);
+                //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 <<<<< ここまで
                 //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
 
                 default:

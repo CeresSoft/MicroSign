@@ -18,8 +18,9 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedWidth">マトリクスLED横ドット数</param>
         /// <param name="matrixLedHeight">マトリクスLED縦ドット数</param>
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
+        /// <param name="gamma">ガンマ値(2025.08.18:CS)土田:ガンマ補正対応で追加)</param>
         /// <returns></returns>
-        private ConvertResult ConvertAnimationIndexColor(AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness)
+        private ConvertResult ConvertAnimationIndexColor(AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma)
         {
             //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
             ////アニメーション画像からマージしたアニメーション用画像を生成
@@ -99,10 +100,45 @@ namespace MicroSign.Core.Models
                 }
             }
 
+            //2025.08.18:CS)土田:ガンマ補正対応で追加 >>>>> ここから
+            //----------
+            BitmapSource? correctedImage = null;  //CorrectInvertGammaで使用した画像
+            {
+                CorrectImageGammaResult ret = this.CorrectImageGamma(margeImage, gamma);
+
+                if (ret.IsSuccess)
+                {
+                    //成功した場合は処理続行
+                }
+                else
+                {
+                    //失敗した場合は終了
+                    string msg = $"補正画像の生成で失敗 ({ret.Message})";
+                    return ConvertResult.Failed(msg);
+                }
+
+                //補正画像取得
+                correctedImage = ret.CorrectedImage;
+                if (correctedImage == null)
+                {
+                    //無効の場合はエラーで終了
+                    return ConvertResult.Failed("補正画像が無効");
+                }
+                else
+                {
+                    //有効の場合は処理続行
+                }
+            }
+            //2025.08.18:CS)土田:ガンマ補正対応で追加 <<<<< ここまで
+
             //ファイルに保存する
             BitmapSource? usedImage = null;  //ConvertAnimationIndexColor_SaveToFileで使用した画像
             {
-                ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(margeImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                //2025.08.18:CS)土田:ガンマ補正対応で使用する画像を変更 >>>>> ここから
+                //ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(margeImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                //----------
+                ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(correctedImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                //2025.08.18:CS)土田:ガンマ補正対応で使用する画像を変更 <<<<< ここまで
                 if (ret.IsSuccess)
                 {
                     //成功した場合は処理続行
