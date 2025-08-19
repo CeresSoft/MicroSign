@@ -188,7 +188,7 @@ namespace MicroSign.Core
         }
 
         /// <summary>
-        /// バージョン
+        /// MicroSignアニメーションファイル向けバージョン
         /// </summary>
         public static class Versions
         {
@@ -201,6 +201,23 @@ namespace MicroSign.Core
             /// version 1.1.0
             /// </summary>
             public const int V110 = 110;
+        }
+
+        /// <summary>
+        /// パネル設定
+        /// </summary>
+        public static class PanelConfig
+        {
+            /// <summary>
+            /// パネル設定向けバージョン
+            /// </summary>
+            public static class Versions
+            {
+                /// <summary>
+                /// version 1.0.0
+                /// </summary>
+                public const int V100 = 100;
+            }
         }
 
         /// <summary>
