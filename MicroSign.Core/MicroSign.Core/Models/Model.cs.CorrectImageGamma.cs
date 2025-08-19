@@ -7,7 +7,10 @@ namespace MicroSign.Core.Models
 {
     partial class Model
     {
-        private struct CorrectInvertGammaResult
+        /// <summary>
+        /// 画像のガンマ補正結果
+        /// </summary>
+        private struct CorrectImageGammaResult
         {
             /// <summary>
             /// 成功フラグ
@@ -30,7 +33,7 @@ namespace MicroSign.Core.Models
             /// <param name="isSuccess">成功フラグ</param>
             /// <param name="message">メッセージ</param>
             /// <param name="correctedImage">補正画像</param>
-            private CorrectInvertGammaResult(bool isSuccess, string? message, WriteableBitmap? correctedImage)
+            private CorrectImageGammaResult(bool isSuccess, string? message, WriteableBitmap? correctedImage)
             {
                 this.IsSuccess = isSuccess;
                 this.Message = message;
@@ -42,9 +45,9 @@ namespace MicroSign.Core.Models
             /// </summary>
             /// <param name="message">メッセージ</param>
             /// <returns></returns>
-            public static CorrectInvertGammaResult Failed(string message)
+            public static CorrectImageGammaResult Failed(string message)
             {
-                CorrectInvertGammaResult result = new CorrectInvertGammaResult(false, message, null);
+                CorrectImageGammaResult result = new CorrectImageGammaResult(false, message, null);
                 return result;
             }
 
@@ -53,34 +56,31 @@ namespace MicroSign.Core.Models
             /// </summary>
             /// <param name="correctedImage">補正画像</param>
             /// <returns></returns>
-            public static CorrectInvertGammaResult Success(WriteableBitmap? correctedImage)
+            public static CorrectImageGammaResult Success(WriteableBitmap? correctedImage)
             {
-                CorrectInvertGammaResult result = new CorrectInvertGammaResult(true, null, correctedImage);
+                CorrectImageGammaResult result = new CorrectImageGammaResult(true, null, correctedImage);
                 return result;
             }
         }
 
         /// <summary>
-        /// 逆ガンマ補正
+        /// 画像のガンマ補正
         /// </summary>
         /// <param name="image">入力画像</param>
-        /// <param name="gamma">入力画像のガンマ値</param>
-        /// <returns></returns>
-        private CorrectInvertGammaResult CorrectInvertGamma(BitmapSource? image, double gamma)
+        /// <param name="gamma">ガンマ値</param>
+        /// <returns>補正後の画像</returns>
+        private CorrectImageGammaResult CorrectImageGamma(BitmapSource? image, double gamma)
         {
             //入力画像有効判定
             if (image == null)
             {
                 //画像が無効の場合は終了
-                return CorrectInvertGammaResult.Failed($"入力画像が無効です");
+                return CorrectImageGammaResult.Failed($"入力画像が無効です");
             }
             else
             {
                 //有効の場合は処理続行
             }
-
-            //逆ガンマ補正の値を計算
-            double invertGamma = CommonConsts.Values.One.I / gamma;
 
             //画像ピクセル取得
             // >> 検証済の値を取得
@@ -127,10 +127,10 @@ namespace MicroSign.Core.Models
                     int greenValue = bgra32[greenIndex];
                     int blueValue = bgra32[blueIndex];
 
-                    //逆ガンマ補正
-                    int correctedRedValue = this.CalcGammaCorrectedValue(redValue, invertGamma);
-                    int correctedGreenValue = this.CalcGammaCorrectedValue(greenValue, invertGamma);
-                    int correctedBlueValue = this.CalcGammaCorrectedValue(blueValue, invertGamma);
+                    //ガンマ補正
+                    int correctedRedValue = CommonUtils.CorrectGamma8bit(redValue, gamma);
+                    int correctedGreenValue = CommonUtils.CorrectGamma8bit(greenValue, gamma);
+                    int correctedBlueValue = CommonUtils.CorrectGamma8bit(blueValue, gamma);
 
                     //色を置き換え
                     bgra32[redIndex] = (byte)correctedRedValue;
@@ -150,49 +150,7 @@ namespace MicroSign.Core.Models
             }
 
             //ここまできたら成功で終了
-            return CorrectInvertGammaResult.Success(correctedBitmap);
-        }
-
-        /// <summary>
-        /// ガンマ補正値計算
-        /// </summary>
-        /// <param name="value">8bitカラー値(0～255)</param>
-        /// <param name="gamma">ガンマ値</param>
-        /// <returns></returns>
-        private int CalcGammaCorrectedValue(int value, double gamma)
-        {
-            //入力値有効判定
-            // >> 最小値以上判定
-            if(value < CommonConsts.Palettes.Colors.Min8bit)
-            {
-                //最小値未満は計算できないので、8bitカラーの最小値を返す
-                return CommonConsts.Palettes.Colors.Min8bit;
-            }
-            else
-            {
-                //有効の場合は処理続行
-            }
-            // >> 最大値以下判定
-            if (CommonConsts.Palettes.Colors.Max8bit < value)
-            {
-                //最大値超過は計算できないので、8bitカラーの最大値を返す
-                return CommonConsts.Palettes.Colors.Max8bit;
-            }
-            else
-            {
-                //有効の場合は処理続行
-            }
-
-            //0～255を0～1に変換
-            double valueIn = value / (double)CommonConsts.Palettes.Colors.AlphaMax;
-
-            //ガンマ補正
-            double valueOut = Math.Pow(valueIn, gamma);
-
-            //0～255に戻す
-            int result = (int)(valueOut * CommonConsts.Palettes.Colors.AlphaMax);
-
-            return result;
+            return CorrectImageGammaResult.Success(correctedBitmap);
         }
     }
 }

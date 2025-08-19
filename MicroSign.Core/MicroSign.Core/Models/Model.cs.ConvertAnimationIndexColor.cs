@@ -104,7 +104,7 @@ namespace MicroSign.Core.Models
             //----------
             BitmapSource? correctedImage = null;  //CorrectInvertGammaで使用した画像
             {
-                CorrectInvertGammaResult ret = this.CorrectInvertGamma(margeImage, gamma);
+                CorrectImageGammaResult ret = this.CorrectImageGamma(margeImage, gamma);
 
                 if (ret.IsSuccess)
                 {

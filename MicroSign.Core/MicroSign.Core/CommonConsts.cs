@@ -600,6 +600,11 @@ namespace MicroSign.Core
             /// 整数から小数へ変換するための係数
             /// </remarks>
             public static readonly double Magnification = 100.0;
+
+            /// <summary>
+            /// 四捨五入の値
+            /// </summary>
+            public static readonly double RoundOffValue = 0.5;
         }
     }
 }
