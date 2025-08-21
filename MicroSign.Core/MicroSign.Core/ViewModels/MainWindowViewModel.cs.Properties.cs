@@ -651,6 +651,58 @@ namespace MicroSign.Core.ViewModels
             }
         }
         #endregion
+        #region 残像軽減
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// 残像軽減初期値
+            /// </summary>
+            public const int MotionBlurReduction = 1;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// 残像軽減プロパティ名
+            /// </summary>
+            public const string MotionBlurReduction = "MotionBlurReduction";
+        }
+
+        /// <summary>
+        /// 残像軽減保持変数
+        /// </summary>
+        protected int _MotionBlurReduction = InitializeValues.MotionBlurReduction;
+
+        /// <summary>
+        /// 残像軽減
+        /// </summary>
+        /// <remarks>
+        /// 2025.08.21:CS)土田:本体の黒フレーム挿入機能対応で追加
+        /// </remarks>
+        public int MotionBlurReduction
+        {
+            get
+            {
+                return this._MotionBlurReduction;
+            }
+            set
+            {
+                int now = this._MotionBlurReduction;
+                if (now == value)
+                {
+                    return;
+                }
+                this._MotionBlurReduction = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
 
         //「Documents\ViewModelプロパティ作成テンプレート.xlsx」の「MainWindowViewModel」をコピー <<<<< ここまで
     }

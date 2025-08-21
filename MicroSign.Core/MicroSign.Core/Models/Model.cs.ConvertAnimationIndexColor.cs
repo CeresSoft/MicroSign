@@ -19,8 +19,9 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedHeight">マトリクスLED縦ドット数</param>
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
         /// <param name="gamma">ガンマ値(2025.08.18:CS)土田:ガンマ補正対応で追加)</param>
+        /// <param name="motionBlurReduction">残像軽減(2025.08.21:CS)土田:残像軽減対応で追加)</param>
         /// <returns></returns>
-        private ConvertResult ConvertAnimationIndexColor(AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma)
+        private ConvertResult ConvertAnimationIndexColor(AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma, int motionBlurReduction)
         {
             //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
             ////アニメーション画像からマージしたアニメーション用画像を生成
@@ -137,7 +138,11 @@ namespace MicroSign.Core.Models
                 //2025.08.18:CS)土田:ガンマ補正対応で使用する画像を変更 >>>>> ここから
                 //ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(margeImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
                 //----------
-                ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(correctedImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                //2025.08.21:CS)土田:残像軽減対応で引数を追加 >>>>> ここから
+                //ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(correctedImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
+                //----------
+                ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(correctedImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness, motionBlurReduction);
+                //2025.08.21:CS)土田:残像軽減対応で引数を追加 <<<<< ここまで
                 //2025.08.18:CS)土田:ガンマ補正対応で使用する画像を変更 <<<<< ここまで
                 if (ret.IsSuccess)
                 {
@@ -227,12 +232,13 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedWidth">マトリクスLED横ドット数</param>
         /// <param name="matrixLedHeight">マトリクスLED縦ドット数</param>
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
+        /// <param name="motionBlurReduction">残像軽減(2025.08.21:CS)土田:残像軽減対応で追加)</param>
         /// <returns></returns>
         /// <remarks>
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
         /// ConvertColorFile()を移植(=ConvertColorFile()は削除)
         /// </remarks>
-        public ConvertAnimationIndexColor_SaveToFileResult ConvertAnimationIndexColor_SaveToFile(BitmapSource? image, AnimationDataCollection? animationDatas, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness)
+        public ConvertAnimationIndexColor_SaveToFileResult ConvertAnimationIndexColor_SaveToFile(BitmapSource? image, AnimationDataCollection? animationDatas, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, int motionBlurReduction)
         {
             //画像有効判定
             if (image == null)
@@ -411,8 +417,13 @@ namespace MicroSign.Core.Models
                     // >> 明るさ
                     bw.Write((UInt16)matrixLedBrightness);
 
-                    //空き
-                    bw.Write((UInt16)MicroSignConsts.FileData.Reserve);
+                    //2025.08.21:CS)土田:残像軽減対応で値を追加 >>>>> ここから
+                    ////空き
+                    //bw.Write((UInt16)MicroSignConsts.FileData.Reserve);
+                    //-----
+                    //残像軽減
+                    bw.Write((UInt16)motionBlurReduction);
+                    //2025.08.21:CS)土田:残像軽減対応で値を追加 <<<<< ここまで
                 }
 
                 //2025.08.11:CS)杉原:インデックスカラー対応修正 >>>>> ここから
