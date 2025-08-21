@@ -29,11 +29,12 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedHeight">マトリクスLED縦ドット数</param>
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
         /// <param name="gamma">ガンマ値(2025.08.18:CS)土田:ガンマ補正対応で追加)</param>
+        /// <param name="motionBlurReduction">残像軽減(2025.08.21:CS)土田:残像軽減対応で追加)</param>
         /// <returns></returns>
         /// <remarks>
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で不要なパラメータを削除
         /// </remarks>
-        public ConvertResult ConvertAnimation(FormatKinds formatKind, AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma)
+        public ConvertResult ConvertAnimation(FormatKinds formatKind, AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma, int motionBlurReduction)
         //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
         {
             switch (formatKind)
@@ -58,8 +59,12 @@ namespace MicroSign.Core.Models
                     //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 >>>>> ここから
                     //return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
                     //-----
-                    return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma);
-                //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 <<<<< ここまで
+                    //2025.08.21:CS)土田:残像軽減対応で引数を追加 >>>>> ここから
+                    //return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma);
+                    //----------
+                    return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma, motionBlurReduction);
+                    //2025.08.21:CS)土田:残像軽減対応で引数を追加 <<<<< ここまで
+                    //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 <<<<< ここまで
                 //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
 
                 default:

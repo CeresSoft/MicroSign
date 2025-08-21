@@ -87,6 +87,10 @@ namespace MicroSign.Core.ViewModels
             // >> 小数に変換
             double gamma = gammaCorrection / CommonConsts.Gammas.Magnification;
             //2025.08.18:CS)土田:ガンマ補正対応で追加 <<<<< ここまで
+            //2025.08.21:CS)土田:残像軽減対応で追加 >>>>> ここから
+            //-----
+            int motionBlurReduction = this.MotionBlurReduction;
+            //2025.08.21:CS)土田:残像軽減対応で追加 <<<<< ここまで
 
             //アニメーション画像コレクション
             // >> コンストラクタで生成しているのでnullチェック不要
@@ -102,7 +106,11 @@ namespace MicroSign.Core.ViewModels
             //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 >>>>> ここから
             //Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
             //-----
-            Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma);
+            //2025.08.21:CS)土田:残像軽減対応で引数を追加 >>>>> ここから
+            //Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma);
+            //-----
+            Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma, motionBlurReduction);
+            //2025.08.21:CS)土田:残像軽減対応で引数を追加 <<<<< ここまで
             //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 <<<<< ここまで
             this.AnimationMergedBitmap = ret.AnimationMergedBitmap;
             this.AnimationDatas = ret.AnimationDatas;
