@@ -559,7 +559,9 @@
 
     <!-- アニメーション画像データテンプレート -->
     <DataTemplate x:Key="AnimationImageItemDataTemplate" DataType="{x:Type ViewModels:AnimationImageItem}">
-        <Grid>
+        <!-- ItemContainerStyleのBorderThicknessと相殺するためにマイナスマージンを入れる -->
+        <!-- 親要素のSnapsToDevicePixels=Trueが効くと1pxラインの表示が崩れるので、Grid内で無効化する -->
+        <Grid Margin="-1" SnapsToDevicePixels="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="Auto"/>
