@@ -287,7 +287,12 @@ namespace MicroSign.Core.ViewModels
                         double displayPeriod = CommonConsts.Time.Zero;
                         {
                             //表示時間(ms)を取得
-                            int time = BitConverter.ToInt32(frameDelayTimePropertyItemValue, CommonConsts.Index.First) * CommonConsts.Time.GifUnitTime;
+                            //2025.08.25:CS)土田:表示時間のインデックスがフレームに連動するように修正 >>>>> ここから
+                            //int time = BitConverter.ToInt32(frameDelayTimePropertyItemValue, CommonConsts.Index.First) * CommonConsts.Time.GifUnitTime;
+                            //----------
+                            int timeIndex = i * CommonConsts.ByteCount.INT;
+                            int time = BitConverter.ToInt32(frameDelayTimePropertyItemValue, timeIndex) * CommonConsts.Time.GifUnitTime;
+                            //2025.08.25:CS)土田:表示時間のインデックスがフレームに連動するように修正 <<<<< ここまで
 
                             //表示時間を秒に変換
                             TimeSpan ts = TimeSpan.FromMilliseconds(time);
