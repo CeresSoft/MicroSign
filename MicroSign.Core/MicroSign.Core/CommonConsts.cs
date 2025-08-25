@@ -530,7 +530,13 @@ namespace MicroSign.Core
             /// </summary>
             public static readonly string PngFileFormat = "{0}.png";
 
-
+            /// <summary>
+            /// GIFファイル拡張子
+            /// </summary>
+            /// <remarks>
+            /// switch分岐で使用するためconstにします
+            /// </remarks>
+            public const string GifExtension = ".gif";
         }
 
         /// <summary>

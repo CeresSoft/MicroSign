@@ -261,15 +261,18 @@ namespace MicroSign.Core.ViewModels
                         }
                     }
 
-                    //アニメーション画像リストをクリア
-                    // >> イベント処理した場合にRemoveとして扱いたいのでClear()を使わずRemoveAt()で削除します
-                    {
-                        int c = CommonUtils.GetCount(animationImages);
-                        for (int i = CommonConsts.Index.First; i < c; i += CommonConsts.Index.Step)
-                        {
-                            animationImages.RemoveAt(CommonConsts.Index.First);
-                        }
-                    }
+                    //2025.08.25:CS)土田:複数GIFを同時に読み込めるように、リストクリアのタイミングを変更 >>>>> ここから 
+                    ////アニメーション画像リストをクリア
+                    //// >> イベント処理した場合にRemoveとして扱いたいのでClear()を使わずRemoveAt()で削除します
+                    //{
+                    //    int c = CommonUtils.GetCount(animationImages);
+                    //    for (int i = CommonConsts.Index.First; i < c; i += CommonConsts.Index.Step)
+                    //    {
+                    //        animationImages.RemoveAt(CommonConsts.Index.First);
+                    //    }
+                    //}
+                    //----------
+                    //2025.08.25:CS)土田:複数GIFを同時に読み込めるように、リストクリアのタイミングを変更 <<<<< ここまで
 
                     //フレームを処理する
                     for (int i = CommonConsts.Index.First; i < frameCount; i += CommonConsts.Index.Step)
