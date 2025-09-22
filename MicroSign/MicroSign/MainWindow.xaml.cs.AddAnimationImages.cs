@@ -1,4 +1,5 @@
 ﻿using MicroSign.Core;
+using MicroSign.Core.Navigations;
 using MicroSign.Core.ViewModels;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -165,8 +166,20 @@ namespace MicroSign
                 }
                 else
                 {
-                    //適合しない場合は失敗にする
-                    this.ShowWarning(CommonLogger.Warn($"パネルサイズに適合しない画像です\npath='{imagePath}'"));
+                    //2025.09.22:CS)土田:パネルサイズより大きい場合は切り抜く機能追加 >>>>> ここから
+                    ////適合しない場合は失敗にする
+                    //this.ShowWarning(CommonLogger.Warn($"パネルサイズに適合しない画像です\npath='{imagePath}'"));
+                    //----------
+                    //ViewModelから設定されているマトリクスLEDの情報を取得する
+                    MainWindowViewModel vm = this.ViewModel;
+                    int matrixLedWidth = vm.MatrixLedWidth;
+                    int matrixLedHeight = vm.MatrixLedHeight;
+
+                    //切り抜きページを表示
+                    // >> 切り抜きスクロールした画像の追加はコールバック内で行う
+                    MicroSign.Core.Views.Pages.AnimationClipPage page = new MicroSign.Core.Views.Pages.AnimationClipPage(matrixLedWidth, matrixLedHeight, image);
+                    this.NaviPanel.NavigationCall(page, null, this.AnimationClip_Result);
+                    //2025.09.22:CS)土田:パネルサイズより大きい場合は切り抜く機能追加 <<<<< ここまで
                     return;
                 }
             }
@@ -174,6 +187,16 @@ namespace MicroSign
 
             //リストに追加
             this.ViewModel.AddAnimationImage(animationImageItem);
+        }
+
+        /// <summary>
+        /// アニメーション切り抜き結果
+        /// </summary>
+        /// <param name="callArgs"></param>
+        /// <param name="result"></param>
+        private void AnimationClip_Result(object? callArgs, object? result)
+        {
+            //TODO: 2025.09.22: AnimationClip_Result
         }
     }
 }
