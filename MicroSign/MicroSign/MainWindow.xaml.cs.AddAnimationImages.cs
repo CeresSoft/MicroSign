@@ -1,8 +1,11 @@
 ﻿using MicroSign.Core;
 using MicroSign.Core.Navigations;
+using MicroSign.Core.Navigations.Enums;
 using MicroSign.Core.ViewModels;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
+using static MicroSign.Core.Views.Pages.AnimationClipPage;
 
 namespace MicroSign
 {
@@ -177,7 +180,7 @@ namespace MicroSign
 
                     //切り抜きページを表示
                     // >> 切り抜きスクロールした画像の追加はコールバック内で行う
-                    MicroSign.Core.Views.Pages.AnimationClipPage page = new MicroSign.Core.Views.Pages.AnimationClipPage(matrixLedWidth, matrixLedHeight, image);
+                    MicroSign.Core.Views.Pages.AnimationClipPage page = new MicroSign.Core.Views.Pages.AnimationClipPage(matrixLedWidth, matrixLedHeight, image, imagePath);
                     this.NaviPanel.NavigationCall(page, null, this.AnimationClip_Result);
                     //2025.09.22:CS)土田:パネルサイズより大きい場合は切り抜く機能追加 <<<<< ここまで
                     return;
@@ -197,6 +200,48 @@ namespace MicroSign
         private void AnimationClip_Result(object? callArgs, object? result)
         {
             //TODO: 2025.09.22: AnimationClip_Result
+            AnimationClipPageResult? pageResult = result as AnimationClipPageResult;
+            if (pageResult == null)
+            {
+                //結果無効の場合は失敗
+                this.ShowWarning("アニメーション切り抜きに失敗しました");
+                return;
+            }
+            else
+            {
+                //結果有効の場合は続行
+            }
+
+            //結果種類を取得
+            NavigationResultKind resultKind = pageResult.ResultKind;
+            switch(resultKind)
+            {
+                case NavigationResultKind.Success:
+                    //成功の場合は続行
+                    break;
+
+                case NavigationResultKind.Cancel:
+                    //キャンセルの場合は何もしない
+                    return;
+
+                default:
+                    //上記以外は失敗
+                    this.ShowWarning("アニメーション切り抜きに失敗しました");
+                    return;
+            }
+
+            //出力パス一覧を取得
+            List<string>? outputPaths = pageResult.OutputPaths;
+            if (outputPaths == null)
+            {
+                //出力パス一覧が無効の場合は失敗
+                this.ShowWarning("出力画像の一覧を取得できませんでした");
+                return;
+            }
+
+            //アニメーション画像追加を実行し直す
+            string[] paths = outputPaths.ToArray();
+            this.AddAnimationImages(paths);
         }
     }
 }

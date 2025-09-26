@@ -152,6 +152,59 @@ namespace MicroSign.Core.ViewModels.Pages
             }
         }
         #endregion
+        #region オリジナル画像パス
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// オリジナル画像パス初期値
+            /// </summary>
+            public const string? OriginalImagePath = null;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// オリジナル画像パスプロパティ名
+            /// </summary>
+            public const string OriginalImagePath = "OriginalImagePath";
+        }
+
+        /// <summary>
+        /// オリジナル画像パス保持変数
+        /// </summary>
+        protected string? _OriginalImagePath = InitializeValues.OriginalImagePath;
+
+        /// <summary>
+        /// オリジナル画像パス
+        /// </summary>
+        /// <remarks>
+        /// 同じフォルダに切り抜き画像を出力します
+        /// </remarks>
+        public string? OriginalImagePath
+        {
+            get
+            {
+                return this._OriginalImagePath;
+            }
+            set
+            {
+                string? now = this._OriginalImagePath;
+                if (now == value)
+                {
+                    return;
+                }
+                this._OriginalImagePath = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
+
         #region プレビュー画像
         /// <summary>
         /// 初期値

@@ -57,49 +57,45 @@ namespace MicroSign.Core.ViewModels.Pages
                     //大きい場合は続行
                 }
 
-                //レンダリングターゲットビットマップを生成
-                var ret = this.Model.CreateRenderTargetBitmap(matrixLedWidth, previewHeight);
-                if (ret.IsSuccess)
+                //レンダーターゲットビットマップを生成
+                RenderTargetBitmap? renderBitmap = null;
                 {
-                    //成功の場合は続行
-                }
-                else
-                {
-                    //失敗の場合
-                    //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Failed, CommonLogger.Warn($"レンダリングターゲットビットマップの生成に失敗しました (理由={ret.Message})"));
-                    return;
-                }
+                    var ret = this.Model.CreateRenderTargetBitmap(matrixLedWidth, previewHeight);
+                    if (ret.IsSuccess)
+                    {
+                        //成功の場合は続行
+                    }
+                    else
+                    {
+                        //失敗の場合は終了
+                        //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Failed, CommonLogger.Warn($"レンダリングターゲットビットマップの生成に失敗しました (理由={ret.Message})"));
+                        return;
+                    }
 
-                //レンダリングターゲットビットマップを取得
-                RenderTargetBitmap? bmp = ret.RenderBitmap;
-
-                //ビットマップ有効判定
-                if (bmp == null)
-                {
-                    //レンダリングターゲットビットマップが無効の場合は処理できないので終了
-                    //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Failed, CommonLogger.Warn($"レンダリングターゲットビットマップが無効です"));
-                    return;
-                }
-                else
-                {
-                    //レンダリングターゲットビットマップが有効の場合は処理続行
-                    CommonLogger.Debug("レンダリングターゲットビットマップが有効");
+                    //生成したレンダーターゲットビットマップを取得
+                    renderBitmap = ret.RenderBitmap;
                 }
 
                 //プレビュー画像を描画
-                System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-                image.Width = matrixLedWidth;
-                image.Height = previewHeight;
-                image.Stretch = System.Windows.Media.Stretch.Fill;
-                image.Source = originalImage;
-                image.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                image.Arrange(new Rect(CommonConsts.Points.Zero.X, CommonConsts.Points.Zero.Y, matrixLedWidth, previewHeight));
+                {
+                    var ret = this.Model.RenderImage(renderBitmap, originalImage, CommonConsts.Points.Zero.X, CommonConsts.Points.Zero.Y, matrixLedWidth, previewHeight);
+                    if (ret.IsSuccess)
+                    {
+                        //成功の場合は処理続行
+                    }
+                    else
+                    {
+                        //失敗の場合は終了
+                        //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Failed, CommonLogger.Warn($"プレビュー画像を描画に失敗しました (理由={ret.Message})"));
+                        return;
+                    }
+                }
 
-                //ビットマップに描写
-                bmp.Render(image);
+                //内容が確定したのでフリーズする
+                renderBitmap?.Freeze();
 
                 //画像を保存
-                this.PreviewImage = bmp;
+                this.PreviewImage = renderBitmap;
             }
 
             //初期化完了にする
