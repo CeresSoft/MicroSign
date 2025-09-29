@@ -68,13 +68,11 @@ namespace MicroSign.Core.Models
                 DrawingVisual visual = new DrawingVisual();
 
                 //描画コンテキストを開く
-                DrawingContext drawingContext = visual.RenderOpen();
-
-                //画像を描画
-                drawingContext.DrawImage(imageSource, new Rect(x, y, imageWidth, imageHeight));
-
-                //描画コンテキストを閉じる
-                drawingContext.Close();
+                using(DrawingContext drawingContext = visual.RenderOpen())
+                {
+                    //画像を描画
+                    drawingContext.DrawImage(imageSource, new Rect(x, y, imageWidth, imageHeight));
+                }
 
                 //ビットマップに描画
                 bmp.Render(visual);
