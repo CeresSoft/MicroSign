@@ -14,5 +14,15 @@
         /// 上から下
         /// </summary>
         Down,
+
+        /// <summary>
+        /// 右から左
+        /// </summary>
+        Left,
+
+        /// <summary>
+        /// 左から右
+        /// </summary>
+        Right,
     }
 }

@@ -257,7 +257,6 @@ namespace MicroSign.Core.ViewModels.Pages
             }
         }
         #endregion
-
         #region 移動方向
         /// <summary>
         /// 初期値
@@ -267,7 +266,7 @@ namespace MicroSign.Core.ViewModels.Pages
             /// <summary>
             /// 移動方向初期値
             /// </summary>
-            public const AnimationMoveDirection MoveDirection = AnimationMoveDirection.Down;
+            public const AnimationMoveDirection MoveDirection = AnimationMoveDirection.Up;
         }
 
         /// <summary>
@@ -342,7 +341,7 @@ namespace MicroSign.Core.ViewModels.Pages
         /// 移動速度
         /// </summary>
         /// <remarks>
-        /// 0.1秒あたりの移動量をpxで指定
+        /// 1フレームあたりの移動量をpxで指定
         /// </remarks>
         public int MoveSpeed
         {
@@ -358,6 +357,108 @@ namespace MicroSign.Core.ViewModels.Pages
                     return;
                 }
                 this._MoveSpeed = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
+        #region 表示期間(ミリ秒)
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// 表示期間(ミリ秒)初期値
+            /// </summary>
+            public const int DisplayPeriodMillisecond = 50;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// 表示期間(ミリ秒)プロパティ名
+            /// </summary>
+            public const string DisplayPeriodMillisecond = "DisplayPeriodMillisecond";
+        }
+
+        /// <summary>
+        /// 表示期間(ミリ秒)保持変数
+        /// </summary>
+        protected int _DisplayPeriodMillisecond = InitializeValues.DisplayPeriodMillisecond;
+
+        /// <summary>
+        /// 表示期間(ミリ秒)
+        /// </summary>
+        /// <remarks>
+        /// 秒数*1000の整数を設定する
+        /// </remarks>
+        public int DisplayPeriodMillisecond
+        {
+            get
+            {
+                return this._DisplayPeriodMillisecond;
+            }
+            set
+            {
+                int now = this._DisplayPeriodMillisecond;
+                if (now == value)
+                {
+                    return;
+                }
+                this._DisplayPeriodMillisecond = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
+
+        #region 移動方向選択コマンド
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// 移動方向選択コマンド初期値
+            /// </summary>
+            public const DelegateCommand? MoveDirectionSelectCommand = null;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// 移動方向選択コマンドプロパティ名
+            /// </summary>
+            public const string MoveDirectionSelectCommand = "MoveDirectionSelectCommand";
+        }
+
+        /// <summary>
+        /// 移動方向選択コマンド保持変数
+        /// </summary>
+        protected DelegateCommand? _MoveDirectionSelectCommand = InitializeValues.MoveDirectionSelectCommand;
+
+        /// <summary>
+        /// 移動方向選択コマンド
+        /// </summary>
+        public DelegateCommand? MoveDirectionSelectCommand
+        {
+            get
+            {
+                return this._MoveDirectionSelectCommand;
+            }
+            set
+            {
+                DelegateCommand? now = this._MoveDirectionSelectCommand;
+                if (now == value)
+                {
+                    return;
+                }
+                this._MoveDirectionSelectCommand = value;
                 this.RaisePropertyChanged();
             }
         }

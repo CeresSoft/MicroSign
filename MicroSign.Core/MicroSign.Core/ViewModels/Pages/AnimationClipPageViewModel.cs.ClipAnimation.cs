@@ -217,11 +217,100 @@ namespace MicroSign.Core.ViewModels.Pages
             int imageWidth = image.PixelWidth;
             int imageHeight = image.PixelHeight;
 
-            //移動速度から必要なフレーム数を計算
+            //移動方向から、開始位置と移動量を計算
+            int moveDistance = CommonConsts.Values.Zero.I;
+            int startX = (int)CommonConsts.Points.Zero.X;
+            int startY = (int)CommonConsts.Points.Zero.Y;
+            int moveX = CommonConsts.Values.Zero.I;
+            int moveY = CommonConsts.Values.Zero.I;
+            switch (moveDirection)
+            {
+                case AnimationMoveDirection.Up:
+                    //下から上へ移動
+                    {
+                        //移動量
+                        // >> 画像縦幅とLED縦幅の差を移動
+                        moveDistance = imageHeight - matrixLedHeight;
+
+                        //X軸
+                        // >> 変化しない
+
+                        //Y軸
+                        // >> 開始位置は上端
+                        //startY = 0;
+                        // >> 画像を上に動かすので、負方向に移動する
+                        moveY = moveSpeed * CommonConsts.Values.NegativeOne.I;
+                    }
+                    break;
+
+                case AnimationMoveDirection.Down:
+                    //上から下へ移動
+                    {
+                        //移動量
+                        // >> 画像縦幅とLED縦幅の差を移動
+                        moveDistance = imageHeight - matrixLedHeight;
+
+                        //X軸
+                        // >> 変化しない
+
+                        //Y軸
+                        // >> 開始位置は下端
+                        startY = (int)CommonConsts.Points.Zero.Y - moveDistance;
+                        // >> 画像を下に動かすので、正方向に移動する
+                        moveY = moveSpeed;
+                    }
+                    break;
+
+                case AnimationMoveDirection.Left:
+                    //右から左へ移動
+                    {
+                        //移動量
+                        // >> 画像横幅とLED横幅の差を移動
+                        moveDistance = imageWidth - matrixLedWidth;
+
+                        //X軸
+                        // >> 開始位置は左端
+                        //startX = 0;
+                        // >> 画像を左に動かすので、負方向に移動する
+                        moveX = moveSpeed * CommonConsts.Values.NegativeOne.I;
+
+                        //Y軸
+                        // >> 変化しない
+                    }
+                    break;
+
+                case AnimationMoveDirection.Right:
+                    //左から右へ移動
+                    {
+                        //移動量
+                        // >> 画像横幅とLED横幅の差を移動
+                        moveDistance = imageWidth - matrixLedWidth;
+
+                        //X軸
+                        // >> 開始位置は右端
+                        startX = (int)CommonConsts.Points.Zero.X - moveDistance;
+                        // >> 画像を右に動かすので、正方向に移動する
+                        moveX = moveSpeed;
+
+                        //Y軸
+                        // >> 変化しない
+                    }
+                    break;
+
+                default:
+                    //上記以外の方向には未対応
+                    {
+                        string msg = $"未対応の移動方向です(MoveDirection='{moveDirection}')";
+                        CommonLogger.Warn(msg);
+                        return ClipAnimationResult.Failed(msg);
+                    }
+            }
+
+            //移動量から必要なフレーム数を計算
             // >> フレーム数 = (画像縦幅 - LED縦幅) / 移動速度
             // >> ただし余りが出る場合はコマ数を+1する必要がある
             // >> 画像縦幅は必ず整数なので、1を引くことで必ず[必要なコマ数-1]にしてから、最後に+1する
-            int frameCount = ((imageHeight - matrixLedHeight - CommonConsts.Values.One.I) / moveSpeed) + CommonConsts.Values.One.I;
+            int frameCount = ((moveDistance - CommonConsts.Values.One.I) / moveSpeed) + CommonConsts.Values.One.I;
             CommonLogger.Debug($"フレーム数='{frameCount}'");
 
             //ファイル番号フォーマットを取得
@@ -236,10 +325,6 @@ namespace MicroSign.Core.ViewModels.Pages
                 }
                 fileNumberFormat = sb.ToString();
             }
-
-            //TODO:  2025.09.26: 移動方向から開始位置と移動量を計算
-            int startY = (int)CommonConsts.Points.Zero.Y;
-            int moveY = moveSpeed;
 
             //出力画像パスを保存するリスト
             List<string> outputPaths = new List<string>();
@@ -272,9 +357,9 @@ namespace MicroSign.Core.ViewModels.Pages
             for (int i = CommonConsts.Index.First; i < frameCount; i += CommonConsts.Index.Step)
             {
                 //切り抜き座標を計算
-                // >> 2025.09.26:現状は縦方向のみ対応のため、Xは固定
-                int x = (int)CommonConsts.Points.Zero.X;
-                int y = startY - (moveY * i);
+                // >> 移動しない方向のmoveは0なので、開始位置から変化しない
+                int x = startX + (moveX * i);
+                int y = startY + (moveY * i);
 
                 //切り抜いた画像を描写
                 {

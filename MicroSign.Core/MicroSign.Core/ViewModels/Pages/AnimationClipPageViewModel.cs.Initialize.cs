@@ -36,31 +36,54 @@ namespace MicroSign.Core.ViewModels.Pages
             //マトリクスLEDの縦幅を取得
             int matrixLedHeight = this.MatrixLedHeight;
 
-            //マトリクスLEDの横幅にあわせて画像を縮小
+            //縮小後の画像サイズを計算
+            // >> 初期値はLEDサイズそのまま
+            int previewWidth = matrixLedWidth;
+            int previewHeight = matrixLedHeight;
+            CommonLogger.Debug($"縮小後の画像サイズを計算 ImageWidth={imageWidth}, ImageHeight={imageHeight}, MatrixLedWidth={matrixLedWidth}, MatrixLedHeight={matrixLedHeight}");
+
+            // >> 最初に横幅にあわせて計算する
             {
-                //オリジナル:マトリクスLEDの比率を計算
+                //横幅のオリジナル:マトリクスLEDの比率を計算
                 double ratio = matrixLedWidth / (double)imageWidth;
 
                 //プレビュー画像の縦幅を計算
                 double previewHeightD = imageHeight * ratio;
                 // >> 整数に丸める
-                int previewHeight = (int)previewHeightD;
+                previewHeight = (int)previewHeightD;
+                CommonLogger.Debug($"横幅を基準に計算 Width={previewWidth}, Height={previewHeight}");
+            }
 
-                //TODO: 2025.09.22: 縦幅がマトリクスLEDより小さい場合は現状は非対応とする
-                if (previewHeight < matrixLedHeight)
-                {
-                    //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Failed, CommonLogger.Warn($"縦幅がマトリクスLEDの縦幅未満です"));
-                    return;
-                }
-                else
-                {
-                    //大きい場合は続行
-                }
+            // >> 横幅に合わせて縮小した場合に縦幅が足りるか
+            if (previewHeight < matrixLedHeight)
+            {
+                CommonLogger.Debug($"縮小後縦幅がマトリクスLED縦幅より小さいため再計算");
 
+                //縦幅のオリジナル:マトリクスLEDの比率を計算
+                double ratio = matrixLedHeight / (double)imageHeight;
+
+                //プレビュー画像の横幅を計算
+                double previewWidthD = imageWidth * ratio;
+                // >> 整数に丸める
+                previewWidth = (int)previewWidthD;
+
+                //縦幅はマトリクスLEDの縦幅にあわせる
+                previewHeight = matrixLedHeight;
+                CommonLogger.Debug($"縦幅を基準に計算 Width={previewWidth}, Height={previewHeight}");
+
+                //移動方向の初期値を右から左に変更
+                this.MoveDirection = AnimationMoveDirection.Left;
+            }
+            else
+            {
+                //縦幅が足りる場合は何もしない
+            }
+
+            { 
                 //レンダーターゲットビットマップを生成
                 RenderTargetBitmap? renderBitmap = null;
                 {
-                    var ret = this.Model.CreateRenderTargetBitmap(matrixLedWidth, previewHeight);
+                    var ret = this.Model.CreateRenderTargetBitmap(previewWidth, previewHeight);
                     if (ret.IsSuccess)
                     {
                         //成功の場合は続行
@@ -78,7 +101,7 @@ namespace MicroSign.Core.ViewModels.Pages
 
                 //プレビュー画像を描画
                 {
-                    var ret = this.Model.RenderImage(renderBitmap, originalImage, CommonConsts.Points.Zero.X, CommonConsts.Points.Zero.Y, matrixLedWidth, previewHeight);
+                    var ret = this.Model.RenderImage(renderBitmap, originalImage, CommonConsts.Points.Zero.X, CommonConsts.Points.Zero.Y, previewWidth, previewHeight);
                     if (ret.IsSuccess)
                     {
                         //成功の場合は処理続行

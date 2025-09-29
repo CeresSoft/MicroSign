@@ -31,14 +31,24 @@ namespace MicroSign.Core.Views.Pages
             public readonly List<string>? OutputPaths;
 
             /// <summary>
+            /// 表示期間
+            /// </summary>
+            /// <remarks>
+            /// 出力したすべてのフレームで共通の値
+            /// </remarks>
+            public readonly double DisplayPeriod;
+
+            /// <summary>
             /// コンストラクタ
             /// </summary>
             /// <param name="resultKind">結果</param>
             /// <param name="outputPaths">出力パス一覧</param>
-            private AnimationClipPageResult(NavigationResultKind resultKind, List<string>? outputPaths)
+            /// <param name="displayPeriod">表示期間</param>
+            private AnimationClipPageResult(NavigationResultKind resultKind, List<string>? outputPaths, double displayPeriod)
             {
                 this.ResultKind = resultKind;
                 this.OutputPaths = outputPaths;
+                this.DisplayPeriod = displayPeriod;
             }
 
             /// <summary>
@@ -47,7 +57,7 @@ namespace MicroSign.Core.Views.Pages
             /// <returns></returns>
             public static AnimationClipPageResult Cancel()
             {
-                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Cancel, null);
+                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Cancel, null, AnimationClipPageViewModel.InitializeValues.DisplayPeriodMillisecond);
                 return result;
             }
 
@@ -55,10 +65,11 @@ namespace MicroSign.Core.Views.Pages
             /// 成功の場合
             /// </summary>
             /// <param name="outputPaths">出力パス一覧</param>
+            /// <param name="displayPeriod">表示期間</param>
             /// <returns></returns>
-            public static AnimationClipPageResult Success(List<string>? outputPaths)
+            public static AnimationClipPageResult Success(List<string>? outputPaths, double displayPeriod)
             {
-                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Success, outputPaths);
+                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Success, outputPaths, displayPeriod);
                 return result;
             }
 
@@ -68,7 +79,7 @@ namespace MicroSign.Core.Views.Pages
             /// <returns></returns>
             public static AnimationClipPageResult Failed()
             {
-                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Failed, null);
+                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Failed, null, AnimationClipPageViewModel.InitializeValues.DisplayPeriodMillisecond);
                 return result;
             }
         }
@@ -123,19 +134,28 @@ namespace MicroSign.Core.Views.Pages
         /// <param name="taskResult"></param>
         private void OnClipAnimationFinish(ClipAnimationResult taskResult)
         {
-            System.Diagnostics.Debug.WriteLine("OnClipAnimationFinish");
+            //ViewModelを取得
+            AnimationClipPageViewModel vm = this.ViewModel;
 
             //操作可能
             this.IsEnabled = true;
 
             //画面を閉じる
             {
+                //アニメーション切り抜き処理の成否を取得
                 bool isSuccess = taskResult.IsSuccess;
                 if (isSuccess)
                 {
-                    //成功で終了
+                    //出力結果を取得
                     List<string>? outputPaths = taskResult.OutputPaths;
-                    AnimationClipPageResult result = AnimationClipPageResult.Success(outputPaths);
+
+                    //アニメーション設定値を取得
+                    int displayPeriodMs = vm.DisplayPeriodMillisecond;
+                    // >> ミリ秒を秒に変換
+                    double displayPeriod = displayPeriodMs / (double)CommonConsts.Intervals.OneSec;
+
+                    //成功で終了
+                    AnimationClipPageResult result = AnimationClipPageResult.Success(outputPaths, displayPeriod);
                     this.NavigationReturn(result);
                 }
                 else
