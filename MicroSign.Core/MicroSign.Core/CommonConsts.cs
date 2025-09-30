@@ -486,6 +486,27 @@ namespace MicroSign.Core
                 /// </summary>
                 public const int M = 1024 * 1024;
             }
+
+            /// <summary>
+            /// -1
+            /// </summary>
+            public static class NegativeOne
+            {
+                /// <summary>
+                /// intの-1.0
+                /// </summary>
+                public const int I = -1;
+
+                /// <summary>
+                /// doubeの-1.0
+                /// </summary>
+                public const double D = I;
+
+                /// <summary>
+                /// decimalの-1.0
+                /// </summary>
+                public const decimal M = I;
+            }
         }
 
         /// <summary>
@@ -530,7 +551,13 @@ namespace MicroSign.Core
             /// </summary>
             public static readonly string PngFileFormat = "{0}.png";
 
-
+            /// <summary>
+            /// GIFファイル拡張子
+            /// </summary>
+            /// <remarks>
+            /// switch分岐で使用するためconstにします
+            /// </remarks>
+            public const string GifExtension = ".gif";
         }
 
         /// <summary>

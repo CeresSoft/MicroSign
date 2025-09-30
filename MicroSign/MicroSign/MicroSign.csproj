@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MicroSign.ico</ApplicationIcon>
     <Authors>CeresSoft</Authors>
-    <FileVersion>1.3.2.1</FileVersion>
+    <FileVersion>1.3.3.1</FileVersion>
     <Copyright>(C) 2023-2025 CeresSoft</Copyright>
     <AssemblyTitle>MicroSignアニメーション作成</AssemblyTitle>
   </PropertyGroup>

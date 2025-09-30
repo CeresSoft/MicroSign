@@ -1315,6 +1315,12 @@ namespace MicroSign
                     }
                 }
 
+                //2025.08.25:CS)土田:複数GIFを同時に読み込めるように、リストクリアのタイミングを変更 >>>>> ここから
+                //----------
+                //アニメーション画像リストをクリア
+                this.ViewModel.ClearAnimationImages();
+                //2025.08.25:CS)土田:複数GIFを同時に読み込めるように、リストクリアのタイミングを変更 <<<<< ここまで
+
                 //GIFアニメーション読込
                 {
                     var ret = this.ViewModel.LoadGifAnimation(imagePath);
