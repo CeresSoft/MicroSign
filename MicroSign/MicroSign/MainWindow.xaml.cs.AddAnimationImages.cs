@@ -199,7 +199,7 @@ namespace MicroSign
         /// <param name="result"></param>
         private void AnimationClip_Result(object? callArgs, object? result)
         {
-            //TODO: 2025.09.22: AnimationClip_Result
+            //アニメーション切り抜き結果を取得
             AnimationClipPageResult? pageResult = result as AnimationClipPageResult;
             if (pageResult == null)
             {
@@ -238,10 +238,35 @@ namespace MicroSign
                 this.ShowWarning("出力画像の一覧を取得できませんでした");
                 return;
             }
+            else
+            {
+                //有効の場合は続行
+            }
 
-            //アニメーション画像追加を実行し直す
-            string[] paths = outputPaths.ToArray();
-            this.AddAnimationImages(paths);
+            //2025.09.30:CS)土田:切り抜き結果から表示期間をもらうように変更 >>>>> ここから
+            ////アニメーション画像追加を実行し直す
+            //string[] paths = outputPaths.ToArray();
+            //this.AddAnimationImages(paths);
+            //----------
+            //設定されているパネルサイズを取得
+            int panelWidth = this.ViewModel.MatrixLedWidth;
+            int panelHeight = this.ViewModel.MatrixLedHeight;
+
+            //表示期間を取得
+            double displayPeriod = pageResult.DisplayPeriod;
+
+            //出力された画像をアニメーションに追加する
+            // >> 出力順序の通りに追加するため、ソートは行わない
+            int n = CommonUtils.GetCount(outputPaths);
+            for(int i = CommonConsts.Index.First; i < n; i += CommonConsts.Index.Step)
+            {
+                //パスを取得
+                string imagePath = outputPaths[i];
+
+                //通常のアニメーション画像追加
+                this.AddAnimationImagesImpl(imagePath, displayPeriod, panelWidth, panelHeight);
+            }
+            //2025.09.30:CS)土田:切り抜き結果から表示期間をもらうように変更 <<<<< ここまで
         }
     }
 }
