@@ -147,6 +147,13 @@ namespace MicroSign.Core.Views.Pages
                         //常に成功として処理続行する
                         break;
 
+                    //2025.09.30:CS)土田:ビットマップは更新時に毎回生成するように変更 >>>>> ここから
+                    //----------
+                    case AnimationTextPageStateKind.Ready:
+                        //準備完了の場合はテキスト描写に成功しているので処理続行する
+                        break;
+                    //2025.09.30:CS)土田:ビットマップは更新時に毎回生成するように変更 <<<<< ここまで
+
                     default:
                         //それ以外は何らかのエラーなのでエラーメッセージを表示して終了
                         this.NavigationCall(new WarnMessageBox($"エラー '{this.ViewModel.StatusText}'"));
@@ -154,15 +161,36 @@ namespace MicroSign.Core.Views.Pages
                 }
             }
 
-            //画面を閉じる
+            //2025.09.30:CS)土田:画像をファイルに書き出すように変更 >>>>> ここから
+            ////画面を閉じる
+            //{
+            //    int fontSize = vm.SelectFontSize;
+            //    int fontColor = vm.SelectFontColor;
+            //    string? displayText = vm.DisplayText;
+            //    RenderTargetBitmap? renderBitmap = vm.RenderBitmap;
+            //    AnimationTextPageResult result = AnimationTextPageResult.Success(fontSize, fontColor, displayText, renderBitmap);
+            //    this.NavigationReturn(result);
+            //}
+            //----------
+            //レンダリングビットマップを取得
+            RenderTargetBitmap? renderBitmap = vm.RenderBitmap;
+
+            //文字スクロール有無判定
+            bool isScrollEnabled = vm.IsScrollEnabled;
+            if (isScrollEnabled)
             {
+                //TODO: 2025.09.30: スクロールありの場合、連番画像を出力する
+            }
+            else
+            {
+                //TODO: 2025.09.30: スクロールなしの場合、レンダリング済のビットマップを出力する
                 int fontSize = vm.SelectFontSize;
                 int fontColor = vm.SelectFontColor;
                 string? displayText = vm.DisplayText;
-                RenderTargetBitmap? renderBitmap = vm.RenderBitmap;
                 AnimationTextPageResult result = AnimationTextPageResult.Success(fontSize, fontColor, displayText, renderBitmap);
                 this.NavigationReturn(result);
             }
+            //2025.09.30:CS)土田:画像をファイルに書き出すように変更 <<<<< ここまで
 
             //成功で終了
             e.Success();

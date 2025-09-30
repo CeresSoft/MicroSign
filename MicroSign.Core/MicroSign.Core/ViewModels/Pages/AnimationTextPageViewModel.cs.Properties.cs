@@ -464,6 +464,56 @@ namespace MicroSign.Core.ViewModels.Pages
         }
         #endregion
 
+        #region 文字スクロール有効フラグ
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// 文字スクロール有効フラグ初期値
+            /// </summary>
+            public const bool IsScrollEnabled = false;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// 文字スクロール有効フラグプロパティ名
+            /// </summary>
+            public const string IsScrollEnabled = "IsScrollEnabled";
+        }
+
+        /// <summary>
+        /// 文字スクロール有効フラグ保持変数
+        /// </summary>
+        protected bool _IsScrollEnabled = InitializeValues.IsScrollEnabled;
+
+        /// <summary>
+        /// 文字スクロール有効フラグ
+        /// </summary>
+        public bool IsScrollEnabled
+        {
+            get
+            {
+                return this._IsScrollEnabled;
+            }
+            set
+            {
+                bool now = this._IsScrollEnabled;
+                if (now == value)
+                {
+                    return;
+                }
+                this._IsScrollEnabled = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
+
         //「Documents\ViewModelプロパティ作成テンプレート.xlsx」の「AnimationTextPageViewModel」をコピー <<<<< ここまで
     }
 }
