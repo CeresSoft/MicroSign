@@ -1,16 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using LOGGER = MicroSign.Core.CommonLogger;
+
+#nullable disable //Variousから移植したコードなので、Null非許容警告を無効化します
 
 namespace MicroSign.Core.Navigations
 {
-    /// <summary>
-    /// ナビゲーション終了コールバック
-    /// </summary>
-    /// <param name="callArgs">呼出時引数</param>
-    /// <param name="result">戻り値</param>
-    public delegate void NavigationReturnCallback(object? callArgs, object? result);
-
     /// <summary>
     /// ナビゲーションコントローラー
     /// </summary>
@@ -42,11 +38,16 @@ namespace MicroSign.Core.Navigations
     /// </remarks>
     public partial class NavigationController : DependencyObject
     {
+        ///// <summary>
+        ///// LOG4NETのロガー
+        ///// </summary>
+        //private static readonly log4net.ILog LOGGER = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// ナビゲーションで使うパネル
         /// </summary>
         /// <remarks>コンテンツとして表示するエレメントを複数追加するのでPanelにします</remarks>
-        private Panel? _NavigationPanel = null;
+        private Panel _NavigationPanel = null;
 
         /// <summary>
         /// エレメントスタック用のクラス
@@ -57,28 +58,21 @@ namespace MicroSign.Core.Navigations
             /// <summary>
             /// エレメント
             /// </summary>
-            public FrameworkElement? Element { get; protected set; } = null;
-            
-            /// <summary>
-            /// 呼出引数
-            /// </summary>
-            public object? CallArgs { get; protected set; } = null;
+            public FrameworkElement Element { get; protected set; } = null;
 
             /// <summary>
             /// 戻りコールバック
             /// </summary>
-            public NavigationReturnCallback? ReturnCallback { get; protected set; } = null;
+            public System.Action<object> ReturnCallback { get; protected set; } = null;
 
             /// <summary>
             /// コンストラクタ
             /// </summary>
-            /// <param name="element">対象引数</param>
-            /// <param name="callArgs">呼出引数</param>
-            /// <param name="returncallback">戻りコールバック</param>
-            public ElementStackData(FrameworkElement element, object? callArgs, NavigationReturnCallback? returncallback)
+            /// <param name="element"></param>
+            /// <param name="returncallback"></param>
+            public ElementStackData(FrameworkElement element, System.Action<object> returncallback)
             {
                 this.Element = element;
-                this.CallArgs = callArgs;
                 this.ReturnCallback = returncallback;
             }
         }
@@ -92,67 +86,128 @@ namespace MicroSign.Core.Navigations
         /// <summary>
         /// 現在表示しているエレメント
         /// </summary>
-        private FrameworkElement? _CurrentElement = null;
-
-        /// <summary>
-        /// 現在表示しているエレメントの呼出引数
-        /// </summary>
-        private object? _CurrentCallArgs = null;
+        private FrameworkElement _CurrentElement = null;
 
         /// <summary>
         /// 現在表示しているエレメントの戻り時に呼び出す関数
         /// </summary>
         /// <remarks>2021.12.28:CS)杉原:追加</remarks>
-        private NavigationReturnCallback? _CurrentReturnCallback = null;
+        private System.Action<object> _CurrentReturnCallback = null;
 
-        //2023.12.18:CS)杉原:コールバックが指定できるようになったので削除 >>>>> ここから
-        ///// <summary>
-        ///// ホストに戻った時に呼出関数
-        ///// </summary>
-        ///// <remarks>
-        ///// 2021.05.22:CS)杉原:
-        ///// オーバーラップ品使わない場合、最後はナビゲーションしているElementHostに戻ってくるが
-        ///// 戻り値を渡す関数が無いので、コンストラクタで指定できるようにする
-        ///// </remarks>
-        //private INavigationReturnParameter? HostReturn { get; set; } = null;
-        //----------
-        //2023.12.18:CS)杉原:コールバックが指定できるようになったので削除 <<<<< ここまで
+        /// <summary>
+        /// ウインドウクローズフラグ
+        /// </summary>
+        public bool IsWindowClosed { get; protected set; } = false;
+
+        /// <summary>
+        /// ホストに戻った時に呼出関数
+        /// </summary>
+        /// <remarks>
+        /// 2021.05.22:CS)杉原:
+        /// オーバーラップしか使わない場合、最後はナビゲーションしているElementHostに戻ってくるが
+        /// ナビゲーションしているElementHostには戻り値を渡す関数が無いので、
+        /// 自エレメントをコンストラクタで指定できるようにする
+        /// </remarks>
+        private INavigationReturnParameter HostReturn { get; set; } = null;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="naviPanel">コンテンツを表示する領域になるPanel</param>
-        public NavigationController(Panel naviPanel)
+        public NavigationController(Panel naviPanel): this(naviPanel, null)
+        {
+        }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="naviPanel">コンテンツを表示する領域になるPanel</param>
+        /// <param name="hostReturn">ホストに戻った時に呼び出すインターフェイス</param>
+        public NavigationController(Panel naviPanel, INavigationReturnParameter hostReturn)
         {
             //パネルを保存
             this._NavigationPanel = naviPanel;
+
+            //パネルの親のWindowのクローズを購読
+            if(naviPanel == null)
+            {
+                //無効の場合は何もしない
+            }
+            else
+            {
+                //有効の場合はウインドウを取得
+                Window w = Window.GetWindow(naviPanel);
+                if(w == null)
+                {
+                    //無効の場合は何もしない
+                }
+                else
+                {
+                    //有効の場合はクローズを購読
+                    w.Closed += this.OnWindowClose;
+                }
+            }
+
+            //ホストのインターフェイスを保存
+            this.HostReturn = hostReturn;
         }
 
-        //2023.12.18:CS)杉原:コールバックが指定できるようになったので削除 >>>>> ここから
-        ///// <summary>
-        ///// コンストラクタ
-        ///// </summary>
-        ///// <param name="naviPanel">コンテンツを表示する領域になるPanel</param>
-        ///// <param name="hostReturn">ホストに戻った時に呼び出すインターフェイス</param>
-        //public NavigationController(Panel naviPanel, INavigationReturnParameter hostReturn)
-        //{
-        //    //パネルを保存
-        //    this._NavigationPanel = naviPanel;
+        /// <summary>
+        /// ウインドウクローズ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        private void OnWindowClose(object sender, System.EventArgs e)
+        {
+            //ウインドウクローズフラグをtrueにする
+            this.IsWindowClosed = true;
+        }
 
-        //    //ホストのインターフェイスを保存
-        //    this.HostReturn = hostReturn;
-        //}
-        //----------
-        //2023.12.18:CS)杉原:コールバックが指定できるようになったので削除 <<<<< ここまで
+        /// <summary>
+        /// ナビゲーションコントローラー初期化
+        /// </summary>
+        /// <param name="naviPanel"></param>
+        /// <param name="hostReturn"></param>
+        /// <returns></returns>
+        public static NavigationController Initialize(Panel naviPanel)
+        {
+            //ナビゲーションコントローラー生成
+            NavigationController result = new NavigationController(naviPanel);
+
+            //パネルにナビゲーションコントローラーを設定
+            NavigationController.SetNavigationController(naviPanel, result);
+
+            //終了
+            return result;
+        }
+
+        /// <summary>
+        /// ナビゲーションコントローラー初期化
+        /// </summary>
+        /// <param name="naviPanel"></param>
+        /// <param name="hostReturn"></param>
+        /// <returns></returns>
+        public static NavigationController Initialize(Panel naviPanel, INavigationReturnParameter hostReturn)
+        {
+            //ナビゲーションコントローラー生成
+            NavigationController result = new NavigationController(naviPanel, hostReturn);
+
+            //パネルにナビゲーションコントローラーを設定
+            NavigationController.SetNavigationController(naviPanel, result);
+
+            //終了
+            return result;
+        }
 
         /// <summary>
         /// 一番上のエレメントを取得
         /// </summary>
         /// <returns></returns>
-        private ElementStackData? PopElement()
+        private ElementStackData PopElement()
         {
             int n = this._ElementStack.Count;
-            if(MicroSign.Core.CommonConsts.Collection.Empty < n)
+            if(CommonConsts.Collection.Empty < n)
             {
                 //要素が存在する場合
                 ElementStackData result = this._ElementStack.Pop();
@@ -169,15 +224,35 @@ namespace MicroSign.Core.Navigations
         /// 遷移処理
         /// </summary>
         /// <param name="moveElement">遷移先のエレメント</param>
-        /// <param name="arg">遷移先エレメントに渡す引数</param>
-        /// <remarks>現在表示しているエレメントを破棄し、新しいエレメントを表示します</remarks>
-        public void Move(FrameworkElement moveElement, object? arg)
+        /// <remarks>
+        /// 現在表示しているエレメントを破棄し、新しいエレメントを表示します
+        /// 【注意】コールバックの変更は行いません(ReturnしたらCall/Overwrapされたときのコールバックを呼び出します)
+        /// これは設定画面のような、Callで画面Aを呼び出し、この画面Aが画面B遷移し、画面BでReturnした場合
+        /// 画面Aを呼びだした時に指定したコールバックを呼び出すパターンが多いからと判断したためです
+        /// </remarks>
+        public void Move(FrameworkElement moveElement)
+        {
+            this.Move(moveElement, null);
+        }
+
+        /// <summary>
+        /// 遷移処理
+        /// </summary>
+        /// <param name="moveElement">遷移先のエレメント</param>
+        /// <param name="arg">遷移先エレメントに渡すパラメータ</param>
+        /// <remarks>
+        /// 現在表示しているエレメントを破棄し、新しいエレメントを表示します
+        /// 【注意】コールバックの変更は行いません(ReturnしたらCall/Overwrapされたときのコールバックを呼び出します)
+        /// これは設定画面のような、Callで画面Aを呼び出し、この画面Aが画面B遷移し、画面BでReturnした場合
+        /// 画面Aを呼びだした時に指定したコールバックを呼び出すパターンが多いからと判断したためです
+        /// </remarks>
+        public void Move(FrameworkElement moveElement, object arg)
         {
             //移動先エレメント有効判定
             if(moveElement == null)
             {
                 //無効の場合は即終了
-                MicroSign.Core.CommonLogger.Warn("遷移先エレメントが無効です");
+                LOGGER.Warn("遷移先エレメントが無効です");
                 return;
             }
             else
@@ -186,11 +261,11 @@ namespace MicroSign.Core.Navigations
             }
 
             //ナビゲーションパネル有効判定
-            Panel? naviPanel = this._NavigationPanel;
+            Panel naviPanel = this._NavigationPanel;
             if (naviPanel == null)
             {
                 //無効の場合は即終了
-                MicroSign.Core.CommonLogger.Warn("ナビゲーションパネルが無効です");
+                LOGGER.Warn("ナビゲーションパネルが無効です");
                 return;
             }
             else
@@ -199,13 +274,28 @@ namespace MicroSign.Core.Navigations
             }
 
             //現在のエレメントを破棄する
-            FrameworkElement? currentElement = this._CurrentElement;
+            FrameworkElement currentElement = this._CurrentElement;
             if (currentElement == null)
             {
                 //現在のエレメントが無効の場合は何もしない
             }
             else
             {
+                //現在エレメントから遷移で終了のインターフェイスを取得
+                // >> 2021.12.28:CS)杉原:追加
+                {
+                    INavigationMove naviParam = currentElement as INavigationMove;
+                    if (naviParam == null)
+                    {
+                        //インターフェイスが無い場合は何もしない
+                    }
+                    else
+                    {
+                        //インターフェイスがある場合は呼び出し
+                        naviParam.NavigationMove(moveElement, arg);
+                    }
+                }
+
                 //カレントエレメントを解除
                 naviPanel.Children.Remove(currentElement);
             }
@@ -219,14 +309,10 @@ namespace MicroSign.Core.Navigations
             //移動先のエレメントを設定
             naviPanel.Children.Add(moveElement);
             this._CurrentElement = moveElement;
-            this._CurrentCallArgs = arg;
-            //2023.12.17:CS)杉原:インストーラーのような遷移する画面に対応するため
-            //Call後にMoveした場合はCallのReturnを使うようにReturnCallbackは設定しない
-            //this._CurrentReturnCallback = null;
 
             //遷移先エレメントからパラメータ受け渡しのインターフェイスを取得
             {
-                INavigationReceiveParameter? naviParam = moveElement as INavigationReceiveParameter;
+                INavigationReceiveParameter naviParam = moveElement as INavigationReceiveParameter;
                 if(naviParam == null)
                 {
                     //インターフェイスが無い場合は何もしない
@@ -243,9 +329,19 @@ namespace MicroSign.Core.Navigations
         /// 呼出処理
         /// </summary>
         /// <param name="callElement">呼出先エレメント</param>
+        /// <remarks>現在表示しているエレメントを非表示時にし、新しいエレメントを表示します</remarks>
+        public void Call(FrameworkElement callElement)
+        {
+            this.Call(callElement, null, null);
+        }
+
+        /// <summary>
+        /// 呼出処理
+        /// </summary>
+        /// <param name="callElement">呼出先エレメント</param>
         /// <param name="arg">呼出先エレメントに渡すパラメータ</param>
         /// <remarks>現在表示しているエレメントを非表示時にし、新しいエレメントを表示します</remarks>
-        public void Call(FrameworkElement callElement, object? arg)
+        public void Call(FrameworkElement callElement, object arg)
         {
             this.Call(callElement, arg, null);
         }
@@ -254,16 +350,27 @@ namespace MicroSign.Core.Navigations
         /// 呼出処理
         /// </summary>
         /// <param name="callElement">呼出先エレメント</param>
-        /// <param name="arg">呼出先エレメントに渡す引数</param>
         /// <param name="returnCallback">戻り時のコールバック</param>
         /// <remarks>現在表示しているエレメントを非表示時にし、新しいエレメントを表示します</remarks>
-        public void Call(FrameworkElement callElement, object? arg, NavigationReturnCallback? returnCallback)
+        public void Call(FrameworkElement callElement, System.Action<object> returnCallback)
+        {
+            this.Call(callElement, null, returnCallback);
+        }
+
+        /// <summary>
+        /// 呼出処理
+        /// </summary>
+        /// <param name="callElement">呼出先エレメント</param>
+        /// <param name="arg">呼出先エレメントに渡すパラメータ</param>
+        /// <param name="returnCallback">戻り時のコールバック</param>
+        /// <remarks>現在表示しているエレメントを非表示時にし、新しいエレメントを表示します</remarks>
+        public void Call(FrameworkElement callElement, object arg, System.Action<object> returnCallback)
         {
             //呼出先エレメント有効判定
             if (callElement == null)
             {
                 //無効の場合は即終了
-                MicroSign.Core.CommonLogger.Warn("呼出先エレメントが無効です");
+                LOGGER.Warn("呼出先エレメントが無効です");
                 return;
             }
             else
@@ -272,11 +379,11 @@ namespace MicroSign.Core.Navigations
             }
 
             //ナビゲーションパネル有効判定
-            Panel? naviPanel = this._NavigationPanel;
+            Panel naviPanel = this._NavigationPanel;
             if (naviPanel == null)
             {
                 //無効の場合は即終了
-                MicroSign.Core.CommonLogger.Warn("ナビゲーションパネルが無効です");
+                LOGGER.Warn("ナビゲーションパネルが無効です");
                 return;
             }
             else
@@ -285,17 +392,26 @@ namespace MicroSign.Core.Navigations
             }
 
             //現在のエレメントを非表示にしてスタックに保存
-            FrameworkElement? currentElement = this._CurrentElement;
-            object? currentCallArgs = this._CurrentCallArgs;
-            NavigationReturnCallback? currentCallback = this._CurrentReturnCallback;
+            FrameworkElement currentElement = this._CurrentElement;
+            System.Action<object> currentCallback = this._CurrentReturnCallback;
             if (currentElement == null)
             {
                 //何もしない
+                //2025.04.19:CS)杉原:ナビゲーションパネル内の子要素に対応 >>>>> ここから
+                //----------
+                // >> ナビゲーションパネル内の子要素を非表示にする
+                int n = naviPanel.Children.Count;
+                for (int i = CommonConsts.Index.First; i < n; i += CommonConsts.Index.Step)
+                {
+                    UIElement child = naviPanel.Children[i];
+                    child.Visibility = Visibility.Collapsed;
+                }
+                //2025.04.19:CS)杉原:ナビゲーションパネル内の子要素に対応 <<<<< ここまで
             }
             else
             {
                 //カレントエレメントをスタックに追加
-                ElementStackData stackData = new ElementStackData(currentElement, currentCallArgs, currentCallback);
+                ElementStackData stackData = new ElementStackData(currentElement, currentCallback);
                 this._ElementStack.Push(stackData);
                 //カレントエレメントを非表示にする
                 currentElement.Visibility = Visibility.Collapsed;
@@ -310,12 +426,11 @@ namespace MicroSign.Core.Navigations
             //新しいエレメントを設定
             naviPanel.Children.Add(callElement);
             this._CurrentElement = callElement;
-            this._CurrentCallArgs = arg;
             this._CurrentReturnCallback = returnCallback;
 
             //遷移先エレメントからパラメータ受け渡しのインターフェイスを取得
             {
-                INavigationReceiveParameter? naviParam = callElement as INavigationReceiveParameter;
+                INavigationReceiveParameter naviParam = callElement as INavigationReceiveParameter;
                 if (naviParam == null)
                 {
                     //インターフェイスが無い場合は何もしない
@@ -332,11 +447,32 @@ namespace MicroSign.Core.Navigations
         /// オーバーラップ処理
         /// </summary>
         /// <param name="callElement">呼出先エレメント</param>
+        /// <remarks>現在表示しているエレメントはそのままで、新しいエレメントをオーバーラップ表示します</remarks>
+        public void Overwrap(FrameworkElement callElement)
+        {
+            this.Overwrap(callElement, null, null);
+        }
+
+        /// <summary>
+        /// オーバーラップ処理
+        /// </summary>
+        /// <param name="callElement">呼出先エレメント</param>
         /// <param name="arg">呼出先エレメントに渡すパラメータ</param>
         /// <remarks>現在表示しているエレメントはそのままで、新しいエレメントをオーバーラップ表示します</remarks>
-        public void Overwrap(FrameworkElement callElement, object? arg)
+        public void Overwrap(FrameworkElement callElement, object arg)
         {
             this.Overwrap(callElement, arg, null);
+        }
+
+        /// <summary>
+        /// オーバーラップ処理
+        /// </summary>
+        /// <param name="callElement">呼出先エレメント</param>
+        /// <param name="returnCallback">戻り時のコールバック</param>
+        /// <remarks>現在表示しているエレメントはそのままで、新しいエレメントをオーバーラップ表示します</remarks>
+        public void Overwrap(FrameworkElement callElement, System.Action<object> returnCallback)
+        {
+            this.Overwrap(callElement, null, returnCallback);
         }
 
         /// <summary>
@@ -346,13 +482,13 @@ namespace MicroSign.Core.Navigations
         /// <param name="arg">呼出先エレメントに渡すパラメータ</param>
         /// <param name="returnCallback">戻り時のコールバック</param>
         /// <remarks>現在表示しているエレメントはそのままで、新しいエレメントをオーバーラップ表示します</remarks>
-        public void Overwrap(FrameworkElement callElement, object? arg, NavigationReturnCallback? returnCallback)
+        public void Overwrap(FrameworkElement callElement, object arg, System.Action<object> returnCallback)
         {
             //呼出先エレメント有効判定
             if (callElement == null)
             {
                 //無効の場合は即終了
-                MicroSign.Core.CommonLogger.Warn("呼出先エレメントが無効です");
+                LOGGER.Warn("呼出先エレメントが無効です");
                 return;
             }
             else
@@ -361,11 +497,11 @@ namespace MicroSign.Core.Navigations
             }
 
             //ナビゲーションパネル有効判定
-            Panel? naviPanel = this._NavigationPanel;
+            Panel naviPanel = this._NavigationPanel;
             if (naviPanel == null)
             {
                 //無効の場合は即終了
-                MicroSign.Core.CommonLogger.Warn("ナビゲーションパネルが無効です");
+                LOGGER.Warn("ナビゲーションパネルが無効です");
                 return;
             }
             else
@@ -374,22 +510,35 @@ namespace MicroSign.Core.Navigations
             }
 
             //現在のエレメントを非表示にしてスタックに保存
-            FrameworkElement? currentElement = this._CurrentElement;
-            object? currentCallArgs = this._CurrentCallArgs;
-            NavigationReturnCallback? currentCallback = this._CurrentReturnCallback;
+            FrameworkElement currentElement = this._CurrentElement;
+            System.Action<object> currentCallback = this._CurrentReturnCallback;
             if (currentElement == null)
             {
                 //何もしない
+                //2025.04.19:CS)杉原:ナビゲーションパネル内の子要素に対応 >>>>> ここから
+                //----------
+                // >> ナビゲーションパネル内の子要素を無効にする
+                int n = naviPanel.Children.Count;
+                for(int i = CommonConsts.Index.First; i < n; i+= CommonConsts.Index.Step)
+                {
+                    UIElement child = naviPanel.Children[i];
+                    child.IsEnabled = false;
+                }
+                //2025.04.19:CS)杉原:ナビゲーションパネル内の子要素に対応 <<<<< ここまで
             }
             else
             {
                 //カレントエレメントをスタックに追加
-                ElementStackData stackData = new ElementStackData(currentElement, currentCallArgs, currentCallback);
+                ElementStackData stackData = new ElementStackData(currentElement, currentCallback);
                 this._ElementStack.Push(stackData);
                 // >>>>> 非表示にしない
                 ////カレントエレメントを非表示にする
                 //currentElement.Visibility = Visibility.Collapsed;
                 // <<<<< 非表示にしない
+                //2025.04.19:CS)杉原:操作無効にする >>>>> ここから
+                //----------
+                currentElement.IsEnabled = false;
+                //2025.04.19:CS)杉原:操作無効にする <<<<< ここまで
             }
 
             //ナビゲーションコントローラー(=this)を設定
@@ -401,12 +550,11 @@ namespace MicroSign.Core.Navigations
             //新しいエレメントを設定
             naviPanel.Children.Add(callElement);
             this._CurrentElement = callElement;
-            this._CurrentCallArgs = arg;
             this._CurrentReturnCallback = returnCallback;
 
             //遷移先エレメントからパラメータ受け渡しのインターフェイスを取得
             {
-                INavigationReceiveParameter? naviParam = callElement as INavigationReceiveParameter;
+                INavigationReceiveParameter naviParam = callElement as INavigationReceiveParameter;
                 if (naviParam == null)
                 {
                     //インターフェイスが無い場合は何もしない
@@ -422,16 +570,25 @@ namespace MicroSign.Core.Navigations
         /// <summary>
         /// 戻り処理
         /// </summary>
-        /// <param name="result">呼出元エレメントに返却する戻り値</param>
         /// <remarks>現在表示しているエレメントを破棄し、呼出元のエレメントを表示します</remarks>
-        public void Return(object? result)
+        public void Return()
+        {
+            this.Return(null);
+        }
+
+        /// <summary>
+        /// 戻り処理
+        /// </summary>
+        /// <param name="arg">呼出元エレメントに返却するパラメータ</param>
+        /// <remarks>現在表示しているエレメントを破棄し、呼出元のエレメントを表示します</remarks>
+        public void Return(object arg)
         {
             //ナビゲーションパネル有効判定
-            Panel? naviPanel = this._NavigationPanel;
+            Panel naviPanel = this._NavigationPanel;
             if (naviPanel == null)
             {
                 //無効の場合は即終了
-                MicroSign.Core.CommonLogger.Warn("ナビゲーションパネルが無効です");
+                LOGGER.Warn("ナビゲーションパネルが無効です");
                 return;
             }
             else
@@ -440,11 +597,11 @@ namespace MicroSign.Core.Navigations
             }
 
             //現在表示しているエレメントを無効にする
-            FrameworkElement? currentElement = this._CurrentElement;
+            FrameworkElement currentElement = this._CurrentElement;
             if (currentElement == null)
             {
                 //無効の場合は即終了
-                MicroSign.Core.CommonLogger.Warn("カレントエレメントが無効です");
+                LOGGER.Warn("カレントエレメントが無効です");
                 return;
             }
             else
@@ -453,59 +610,65 @@ namespace MicroSign.Core.Navigations
                 naviPanel.Children.Remove(currentElement);
             }
 
-            //呼出引数
-            object? currentCallArgs = this._CurrentCallArgs;
-
             //戻りコールバック取得
-            NavigationReturnCallback? currentCallback = this._CurrentReturnCallback;
+            System.Action<object> currentCallback = this._CurrentReturnCallback;
 
             //ひとつ前のエレメントを取得
-            ElementStackData? stackData = this.PopElement();
-            FrameworkElement? prevElement = stackData?.Element;
-            object? prevCallArgs = stackData?.CallArgs;
-            NavigationReturnCallback? prevCallback = stackData?.ReturnCallback;
+            ElementStackData stackData = this.PopElement();
+            FrameworkElement prevElement = stackData?.Element;
+            System.Action<object> prevCallback = stackData?.ReturnCallback;
             if (prevElement == null)
             {
                 //ひとつ前が無い場合はカレントをnullにして終了
                 this._CurrentElement = null;
-                this._CurrentCallArgs = null;
                 this._CurrentReturnCallback = null;
-                MicroSign.Core.CommonLogger.Debug("前エレメントがなくなりました");
-
-                //2023.12.18:CS)杉原:コールバックが指定できるようになったので削除 >>>>> ここから
-                ////2021.05.22:CS)杉原 >>>>> ここから
-                //// >> オーバーラップ品使わない場合、最後はナビゲーションしているElementHostに戻ってくるが
-                //// >> 戻り値を渡す関数が無いので、コンストラクタで指定できるようにする
-                //INavigationReturnParameter? hostReturn = this.HostReturn;
-                //if(hostReturn == null)
-                //{
-                //    //ホスト戻り無し
-                //    MicroSign.Core.CommonLogger.Debug("ホスト戻りなし");
-                //}
-                //else
-                //{
-                //    //ホスト戻りあり
-                //    MicroSign.Core.CommonLogger.Debug("ホスト戻りあり");
-                //    hostReturn.NavigationReturnParameter(currentElement, result);
-                //}
-                ////2021.05.22:CS)杉原 <<<<< ここまで
-                //return;
+                LOGGER.Debug("前エレメントがなくなりました");
+                //2025.04.19:CS)杉原:ナビゲーションパネル内の子要素に対応 >>>>> ここから
                 //----------
-                //2023.12.18:CS)杉原:コールバックが指定できるようになったので削除 <<<<< ここまで
+                // >> ナビゲーションパネル内の子要素を無効にする
+                int n = naviPanel.Children.Count;
+                for (int i = CommonConsts.Index.First; i < n; i += CommonConsts.Index.Step)
+                {
+                    UIElement child = naviPanel.Children[i];
+                    child.IsEnabled = true;
+                    child.Visibility = Visibility.Visible;
+                }
+                //2025.04.19:CS)杉原:ナビゲーションパネル内の子要素に対応 <<<<< ここまで
+                //2021.05.22:CS)杉原 >>>>> ここから
+                // >> オーバーラップ品使わない場合、最後はナビゲーションしているElementHostに戻ってくるが
+                // >> 戻り値を渡す関数が無いので、コンストラクタで指定できるようにする
+                INavigationReturnParameter hostReturn = this.HostReturn;
+                if(hostReturn == null)
+                {
+                    //ホスト戻り無し
+                    LOGGER.Debug("ホスト戻りなし");
+                }
+                else
+                {
+                    //ホスト戻りあり
+                    LOGGER.Debug("ホスト戻りあり");
+                    hostReturn.NavigationReturnParameter(currentElement, arg);
+                }
+                //2021.05.22:CS)杉原 <<<<< ここまで
             }
             else
             {
                 //カレントエレメントに設定
                 this._CurrentElement = prevElement;
-                this._CurrentCallArgs = prevCallArgs;
                 this._CurrentReturnCallback = prevCallback;
 
                 //非表示にしてあるので表示に設定
                 prevElement.Visibility = Visibility.Visible;
 
+                //2025.04.19:CS)杉原:操作無効にする >>>>> ここから
+                //----------
+                // >> 操作を有効にする
+                prevElement.IsEnabled = true;
+                //2025.04.19:CS)杉原:操作無効にする <<<<< ここまで
+
                 //遷移先エレメントからパラメータ受け渡しのインターフェイスを取得
                 {
-                    INavigationReturnParameter? naviParam = prevElement as INavigationReturnParameter;
+                    INavigationReturnParameter naviParam = prevElement as INavigationReturnParameter;
                     if (naviParam == null)
                     {
                         //インターフェイスが無い場合は何もしない
@@ -513,33 +676,49 @@ namespace MicroSign.Core.Navigations
                     else
                     {
                         //インターフェイスがある場合は呼び出し
-                        naviParam.NavigationReturnParameter(currentElement, result);
+                        naviParam.NavigationReturnParameter(currentElement, arg);
                     }
                 }
             }
 
             //戻りコールバック呼び出し
-            if (currentCallback == null)
+            if(currentCallback == null)
             {
                 //戻りコールバックが無い場合はなにもしない
             }
             else
             {
                 //戻りコールバックが有効の場合は呼び出し
-                currentCallback(currentCallArgs, result);
+                currentCallback(arg);
             }
         }
 
         /// <summary>
         /// OK通知
         /// </summary>
+        /// <remarks>現在表示しているエレメントにOKを通知します</remarks>
+        /// <returns>
+        /// 表示しているエレメントでINavigationOkインターフェイスを実装していない場合にfalseになります
+        /// Ok処理の結果ではないので注意してください。
+        /// </returns>
+        public bool Ok()
+        {
+            return this.Ok(null);
+        }
+
+        /// <summary>
+        /// OK通知
+        /// </summary>
         /// <param name="arg">表示エレメントに渡すパラメータ</param>
-        /// <remarks>現在表示しているエレメントにキャンセルを通知します</remarks>
-        /// <returns>キャンセル呼び出しした場合にTrueになります</returns>
+        /// <remarks>現在表示しているエレメントにOKを通知します</remarks>
+        /// <returns>
+        /// 表示しているエレメントでINavigationOkインターフェイスを実装していない場合にfalseになります
+        /// Ok処理の結果ではないので注意してください。
+        /// </returns>
         public bool Ok(object arg)
         {
             //現在表示しているエレメントを取得
-            FrameworkElement? currentElement = this._CurrentElement;
+            FrameworkElement currentElement = this._CurrentElement;
             if (currentElement == null)
             {
                 //カレントエレメントが無効の場合何もしない
@@ -552,7 +731,7 @@ namespace MicroSign.Core.Navigations
 
             //カレントエレメントからキャンセルのインターフェイスを取得して呼び出し
             {
-                INavigationOk? naviOk = currentElement as INavigationOk;
+                INavigationOk naviOk = currentElement as INavigationOk;
                 if (naviOk == null)
                 {
                     //インターフェイスが無い場合は何もしない
@@ -570,13 +749,29 @@ namespace MicroSign.Core.Navigations
         /// <summary>
         /// キャンセル通知
         /// </summary>
+        /// <remarks>現在表示しているエレメントにキャンセルを通知します</remarks>
+        /// <returns>
+        /// 表示しているエレメントでINavigationCancelインターフェイスを実装していない場合にfalseになります
+        /// キャンセル処理の結果ではないので注意してください。
+        /// </returns>
+        public bool Cancel()
+        {
+            return this.Cancel(null);
+        }
+
+        /// <summary>
+        /// キャンセル通知
+        /// </summary>
         /// <param name="arg">表示エレメントに渡すパラメータ</param>
         /// <remarks>現在表示しているエレメントにキャンセルを通知します</remarks>
-        /// <returns>キャンセル呼び出しした場合にTrueになります</returns>
+        /// <returns>
+        /// 表示しているエレメントでINavigationCancelインターフェイスを実装していない場合にfalseになります
+        /// キャンセル処理の結果ではないので注意してください。
+        /// </returns>
         public bool Cancel(object arg)
         {
             //現在表示しているエレメントを取得
-            FrameworkElement? currentElement = this._CurrentElement;
+            FrameworkElement currentElement = this._CurrentElement;
             if (currentElement == null)
             {
                 //カレントエレメントが無効の場合何もしない
@@ -589,7 +784,7 @@ namespace MicroSign.Core.Navigations
 
             //カレントエレメントからキャンセルのインターフェイスを取得して呼び出し
             {
-                INavigationCancel? naviCancel = currentElement as INavigationCancel;
+                INavigationCancel naviCancel = currentElement as INavigationCancel;
                 if (naviCancel == null)
                 {
                     //インターフェイスが無い場合は何もしない
@@ -607,7 +802,7 @@ namespace MicroSign.Core.Navigations
         /// <summary>
         /// 表示しているエレメント
         /// </summary>
-        public FrameworkElement? Current
+        public FrameworkElement Current
         {
             get
             {
@@ -616,19 +811,13 @@ namespace MicroSign.Core.Navigations
         }
 
         /// <summary>
-        /// ナビゲーションコントローラー添付プロパティ
-        /// </summary>
-        public static readonly DependencyProperty NavigationControllerProperty =
-            DependencyProperty.RegisterAttached("NavigationController", typeof(NavigationController), typeof(NavigationController), new FrameworkPropertyMetadata(null));
-
-        /// <summary>
         /// ナビゲーションコントローラー取得
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static NavigationController? GetNavigationController(DependencyObject obj)
+        public static NavigationController GetNavigationController(DependencyObject obj)
         {
-            NavigationController? result = obj.GetValue(NavigationController.NavigationControllerProperty) as NavigationController;
+            NavigationController result = obj.GetValue(NavigationControllerProperty) as NavigationController;
             return result;
         }
 
@@ -637,9 +826,15 @@ namespace MicroSign.Core.Navigations
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="navigation"></param>
-        public static void SetNavigationController(DependencyObject obj, NavigationController? navigation)
+        public static void SetNavigationController(DependencyObject obj, NavigationController navigation)
         {
-            obj.SetValue(NavigationController.NavigationControllerProperty, navigation);
+            obj.SetValue(NavigationControllerProperty, navigation);
         }
+
+        /// <summary>
+        /// ナビゲーションコントローラー添付プロパティ
+        /// </summary>
+        public static readonly DependencyProperty NavigationControllerProperty =
+            DependencyProperty.Register("NavigationController", typeof(NavigationController), typeof(NavigationController), new PropertyMetadata(null));
     }
 }

@@ -200,7 +200,12 @@ namespace MicroSign
 
                 //アニメーション文字ページを表示
                 MicroSign.Core.Views.Pages.AnimationTextPage page = new MicroSign.Core.Views.Pages.AnimationTextPage(matrixLedWidth, matrixLedHeight, animationName);
-                this.NaviPanel.NavigationCall(page, null, this.AddAnimationTextButton_Result);
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
+                //this.NaviPanel.NavigationCall(page, null, this.AddAnimationTextButton_Result);
+                //----------
+                object result = this.NaviPanel.NavigationCallWait(page, null);
+                this.AddAnimationTextButton_Result(null, result);
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
             }
             catch (Exception ex)
             {
@@ -343,7 +348,12 @@ namespace MicroSign
                 }
 
                 //確認画面
-                this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("選択されているアニメーション画像を削除します。\nよろしいですか?", this.Title), selectedAnimationImage, this.RemoveAnimationImageButton_Retrun);
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
+                //this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("選択されているアニメーション画像を削除します。\nよろしいですか?", this.Title), selectedAnimationImage, this.RemoveAnimationImageButton_Retrun);
+                //----------
+                object result = this.MsgGrid.NavigationOverwrapWait(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("選択されているアニメーション画像を削除します。\nよろしいですか?", this.Title), selectedAnimationImage);
+                this.RemoveAnimationImageButton_Retrun(selectedAnimationImage, result);
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
             }
             catch (Exception ex)
             {
@@ -394,7 +404,12 @@ namespace MicroSign
             try
             {
                 //確認画面
-                this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("全アニメーション画像を削除します。\nよろしいですか?", this.Title), null, this.RemoveAllAnimationImageButton_Retrun);
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
+                //this.MsgGrid.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("全アニメーション画像を削除します。\nよろしいですか?", this.Title), null, this.RemoveAllAnimationImageButton_Retrun);
+                //----------
+                object ret = this.MsgGrid.NavigationOverwrapWait(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("全アニメーション画像を削除します。\nよろしいですか?", this.Title), null);
+                this.RemoveAllAnimationImageButton_Retrun(null, ret);
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
             }
             catch (Exception ex)
             {
@@ -732,7 +747,12 @@ namespace MicroSign
                 }
 
                 //アニメーション画像コレクション更新確認
-                this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("全アニメーション画像を更新します。\nよろしいですか?", this.Title), null, this.RefreshButton_Return);
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
+                //this.MsgGrid.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("全アニメーション画像を更新します。\nよろしいですか?", this.Title), null, this.RefreshButton_Return);
+                //----------
+                object ret = this.MsgGrid.NavigationOverwrapWait(new MicroSign.Core.Views.Overlaps.ConfirmMessageBox("全アニメーション画像を更新します。\nよろしいですか?", this.Title), null);
+                this.RefreshButton_Return(null, ret);
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
             }
             catch (Exception ex)
             {
@@ -1060,7 +1080,12 @@ namespace MicroSign
 
                     //アニメーション文字追加ページを表示
                     MicroSign.Core.Views.Pages.AnimationTextPage page = new MicroSign.Core.Views.Pages.AnimationTextPage(matrixLedWidth, matrixLedHeight, animationName, selectFontSize, selectFontColor, displayText);
-                    this.NaviPanel.NavigationCall(page, animationItem, this.EditAnimationTextButton_Result);
+                    //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
+                    //this.NaviPanel.NavigationCall(page, animationItem, this.EditAnimationTextButton_Result);
+                    //----------
+                    object ret = this.NaviPanel.NavigationCallWait(page, animationItem);
+                    this.EditAnimationTextButton_Result(animationItem, ret);
+                    //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
                 }
             }
             catch (Exception ex)

@@ -139,8 +139,8 @@ namespace MicroSign.Core.Views.Pages
 
             //エラーチェック
             {
-                AnimationTextPageStateKind status = this.ViewModel.StatusKind;
-                switch(status)
+                AnimationTextPageStateKind status = vm.StatusKind;
+                switch (status)
                 {
                     case AnimationTextPageStateKind.Initialized:
                         //初期化済みなら何等かの画面が表示されているはずなので
@@ -156,7 +156,7 @@ namespace MicroSign.Core.Views.Pages
 
                     default:
                         //それ以外は何らかのエラーなのでエラーメッセージを表示して終了
-                        this.NavigationCall(new WarnMessageBox($"エラー '{this.ViewModel.StatusText}'"));
+                        this.NavigationOverwrap(new WarnMessageBox($"エラー '{vm.StatusText}'"));
                         return;
                 }
             }
@@ -172,21 +172,49 @@ namespace MicroSign.Core.Views.Pages
             //    this.NavigationReturn(result);
             //}
             //----------
-            //レンダリングビットマップを取得
-            RenderTargetBitmap? renderBitmap = vm.RenderBitmap;
+            //保存先取得
+            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.Title = "テキスト画像を保存します";
+            dialog.FileName = ""; // Default file name
+            dialog.DefaultExt = ".png"; // Default file extension
+            dialog.Filter = "PNG画像(*.png)|*.png|すべてのファイル (*.*)|*.*"; // Filter files by extension               
 
-            //文字スクロール有無判定
-            bool isScrollEnabled = vm.IsScrollEnabled;
-            if (isScrollEnabled)
+            //保存ダイアログ表示
             {
-                //TODO: 2025.09.30: スクロールありの場合、連番画像を出力する
+                bool ret = dialog.ShowDialog() ?? false;
+                if (ret)
+                {
+                    //選択した場合は処理続行
+                }
+                else
+                {
+                    //選択しなかった場合は終了
+                    return;
+                }
+            }
+
+            //保存パスを取得
+            string savePath = dialog.FileName;
+
+            //保存
+            AnimationTextPageViewModel.SaveImageResult saveResult = vm.SaveImage(savePath);
+            if (saveResult.IsSuccess)
+            {
+                //成功の場合は続行
             }
             else
             {
-                //TODO: 2025.09.30: スクロールなしの場合、レンダリング済のビットマップを出力する
+                //失敗の場合はエラーメッセージを表示して終了
+                this.NavigationOverwrap(new WarnMessageBox($"エラー '{saveResult.ErrorMessage}'"));
+                return;
+            }
+
+            //画面を閉じる
+            {
                 int fontSize = vm.SelectFontSize;
                 int fontColor = vm.SelectFontColor;
                 string? displayText = vm.DisplayText;
+                RenderTargetBitmap? renderBitmap = vm.RenderBitmap;
                 AnimationTextPageResult result = AnimationTextPageResult.Success(fontSize, fontColor, displayText, renderBitmap);
                 this.NavigationReturn(result);
             }

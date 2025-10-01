@@ -1,6 +1,7 @@
 ﻿using MicroSign.Core.Navigations;
 using MicroSign.Core.Navigations.Enums;
 using MicroSign.Core.ViewModels.Pages;
+using MicroSign.Core.Views.Overlaps;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -146,25 +147,27 @@ namespace MicroSign.Core.Views.Pages
                 bool isSuccess = taskResult.IsSuccess;
                 if (isSuccess)
                 {
-                    //出力結果を取得
-                    List<string>? outputPaths = taskResult.OutputPaths;
-
-                    //アニメーション設定値を取得
-                    int displayPeriodMs = vm.DisplayPeriodMillisecond;
-                    // >> ミリ秒を秒に変換
-                    double displayPeriod = displayPeriodMs / (double)CommonConsts.Intervals.OneSec;
-
-                    //成功で終了
-                    AnimationClipPageResult result = AnimationClipPageResult.Success(outputPaths, displayPeriod);
-                    this.NavigationReturn(result);
+                    //成功の場合は続行
                 }
                 else
                 {
-                    //失敗で終了
-                    AnimationClipPageResult result = AnimationClipPageResult.Failed();
-                    this.NavigationReturn(result);
+                    //失敗の場合はエラーメッセージを表示して終了
+                    this.NavigationOverwrap(new WarnMessageBox($"エラー '{taskResult.ErrorMessage}'"));
+                    return;
                 }
             }
+
+            //出力結果を取得
+            List<string>? outputPaths = taskResult.OutputPaths;
+
+            //アニメーション設定値を取得
+            int displayPeriodMs = vm.DisplayPeriodMillisecond;
+            // >> ミリ秒を秒に変換
+            double displayPeriod = displayPeriodMs / (double)CommonConsts.Intervals.OneSec;
+
+            //成功で終了
+            AnimationClipPageResult result = AnimationClipPageResult.Success(outputPaths, displayPeriod);
+            this.NavigationReturn(result);
         }
 
         /// <summary>

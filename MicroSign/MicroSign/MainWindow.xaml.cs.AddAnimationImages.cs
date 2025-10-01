@@ -2,6 +2,7 @@
 using MicroSign.Core.Navigations;
 using MicroSign.Core.Navigations.Enums;
 using MicroSign.Core.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -16,6 +17,20 @@ namespace MicroSign
         /// </summary>
         /// <param name="imagePaths">追加するアニメーション画像一覧</param>
         protected void AddAnimationImages(string[]? imagePaths)
+        {
+            //デフォルトの表示期間を取得
+            double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
+
+            //デフォルトの表示期間で追加
+            this.AddAnimationImages(imagePaths, defaultDisplayPeriod);
+        }
+
+        /// <summary>
+        /// アニメーション画像追加
+        /// </summary>
+        /// <param name="imagePaths">追加するアニメーション画像一覧</param>
+        /// <param name="displayPeriod">表示期間</param>
+        protected void AddAnimationImages(string[]? imagePaths, double displayPeriod)
         {
             //アニメーション画像一覧有効判定
             if (imagePaths == null)
@@ -41,9 +56,6 @@ namespace MicroSign
                 CommonLogger.Warn("追加するアニメーション画像一覧が空です");
                 return;
             }
-
-            //デフォルトの表示期間を取得
-            double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
 
             //2024.04.30:CS)杉原:リリース向けの機能追加 >>>>> ここから
             //----------
@@ -75,7 +87,7 @@ namespace MicroSign
 
                     default:
                         //通常のアニメーション画像追加
-                        this.AddAnimationImagesImpl(imagePath, defaultDisplayPeriod, panelWidth, panelHeight);
+                        this.AddAnimationImagesImpl(imagePath, displayPeriod, panelWidth, panelHeight);
                         break;
                 }
             }
@@ -173,15 +185,8 @@ namespace MicroSign
                     ////適合しない場合は失敗にする
                     //this.ShowWarning(CommonLogger.Warn($"パネルサイズに適合しない画像です\npath='{imagePath}'"));
                     //----------
-                    //ViewModelから設定されているマトリクスLEDの情報を取得する
-                    MainWindowViewModel vm = this.ViewModel;
-                    int matrixLedWidth = vm.MatrixLedWidth;
-                    int matrixLedHeight = vm.MatrixLedHeight;
-
-                    //切り抜きページを表示
-                    // >> 切り抜きスクロールした画像の追加はコールバック内で行う
-                    MicroSign.Core.Views.Pages.AnimationClipPage page = new MicroSign.Core.Views.Pages.AnimationClipPage(matrixLedWidth, matrixLedHeight, image, imagePath);
-                    this.NaviPanel.NavigationCall(page, null, this.AnimationClip_Result);
+                    //アニメーション切り抜きを行う
+                    this.ClipAnimationImage(image, imagePath, panelWidth, panelHeight);
                     //2025.09.22:CS)土田:パネルサイズより大きい場合は切り抜く機能追加 <<<<< ここまで
                     return;
                 }
@@ -193,14 +198,21 @@ namespace MicroSign
         }
 
         /// <summary>
-        /// アニメーション切り抜き結果
+        /// アニメーション切り抜き
         /// </summary>
-        /// <param name="callArgs"></param>
-        /// <param name="result"></param>
-        private void AnimationClip_Result(object? callArgs, object? result)
+        /// <param name="image"></param>
+        /// <param name="imagePath"></param>
+        /// <param name="panelWidth"></param>
+        /// <param name="panelHeight"></param>
+        private void ClipAnimationImage(BitmapImage image, string imagePath, int panelWidth, int panelHeight)
         {
+            //切り抜きページを表示
+            MicroSign.Core.Views.Pages.AnimationClipPage page = new MicroSign.Core.Views.Pages.AnimationClipPage(panelWidth, panelHeight, image, imagePath);
+            // >> 画面からの戻りを待つ
+            object ret = this.NaviPanel.NavigationCallWait(page, null);
+
             //アニメーション切り抜き結果を取得
-            AnimationClipPageResult? pageResult = result as AnimationClipPageResult;
+            AnimationClipPageResult? pageResult = ret as AnimationClipPageResult;
             if (pageResult == null)
             {
                 //結果無効の場合は失敗
@@ -217,16 +229,18 @@ namespace MicroSign
             switch(resultKind)
             {
                 case NavigationResultKind.Success:
-                    //成功の場合は続行
+                    //成功の場合は処理続行
+                    CommonLogger.Debug("アニメーション切り抜き追加成功");
                     break;
 
                 case NavigationResultKind.Cancel:
-                    //キャンセルの場合は何もしない
+                    //キャンセルの場合は何もせずに終了
+                    CommonLogger.Info("アニメーション切り抜きキャンセル");
                     return;
 
                 default:
-                    //上記以外は失敗
-                    this.ShowWarning("アニメーション切り抜きに失敗しました");
+                    //それ以外は失敗
+                    this.ShowWarning(CommonLogger.Warn($"アニメーション切り抜きに失敗しました (理由={resultKind}')"));
                     return;
             }
 
@@ -234,39 +248,22 @@ namespace MicroSign
             List<string>? outputPaths = pageResult.OutputPaths;
             if (outputPaths == null)
             {
-                //出力パス一覧が無効の場合は失敗
-                this.ShowWarning("出力画像の一覧を取得できませんでした");
+                //無効の場合は失敗
+                this.ShowWarning(CommonLogger.Warn("出力画像の一覧が無効です"));
                 return;
             }
             else
             {
                 //有効の場合は続行
+                CommonLogger.Debug("出力画像の一覧が有効");
             }
-
-            //2025.09.30:CS)土田:切り抜き結果から表示期間をもらうように変更 >>>>> ここから
-            ////アニメーション画像追加を実行し直す
-            //string[] paths = outputPaths.ToArray();
-            //this.AddAnimationImages(paths);
-            //----------
-            //設定されているパネルサイズを取得
-            int panelWidth = this.ViewModel.MatrixLedWidth;
-            int panelHeight = this.ViewModel.MatrixLedHeight;
 
             //表示期間を取得
             double displayPeriod = pageResult.DisplayPeriod;
 
-            //出力された画像をアニメーションに追加する
-            // >> 出力順序の通りに追加するため、ソートは行わない
-            int n = CommonUtils.GetCount(outputPaths);
-            for(int i = CommonConsts.Index.First; i < n; i += CommonConsts.Index.Step)
-            {
-                //パスを取得
-                string imagePath = outputPaths[i];
-
-                //通常のアニメーション画像追加
-                this.AddAnimationImagesImpl(imagePath, displayPeriod, panelWidth, panelHeight);
-            }
-            //2025.09.30:CS)土田:切り抜き結果から表示期間をもらうように変更 <<<<< ここまで
+            //アニメーション画像追加
+            string[] imagePaths = outputPaths.ToArray();
+            this.AddAnimationImages(imagePaths, displayPeriod);
         }
     }
 }
