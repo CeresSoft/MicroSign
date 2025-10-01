@@ -1,4 +1,5 @@
-﻿using System.Windows.Media.Imaging;
+﻿using MicroSign.Core.Models;
+using System.Windows.Media.Imaging;
 
 namespace MicroSign.Core.ViewModels.Pages
 {

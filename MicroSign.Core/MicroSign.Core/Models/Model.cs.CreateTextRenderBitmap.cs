@@ -17,10 +17,27 @@ namespace MicroSign.Core.Models
         /// <param name="fontSize">フォントサイズ</param>
         /// <param name="fontColor">フォント色</param>
         /// <param name="displayText">表示文字</param>
-        /// <param name="minWidth">最小横幅</param>
-        /// <param name="minHeight">最小縦幅</param>
+        /// <param name="minWidth">横幅</param>
+        /// <param name="minHeight">縦幅</param>
         /// <returns></returns>
         public (bool IsSuccess, string Message, RenderTargetBitmap? RenderBitmap) CreateTextRenderBitmap(int fontSize, int fontColor, string? displayText, double minWidth, double minHeight)
+        {
+            //余白なしで生成
+            Thickness padding = new Thickness();
+            return this.CreateTextRenderBitmap(fontSize, fontColor, displayText, minWidth, minHeight, padding);
+        }
+
+        /// <summary>
+        /// 文字レンダリングビットマップ生成
+        /// </summary>
+        /// <param name="fontSize">フォントサイズ</param>
+        /// <param name="fontColor">フォント色</param>
+        /// <param name="displayText">表示文字</param>
+        /// <param name="width">横幅</param>
+        /// <param name="height">縦幅</param>
+        /// <param name="padding">余白</param>
+        /// <returns></returns>
+        public (bool IsSuccess, string Message, RenderTargetBitmap? RenderBitmap) CreateTextRenderBitmap(int fontSize, int fontColor, string? displayText, double width, double height, Thickness padding)
         {
             //表示文字色取得
             Brush brush = Brushes.White;
@@ -70,8 +87,9 @@ namespace MicroSign.Core.Models
                 animationText.Text = displayText ?? string.Empty;
                 animationText.DisplayTextFontSize = fontSize;
                 animationText.DisplayTextColor = brush;
-                animationText.MinWidth = minWidth;
-                animationText.MinHeight = minHeight;
+                animationText.Width = width;
+                animationText.Height = height;
+                animationText.Padding = padding;
 
                 //表示内容から必要サイズを計算
                 animationText.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -87,14 +105,14 @@ namespace MicroSign.Core.Models
 
             //文字列コントロールが収まるビットマップのサイズを計算
             // >> コントロールのWidth/Heightは小数の場合があるので、繰り上げた整数を使用する
-            int width = (int)Math.Ceiling(animationText.ActualWidth);
-            int height = (int)Math.Ceiling(animationText.ActualHeight);
+            int textWidth = (int)Math.Ceiling(animationText.ActualWidth);
+            int textHeight = (int)Math.Ceiling(animationText.ActualHeight);
 
             //レンダリングターゲットビットマップを生成
             RenderTargetBitmap? renderBitmap = null;
             {
                 //レンダリングターゲットビットマップを生成
-                var ret = this.CreateRenderTargetBitmap(width, height);
+                var ret = this.CreateRenderTargetBitmap(textWidth, textHeight);
                 if (ret.IsSuccess)
                 {
                     //成功の場合はレンダリングターゲットビットマップを取得
@@ -103,7 +121,7 @@ namespace MicroSign.Core.Models
                 else
                 {
                     //失敗の場合
-                    CommonLogger.Warn($"レンダリングターゲットビットマップの生成に失敗しました (Width={width}, Height={height})");
+                    CommonLogger.Warn($"レンダリングターゲットビットマップの生成に失敗しました (Width={textWidth}, Height={textHeight})");
                     return (false, ret.Message, null);
                 }
             }

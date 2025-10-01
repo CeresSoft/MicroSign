@@ -83,9 +83,9 @@ namespace MicroSign.Core.ViewModels.Pages
             //文字ビットマップ生成
             RenderTargetBitmap? textBitmap = null;
             {
-                //最小横幅なし、最小縦幅=マトリクスLED縦幅で生成する
-                // >> スクロールに必要な余白を除いた内容部分のみ描画する
-                var ret = model.CreateTextRenderBitmap(fontSize, fontColor, displayText, CommonConsts.Values.Zero.D, matrixLedHeight);
+                //横幅=未指定、縦幅=マトリクスLED縦幅、余白なしで生成する
+                // >> 左右方向の余白を除いた内容部分のみ描画する
+                var ret = model.CreateTextRenderBitmap(fontSize, fontColor, displayText, double.NaN, matrixLedHeight);
                 if (ret.IsSuccess)
                 {
                     //成功の場合はレンダリングターゲットビットマップを取得
