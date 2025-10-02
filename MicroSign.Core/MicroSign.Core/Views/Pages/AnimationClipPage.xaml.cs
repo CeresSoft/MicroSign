@@ -206,7 +206,7 @@ namespace MicroSign.Core.Views.Pages
             }
             catch (Exception ex)
             {
-                //TODO: 2025.09.22: this.ViewModel.SetStatus(AnimationClipPageStateKind.Failed, CommonLogger.Warn("Loadedで例外が発生しました", ex));
+                this.ViewModel.SetStatus(AnimationClipPageStateKind.Failed, CommonLogger.Warn("Loadedで例外が発生しました", ex));
             }
         }
     }
