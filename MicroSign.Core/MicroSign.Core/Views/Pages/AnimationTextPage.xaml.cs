@@ -3,6 +3,7 @@ using MicroSign.Core.Navigations.Enums;
 using MicroSign.Core.ViewModels.Pages;
 using MicroSign.Core.Views.Overlaps;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -14,7 +15,6 @@ namespace MicroSign.Core.Views.Pages
     /// </summary>
     public partial class AnimationTextPage : UserControl
     {
-
         /// <summary>
         /// AnimationTextPage結果
         /// </summary>
@@ -25,41 +25,92 @@ namespace MicroSign.Core.Views.Pages
             /// </summary>
             public readonly NavigationResultKind ResultKind;
 
+            //2025.10.02:CS)土田:文字画像追加の流れを変更 >>>>> ここから
+            ///// <summary>
+            ///// 選択フォントサイズ
+            ///// </summary>
+            //public readonly int SelectFontSize;
+
+            ///// <summary>
+            ///// 選択フォント色
+            ///// </summary>
+            //public readonly int SelectFontColor;
+
+            ///// <summary>
+            ///// 表示文章
+            ///// </summary>
+            //public readonly string? DisplayText;
+
+            ///// <summary>
+            ///// レンダリング結果
+            ///// </summary>
+            //public readonly RenderTargetBitmap? RenderBitmap;
+
+            ///// <summary>
+            ///// コンストラクタ
+            ///// </summary>
+            ///// <param name="resultKind">結果</param>
+            ///// <param name="selectFontSize">選択フォントサイズ</param>
+            ///// <param name="selectFontColor">選択フォント色</param>
+            ///// <param name="displayText">表示テキスト</param>
+            ///// <param name="renderBitmap">レンダリング結果</param>
+            //private AnimationTextPageResult(NavigationResultKind resultKind, int selectFontSize, int selectFontColor, string? displayText, RenderTargetBitmap? renderBitmap)
+            //{
+            //    this.ResultKind = resultKind;
+            //    this.SelectFontSize = selectFontSize;
+            //    this.SelectFontColor = selectFontColor;
+            //    this.DisplayText = displayText;
+            //    this.RenderBitmap = renderBitmap;
+            //}
+
+            ///// <summary>
+            ///// キャンセルの場合
+            ///// </summary>
+            ///// <returns></returns>
+            //public static AnimationTextPageResult Cancel()
+            //{
+            //    AnimationTextPageResult result = new AnimationTextPageResult(NavigationResultKind.Cancel, CommonConsts.Values.Zero.I, CommonConsts.Values.Zero.I, null, null);
+            //    return result;
+            //}
+
+            ///// <summary>
+            ///// 成功の場合
+            ///// </summary>
+            ///// <param name="selectFontSize">選択フォントサイズ</param>
+            ///// <param name="selectFontColor">選択フォント色</param>
+            ///// <param name="displayText">表示テキスト</param>
+            ///// <param name="renderBitmap">レンダリング結果</param>
+            ///// <returns></returns>
+            //public static AnimationTextPageResult Success(int selectFontSize, int selectFontColor, string? displayText, RenderTargetBitmap? renderBitmap)
+            //{
+            //    AnimationTextPageResult result = new AnimationTextPageResult(NavigationResultKind.Success, selectFontSize, selectFontColor, displayText, renderBitmap);
+            //    return result;
+            //}
+            //----------
             /// <summary>
-            /// 選択フォントサイズ
+            /// 出力パス一覧
             /// </summary>
-            public readonly int SelectFontSize;
+            public readonly List<string>? OutputPaths = null;
 
             /// <summary>
-            /// 選択フォント色
+            /// 表示期間
             /// </summary>
-            public readonly int SelectFontColor;
-
-            /// <summary>
-            /// 表示文章
-            /// </summary>
-            public readonly string? DisplayText;
-
-            /// <summary>
-            /// レンダリング結果
-            /// </summary>
-            public readonly RenderTargetBitmap? RenderBitmap;
+            /// <remarks>
+            /// 出力したすべてのフレームで共通の値
+            /// </remarks>
+            public readonly double DisplayPeriod;
 
             /// <summary>
             /// コンストラクタ
             /// </summary>
             /// <param name="resultKind">結果</param>
-            /// <param name="selectFontSize">選択フォントサイズ</param>
-            /// <param name="selectFontColor">選択フォント色</param>
-            /// <param name="displayText">表示テキスト</param>
-            /// <param name="renderBitmap">レンダリング結果</param>
-            private AnimationTextPageResult(NavigationResultKind resultKind, int selectFontSize, int selectFontColor, string? displayText, RenderTargetBitmap? renderBitmap)
+            /// <param name="outputPaths">出力パス一覧</param>
+            /// <param name="displayPeriod">表示期間</param>
+            private AnimationTextPageResult(NavigationResultKind resultKind, List<string>? outputPaths, double displayPeriod)
             {
                 this.ResultKind = resultKind;
-                this.SelectFontSize = selectFontSize;
-                this.SelectFontColor = selectFontColor;
-                this.DisplayText = displayText;
-                this.RenderBitmap = renderBitmap;
+                this.OutputPaths = outputPaths;
+                this.DisplayPeriod = displayPeriod;
             }
 
             /// <summary>
@@ -68,23 +119,22 @@ namespace MicroSign.Core.Views.Pages
             /// <returns></returns>
             public static AnimationTextPageResult Cancel()
             {
-                AnimationTextPageResult result = new AnimationTextPageResult(NavigationResultKind.Cancel, CommonConsts.Values.Zero.I, CommonConsts.Values.Zero.I, null, null);
+                AnimationTextPageResult result = new AnimationTextPageResult(NavigationResultKind.Cancel, null, CommonConsts.Values.Zero.D);
                 return result;
             }
 
             /// <summary>
             /// 成功の場合
             /// </summary>
-            /// <param name="selectFontSize">選択フォントサイズ</param>
-            /// <param name="selectFontColor">選択フォント色</param>
-            /// <param name="displayText">表示テキスト</param>
-            /// <param name="renderBitmap">レンダリング結果</param>
+            /// <param name="outputPaths">出力パス一覧</param>
+            /// <param name="displayPeriod">表示期間</param>
             /// <returns></returns>
-            public static AnimationTextPageResult Success(int selectFontSize, int selectFontColor, string? displayText, RenderTargetBitmap? renderBitmap)
+            public static AnimationTextPageResult Success(List<string>? outputPaths, double displayPeriod)
             {
-                AnimationTextPageResult result = new AnimationTextPageResult(NavigationResultKind.Success, selectFontSize, selectFontColor, displayText, renderBitmap);
+                AnimationTextPageResult result = new AnimationTextPageResult(NavigationResultKind.Success, outputPaths, displayPeriod);
                 return result;
             }
+            //2025.10.02:CS)土田:文字画像追加の流れを変更 <<<<< ここまで
         }
 
         /// <summary>
@@ -209,13 +259,92 @@ namespace MicroSign.Core.Views.Pages
                 return;
             }
 
+            //文字スクロール有効フラグを取得
+            bool isScrollEnabled = vm.IsScrollEnabled;
+
+            //デフォルト表示期間を取得
+            double displayPeriod = vm.DefaultDisplayPeriod;
+
+            //出力画像の一覧と表示期間を取得
+            List<string>? outputPaths = null;
+            // >> スクロール有無で出力枚数を変更する
+            if (isScrollEnabled)
+            {
+                //スクロール有効の場合、出力画像でアニメーション切り抜きを行う
+                RenderTargetBitmap? image = saveResult.RenderBitmap;
+
+                //マトリクスLED設定を取得
+                int matrixLedWidth = vm.MatrixLedWidth;
+                int matrixLedHeight = vm.MatrixLedHeight;
+
+                //アニメーション切り抜きページを表示
+                CommonLogger.Debug("アニメーション切り抜きページを表示");
+                MicroSign.Core.Views.Pages.AnimationClipPage page = new MicroSign.Core.Views.Pages.AnimationClipPage(matrixLedWidth, matrixLedHeight, image, savePath, Consts.DefaultMoveSpeed);
+                // >> 画面からの戻りを待つ
+                object result = this.NavigationCallWait(page, null);
+                if (result == null)
+                {
+                    //戻り値がnullの場合、成功でも失敗でもないので何もしない
+                    CommonLogger.Debug("アニメーション切り抜きページの戻り値なし");
+                    return;
+                }
+                else
+                {
+                    //戻り値が有効の場合は続行
+                }
+
+                //結果を取得
+                if (result is AnimationClipPage.AnimationClipPageResult pageResult)
+                {
+                    //結果種類を取得
+                    NavigationResultKind resultKind = pageResult.ResultKind;
+                    switch (resultKind)
+                    {
+                        case NavigationResultKind.Success:
+                            //成功の場合は処理続行
+                            CommonLogger.Debug("アニメーション切り抜き追加成功");
+                            break;
+
+                        case NavigationResultKind.Cancel:
+                            //キャンセルの場合は何もせずに終了
+                            CommonLogger.Info("アニメーション切り抜きキャンセル");
+                            return;
+
+                        default:
+                            //それ以外は失敗
+                            CommonLogger.Warn("アニメーション切り抜き失敗 (理由={resultKind}')");
+                            this.NavigationOverwrap(new WarnMessageBox($"アニメーション切り抜きに失敗しました (理由={resultKind}')"));
+                            return;
+                    }
+
+                    //出力パス一覧を取得
+                    outputPaths = pageResult.OutputPaths;
+
+                    //表示期間を取得
+                    displayPeriod = pageResult.DisplayPeriod;
+                }
+                else
+                {
+                    //結果を取得できなかった場合はエラーメッセージを表示して終了
+                    this.NavigationOverwrap(new WarnMessageBox($"アニメーション切り抜き結果が確認出来ません"));
+                    return;
+                }
+            }
+            else
+            {
+                //スクロール無効の場合、出力枚数=1とする
+
+                //出力パス一覧を取得
+                // >> 保存パスをそのまま使用する
+                outputPaths = new List<string> { savePath };
+
+                //表示期間を取得
+                // >> デフォルト値をそのまま使用する
+            }
+
             //画面を閉じる
             {
-                int fontSize = vm.SelectFontSize;
-                int fontColor = vm.SelectFontColor;
-                string? displayText = vm.DisplayText;
-                RenderTargetBitmap? renderBitmap = vm.RenderBitmap;
-                AnimationTextPageResult result = AnimationTextPageResult.Success(fontSize, fontColor, displayText, renderBitmap);
+                AnimationTextPageResult result = AnimationTextPageResult.Success(outputPaths, displayPeriod);
                 this.NavigationReturn(result);
             }
             //2025.09.30:CS)土田:画像をファイルに書き出すように変更 <<<<< ここまで

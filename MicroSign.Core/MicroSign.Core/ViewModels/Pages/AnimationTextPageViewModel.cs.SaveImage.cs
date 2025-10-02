@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -23,42 +22,42 @@ namespace MicroSign.Core.ViewModels.Pages
             public readonly string? ErrorMessage;
 
             /// <summary>
-            /// 画像スクロール有効
+            /// レンダリング結果
             /// </summary>
-            public readonly bool IsScrollEnabled;
+            public readonly RenderTargetBitmap? RenderBitmap;
 
             /// <summary>
             /// コンストラクタ
             /// </summary>
-            /// <param name="isSuccess"></param>
-            /// <param name="message"></param>
-            /// <param name="isScrollEnabled"></param>
-            private SaveImageResult(bool isSuccess, string? message, bool isScrollEnabled)
+            /// <param name="isSuccess">成功フラグ</param>
+            /// <param name="message">エラーメッセージ</param>
+            /// <param name="renderBitmap">レンダリング結果</param>
+            private SaveImageResult(bool isSuccess, string? message, RenderTargetBitmap? renderBitmap)
             {
                 this.IsSuccess = isSuccess;
                 this.ErrorMessage = message;
-                this.IsScrollEnabled = isScrollEnabled;
+                this.RenderBitmap = renderBitmap;
             }
 
             /// <summary>
             /// 失敗
             /// </summary>
-            /// <param name="message"></param>
+            /// <param name="message">エラーメッセージ</param>
             /// <returns></returns>
             public static SaveImageResult Failed(string message)
             {
-                SaveImageResult result = new SaveImageResult(false, message, false);
+                SaveImageResult result = new SaveImageResult(false, message, null);
                 return result;
             }
 
             /// <summary>
             /// 成功
             /// </summary>
-            /// <param name="isScrollEnabled"></param>
+            /// <param name="renderBitmap">レンダリング結果</param>
             /// <returns></returns>
-            public static SaveImageResult Success(bool isScrollEnabled)
+            public static SaveImageResult Success(RenderTargetBitmap? renderBitmap)
             {
-                SaveImageResult result = new SaveImageResult(true, null, isScrollEnabled);
+                SaveImageResult result = new SaveImageResult(true, null, renderBitmap);
                 return result;
             }
         }
@@ -96,7 +95,7 @@ namespace MicroSign.Core.ViewModels.Pages
             }
 
             //ここまできたら成功
-            return SaveImageResult.Success(isScrollEnabled);
+            return SaveImageResult.Success(renderBitmap);
         }
 
         /// <summary>

@@ -30,6 +30,32 @@ namespace MicroSign
         /// </summary>
         /// <param name="imagePaths">追加するアニメーション画像一覧</param>
         /// <param name="displayPeriod">表示期間</param>
+        protected void AddAnimationImages(List<string>? imagePaths, double displayPeriod)
+        {
+            if (imagePaths == null)
+            {
+                //無効の場合は何もしない
+                this.ShowWarning(CommonLogger.Warn("追加するアニメーション画像一覧が無効です"));
+                return;
+            }
+            else
+            {
+                //有効の場合は続行
+                CommonLogger.Debug("追加するアニメーション画像一覧が有効");
+            }
+
+            //配列に変換
+            string[] imagePathsArray = imagePaths.ToArray();
+
+            //アニメーション画像追加
+            this.AddAnimationImages(imagePathsArray, displayPeriod);
+        }
+
+        /// <summary>
+        /// アニメーション画像追加
+        /// </summary>
+        /// <param name="imagePaths">追加するアニメーション画像一覧</param>
+        /// <param name="displayPeriod">表示期間</param>
         protected void AddAnimationImages(string[]? imagePaths, double displayPeriod)
         {
             //アニメーション画像一覧有効判定
@@ -209,10 +235,20 @@ namespace MicroSign
             //切り抜きページを表示
             MicroSign.Core.Views.Pages.AnimationClipPage page = new MicroSign.Core.Views.Pages.AnimationClipPage(panelWidth, panelHeight, image, imagePath);
             // >> 画面からの戻りを待つ
-            object ret = this.NaviPanel.NavigationCallWait(page, null);
+            object result = this.NaviPanel.NavigationCallWait(page, null);
+            if (result == null)
+            {
+                //戻り値がnullの場合、成功でも失敗でもないので何もしない
+                CommonLogger.Debug("アニメーション切り抜きページの戻り値なし");
+                return;
+            }
+            else
+            {
+                //戻り値が有効の場合は続行
+            }
 
             //アニメーション切り抜き結果を取得
-            AnimationClipPageResult? pageResult = ret as AnimationClipPageResult;
+            AnimationClipPageResult? pageResult = result as AnimationClipPageResult;
             if (pageResult == null)
             {
                 //結果無効の場合は失敗
@@ -244,26 +280,12 @@ namespace MicroSign
                     return;
             }
 
-            //出力パス一覧を取得
+            //出力結果を取得
             List<string>? outputPaths = pageResult.OutputPaths;
-            if (outputPaths == null)
-            {
-                //無効の場合は失敗
-                this.ShowWarning(CommonLogger.Warn("出力画像の一覧が無効です"));
-                return;
-            }
-            else
-            {
-                //有効の場合は続行
-                CommonLogger.Debug("出力画像の一覧が有効");
-            }
-
-            //表示期間を取得
             double displayPeriod = pageResult.DisplayPeriod;
 
             //アニメーション画像追加
-            string[] imagePaths = outputPaths.ToArray();
-            this.AddAnimationImages(imagePaths, displayPeriod);
+            this.AddAnimationImages(outputPaths, displayPeriod);
         }
     }
 }

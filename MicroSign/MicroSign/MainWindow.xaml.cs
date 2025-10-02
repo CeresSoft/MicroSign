@@ -4,13 +4,13 @@ using MicroSign.Core.Navigations.Enums;
 using MicroSign.Core.ViewModels;
 using MicroSign.Core.Views.Pages;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using static MicroSign.Core.Models.Model;
 
 namespace MicroSign
 {
@@ -203,30 +203,27 @@ namespace MicroSign
                 //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
                 //this.NaviPanel.NavigationCall(page, null, this.AddAnimationTextButton_Result);
                 //----------
+                // >> コールバックを分けずに戻り値を待つ呼び出しに変更
                 object result = this.NaviPanel.NavigationCallWait(page, null);
-                this.AddAnimationTextButton_Result(null, result);
-                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
-            }
-            catch (Exception ex)
-            {
-                this.ShowError(CommonLogger.Error("アニメーション文字追加で例外発生"), ex);
-            }
-        }
+                if(result == null)
+                {
+                    //戻り値がnullの場合、成功でも失敗でもないので何もしない
+                    // >> 通常の動作では必ず戻り値を設定するが、アプリ終了などで呼び出しが中断するとnullになる
+                    // >> nullはアプリ終了とみなして何もせず終了する
+                    CommonLogger.Debug("アニメーション文字ページの戻り値なし");
+                    return;
+                }
+                else
+                {
+                    //戻り値が有効の場合は続行
+                }
 
-        /// <summary>
-        /// アニメーション文字追加結果
-        /// </summary>
-        /// <param name="callArgs"></param>
-        /// <param name="result"></param>
-        private void AddAnimationTextButton_Result(object? callArgs, object? result)
-        {
-            try
-            {
-                if(result is AnimationTextPage.AnimationTextPageResult ret)
+                //結果を取得
+                if (result is AnimationTextPage.AnimationTextPageResult ret)
                 {
                     //結果を判定
                     NavigationResultKind resultKind = ret.ResultKind;
-                    switch(resultKind)
+                    switch (resultKind)
                     {
                         case NavigationResultKind.Success:
                             //成功の場合は処理続行
@@ -243,87 +240,142 @@ namespace MicroSign
                             this.ShowWarning(CommonLogger.Warn($"文字追加に失敗しました (理由={resultKind}')"));
                             return;
                     }
+                    //出力結果を取得
+                    List<string>? outputPaths = ret.OutputPaths;
+                    double displayPeriod = ret.DisplayPeriod;
 
-                    //ビットマップ取得
-                    BitmapSource? image = ret.RenderBitmap;
-                    if (image == null)
-                    {
-                        //取得出来なかった場合は終了
-                        this.ShowError(CommonLogger.Error("文字画像が無効です"));
-                        return;
-                    }
-                    else
-                    {
-                        //有効の場合は処理続行
-                        CommonLogger.Info("文字画像有効");
-                    }
-
-                    //フォントサイズ取得
-                    // >> サイズはいくつでもよい。再編集時にAnimationTextPageへ渡すだけ
-                    int selectFontSize = ret.SelectFontSize;
-
-                    //フォント色取得
-                    // >> 色はいくつでもよい。再編集時にAnimationTextPageへ渡すだけ
-                    int selectFontColor = ret.SelectFontColor;
-
-                    //表示文字取得
-                    // >> 表示文字はなんでもよい。再編集時にAnimationTextPageへ渡すだけ
-                    string? displayText = ret.DisplayText;
-
-                    //デフォルトの表示期間を取得
-                    double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
-
-                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
-                    ////画像変換
-                    //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
-                    //if (convertImageResult.IsSuccess)
-                    //{
-                    //    //成功の場合は続行
-                    //    CommonLogger.Debug($"画像変換成功");
-                    //}
-                    //else
-                    //{
-                    //    //変換失敗の場合は終了
-                    //    this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
-                    //    return;
-                    //}
-                    //
-                    ////アニメーション画像アイテムを生成
-                    //AnimationImageItem animationImageItem = AnimationImageItem.FromText(
-                    //    defaultDisplayPeriod,
-                    //    selectFontSize,
-                    //    selectFontColor,
-                    //    displayText,
-                    //    image,
-                    //    convertImageResult.OutputData,
-                    //    convertImageResult.PreviewImage
-                    //    );
-                    //----------
-                    // >> プレビュー画像が不要になったので変換した画像も不要となりました
-                    //アニメーション画像アイテムを生成
-                    AnimationImageItem animationImageItem = AnimationImageItem.FromText(
-                        defaultDisplayPeriod,
-                        selectFontSize,
-                        selectFontColor,
-                        displayText,
-                        image
-                        );
-                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
-
-                    //リストに追加
-                    this.ViewModel.AddAnimationImage(animationImageItem);
+                    //アニメーション画像追加
+                    this.AddAnimationImages(outputPaths, displayPeriod);
+                    //2025.10.02:CS)土田:文字画像追加の流れを変更 <<<<< ここまで
                 }
                 else
                 {
                     //結果が取得できない場合は何もしない
                     this.ShowWarning(CommonLogger.Warn("アニメーション文字追加結果が確認出来ません"));
                 }
+                //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
             }
             catch (Exception ex)
             {
-                this.ShowError(CommonLogger.Error("アニメーション文字追加結果で例外発生"), ex);
+                this.ShowError(CommonLogger.Error("アニメーション文字追加で例外発生"), ex);
             }
         }
+
+        //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
+        ///// <summary>
+        ///// アニメーション文字追加結果
+        ///// </summary>
+        ///// <param name="callArgs"></param>
+        ///// <param name="result"></param>
+        //private void AddAnimationTextButton_Result(object? callArgs, object? result)
+        //{
+        //    try
+        //    {
+        //        if(result is AnimationTextPage.AnimationTextPageResult ret)
+        //        {
+        //            //結果を判定
+        //            NavigationResultKind resultKind = ret.ResultKind;
+        //            switch(resultKind)
+        //            {
+        //                case NavigationResultKind.Success:
+        //                    //成功の場合は処理続行
+        //                    CommonLogger.Debug("アニメーション文字追加成功");
+        //                    break;
+
+        //                case NavigationResultKind.Cancel:
+        //                    //キャンセルの場合は何もせずに終了
+        //                    CommonLogger.Info("アニメーション文字追加キャンセル");
+        //                    return;
+
+        //                default:
+        //                    //それ以外は失敗
+        //                    this.ShowWarning(CommonLogger.Warn($"文字追加に失敗しました (理由={resultKind}')"));
+        //                    return;
+        //            }
+
+        //            //ビットマップ取得
+        //            BitmapSource? image = ret.RenderBitmap;
+        //            if (image == null)
+        //            {
+        //                //取得出来なかった場合は終了
+        //                this.ShowError(CommonLogger.Error("文字画像が無効です"));
+        //                return;
+        //            }
+        //            else
+        //            {
+        //                //有効の場合は処理続行
+        //                CommonLogger.Info("文字画像有効");
+        //            }
+
+        //            //フォントサイズ取得
+        //            // >> サイズはいくつでもよい。再編集時にAnimationTextPageへ渡すだけ
+        //            int selectFontSize = ret.SelectFontSize;
+
+        //            //フォント色取得
+        //            // >> 色はいくつでもよい。再編集時にAnimationTextPageへ渡すだけ
+        //            int selectFontColor = ret.SelectFontColor;
+
+        //            //表示文字取得
+        //            // >> 表示文字はなんでもよい。再編集時にAnimationTextPageへ渡すだけ
+        //            string? displayText = ret.DisplayText;
+
+        //            //デフォルトの表示期間を取得
+        //            double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
+
+        //            //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+        //            ////画像変換
+        //            //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
+        //            //if (convertImageResult.IsSuccess)
+        //            //{
+        //            //    //成功の場合は続行
+        //            //    CommonLogger.Debug($"画像変換成功");
+        //            //}
+        //            //else
+        //            //{
+        //            //    //変換失敗の場合は終了
+        //            //    this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
+        //            //    return;
+        //            //}
+        //            //
+        //            ////アニメーション画像アイテムを生成
+        //            //AnimationImageItem animationImageItem = AnimationImageItem.FromText(
+        //            //    defaultDisplayPeriod,
+        //            //    selectFontSize,
+        //            //    selectFontColor,
+        //            //    displayText,
+        //            //    image,
+        //            //    convertImageResult.OutputData,
+        //            //    convertImageResult.PreviewImage
+        //            //    );
+        //            //----------
+        //            // >> プレビュー画像が不要になったので変換した画像も不要となりました
+        //            //アニメーション画像アイテムを生成
+        //            AnimationImageItem animationImageItem = AnimationImageItem.FromText(
+        //                defaultDisplayPeriod,
+        //                selectFontSize,
+        //                selectFontColor,
+        //                displayText,
+        //                image
+        //                );
+        //            //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
+
+        //            //リストに追加
+        //            this.ViewModel.AddAnimationImage(animationImageItem);
+        //        }
+        //        else
+        //        {
+        //            //結果が取得できない場合は何もしない
+        //            this.ShowWarning(CommonLogger.Warn("アニメーション文字追加結果が確認出来ません"));
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        this.ShowError(CommonLogger.Error("アニメーション文字追加結果で例外発生"), ex);
+        //    }
+        //}
+        //----------
+        //コールバックを分けずに戻り値を待つ呼び出しに変更
+        //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
 
         /// <summary>
         /// アニメーション画像削除ボタン
@@ -1051,7 +1103,7 @@ namespace MicroSign
                 //アニメーション画像アイテムが文字か判定
                 {
                     AnimationImageType t = animationItem.ImageType;
-                    switch(t)
+                    switch (t)
                     {
                         case AnimationImageType.Text:
                             //テキストの場合は処理続行
@@ -1083,8 +1135,49 @@ namespace MicroSign
                     //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
                     //this.NaviPanel.NavigationCall(page, animationItem, this.EditAnimationTextButton_Result);
                     //----------
-                    object ret = this.NaviPanel.NavigationCallWait(page, animationItem);
-                    this.EditAnimationTextButton_Result(animationItem, ret);
+                    // >> コールバックを分けずに戻り値を待つ呼び出しに変更
+                    object result = this.NaviPanel.NavigationCallWait(page, animationItem);
+                    if (result == null)
+                    {
+                        //戻り値がnullの場合、成功でも失敗でもないので何もしない
+                        CommonLogger.Debug("アニメーション文字ページの戻り値なし");
+                        return;
+                    }
+                    else
+                    {
+                        //戻り値が有効の場合は続行
+                    }
+
+                    //結果を取得
+                    if (result is AnimationTextPage.AnimationTextPageResult ret)
+                    {
+                        //結果を判定
+                        NavigationResultKind resultKind = ret.ResultKind;
+                        switch (resultKind)
+                        {
+                            case NavigationResultKind.Success:
+                                //成功の場合は処理続行
+                                CommonLogger.Debug("アニメーション文字追加成功");
+                                break;
+
+                            case NavigationResultKind.Cancel:
+                                //キャンセルの場合は何もせずに終了
+                                CommonLogger.Info("アニメーション文字追加キャンセル");
+                                return;
+
+                            default:
+                                //それ以外は失敗
+                                this.ShowWarning(CommonLogger.Warn($"文字追加に失敗しました (理由={resultKind}')"));
+                                return;
+                        }
+
+                        //TODO: 2025.10.02: アニメーション文字追加ページの戻り値を変更したため、文字編集機能を無効化
+                    }
+                    else
+                    {
+                        //結果が取得できない場合は何もしない
+                        this.ShowWarning(CommonLogger.Warn("アニメーション文字編集結果が確認出来ません"));
+                    }
                     //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
                 }
             }
@@ -1094,126 +1187,130 @@ namespace MicroSign
             }
         }
 
-        /// <summary>
-        /// アニメーション文字編集結果
-        /// </summary>
-        /// <param name="callArgs"></param>
-        /// <param name="result"></param>
-        private void EditAnimationTextButton_Result(object? callArgs, object? result)
-        {
-            try
-            {
-                if (result is AnimationTextPage.AnimationTextPageResult ret)
-                {
-                    //結果を判定
-                    NavigationResultKind resultKind = ret.ResultKind;
-                    switch (resultKind)
-                    {
-                        case NavigationResultKind.Success:
-                            //成功の場合は処理続行
-                            CommonLogger.Debug("アニメーション文字追加成功");
-                            break;
+        //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 >>>>> ここから
+        ///// <summary>
+        ///// アニメーション文字編集結果
+        ///// </summary>
+        ///// <param name="callArgs"></param>
+        ///// <param name="result"></param>
+        //private void EditAnimationTextButton_Result(object? callArgs, object? result)
+        //{
+        //    try
+        //    {
+        //        if (result is AnimationTextPage.AnimationTextPageResult ret)
+        //        {
+        //            //結果を判定
+        //            NavigationResultKind resultKind = ret.ResultKind;
+        //            switch (resultKind)
+        //            {
+        //                case NavigationResultKind.Success:
+        //                    //成功の場合は処理続行
+        //                    CommonLogger.Debug("アニメーション文字追加成功");
+        //                    break;
 
-                        case NavigationResultKind.Cancel:
-                            //キャンセルの場合は何もせずに終了
-                            CommonLogger.Info("アニメーション文字追加キャンセル");
-                            return;
+        //                case NavigationResultKind.Cancel:
+        //                    //キャンセルの場合は何もせずに終了
+        //                    CommonLogger.Info("アニメーション文字追加キャンセル");
+        //                    return;
 
-                        default:
-                            //それ以外は失敗
-                            this.ShowWarning(CommonLogger.Warn($"文字追加に失敗しました (理由={resultKind}')"));
-                            return;
-                    }
+        //                default:
+        //                    //それ以外は失敗
+        //                    this.ShowWarning(CommonLogger.Warn($"文字追加に失敗しました (理由={resultKind}')"));
+        //                    return;
+        //            }
 
-                    //ビットマップ取得
-                    BitmapSource? image = ret.RenderBitmap;
-                    if (image == null)
-                    {
-                        //取得出来なかった場合は終了
-                        this.ShowError(CommonLogger.Error("文字画像が無効です"));
-                        return;
-                    }
-                    else
-                    {
-                        //有効の場合は処理続行
-                        CommonLogger.Info("文字画像有効");
-                    }
+        //            //ビットマップ取得
+        //            BitmapSource? image = ret.RenderBitmap;
+        //            if (image == null)
+        //            {
+        //                //取得出来なかった場合は終了
+        //                this.ShowError(CommonLogger.Error("文字画像が無効です"));
+        //                return;
+        //            }
+        //            else
+        //            {
+        //                //有効の場合は処理続行
+        //                CommonLogger.Info("文字画像有効");
+        //            }
 
-                    //編集前のアニメーション画像アイテムを取得
-                    AnimationImageItem? animationImage = callArgs as AnimationImageItem;
-                    if(animationImage == null)
-                    {
-                        //取得出来なかった場合は終了
-                        this.ShowError(CommonLogger.Error("アニメーション画像が無効です"));
-                        return;
-                    }
-                    else
-                    {
-                        //有効の場合は処理続行
-                        CommonLogger.Info("アニメーション画像有効");
-                    }
+        //            //編集前のアニメーション画像アイテムを取得
+        //            AnimationImageItem? animationImage = callArgs as AnimationImageItem;
+        //            if (animationImage == null)
+        //            {
+        //                //取得出来なかった場合は終了
+        //                this.ShowError(CommonLogger.Error("アニメーション画像が無効です"));
+        //                return;
+        //            }
+        //            else
+        //            {
+        //                //有効の場合は処理続行
+        //                CommonLogger.Info("アニメーション画像有効");
+        //            }
 
-                    //フォントサイズ取得
-                    // >> サイズはいくつでもよい。再編集時にAnimationTextPageへ渡すだけ
-                    int selectFontSize = ret.SelectFontSize;
+        //            //フォントサイズ取得
+        //            // >> サイズはいくつでもよい。再編集時にAnimationTextPageへ渡すだけ
+        //            int selectFontSize = ret.SelectFontSize;
 
-                    //フォント色取得
-                    // >> 色はいくつでもよい。再編集時にAnimationTextPageへ渡すだけ
-                    int selectFontColor = ret.SelectFontColor;
+        //            //フォント色取得
+        //            // >> 色はいくつでもよい。再編集時にAnimationTextPageへ渡すだけ
+        //            int selectFontColor = ret.SelectFontColor;
 
-                    //表示文字取得
-                    // >> 表示文字はなんでもよい。再編集時にAnimationTextPageへ渡すだけ
-                    string? displayText = ret.DisplayText;
+        //            //表示文字取得
+        //            // >> 表示文字はなんでもよい。再編集時にAnimationTextPageへ渡すだけ
+        //            string? displayText = ret.DisplayText;
 
-                    //デフォルトの表示期間を取得
-                    double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
+        //            //デフォルトの表示期間を取得
+        //            double defaultDisplayPeriod = this.ViewModel.DefaultDisplayPeriod;
 
-                    //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
-                    ////画像変換
-                    //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
-                    //if (convertImageResult.IsSuccess)
-                    //{
-                    //    //成功の場合は続行
-                    //    CommonLogger.Debug($"画像変換成功");
-                    //}
-                    //else
-                    //{
-                    //    //変換失敗の場合は終了
-                    //    this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
-                    //    return;
-                    //}
-                    //
-                    ////アニメーション画像を変更する
-                    //animationImage.UpdateText(
-                    //    selectFontSize,
-                    //    selectFontColor,
-                    //    displayText,
-                    //    image,
-                    //    convertImageResult.OutputData,
-                    //    convertImageResult.PreviewImage
-                    //    );
-                    //----------
-                    // >> プレビュー画像が不要になったので変換した画像も不要となりました
-                    //アニメーション画像アイテムを更新
-                    animationImage.UpdateText(
-                        selectFontSize,
-                        selectFontColor,
-                        displayText,
-                        image
-                        );
-                    //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
-                }
-                else
-                {
-                    //結果が取得できない場合は何もしない
-                    this.ShowWarning(CommonLogger.Warn("アニメーション文字編集結果が確認出来ません"));
-                }
-            }
-            catch (Exception ex)
-            {
-                this.ShowError(CommonLogger.Error("アニメーション文字編集結果で例外発生"), ex);
-            }
-        }
+        //            //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
+        //            ////画像変換
+        //            //MicroSign.Core.Models.Model.ConvertImageResult convertImageResult = this.ViewModel.ConvertAnimationImage(image);
+        //            //if (convertImageResult.IsSuccess)
+        //            //{
+        //            //    //成功の場合は続行
+        //            //    CommonLogger.Debug($"画像変換成功");
+        //            //}
+        //            //else
+        //            //{
+        //            //    //変換失敗の場合は終了
+        //            //    this.ShowError(CommonLogger.Error("画像の変換に失敗しました"));
+        //            //    return;
+        //            //}
+        //            //
+        //            ////アニメーション画像を変更する
+        //            //animationImage.UpdateText(
+        //            //    selectFontSize,
+        //            //    selectFontColor,
+        //            //    displayText,
+        //            //    image,
+        //            //    convertImageResult.OutputData,
+        //            //    convertImageResult.PreviewImage
+        //            //    );
+        //            //----------
+        //            // >> プレビュー画像が不要になったので変換した画像も不要となりました
+        //            //アニメーション画像アイテムを更新
+        //            animationImage.UpdateText(
+        //                selectFontSize,
+        //                selectFontColor,
+        //                displayText,
+        //                image
+        //                );
+        //            //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
+        //        }
+        //        else
+        //        {
+        //            //結果が取得できない場合は何もしない
+        //            this.ShowWarning(CommonLogger.Warn("アニメーション文字編集結果が確認出来ません"));
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        this.ShowError(CommonLogger.Error("アニメーション文字編集結果で例外発生"), ex);
+        //    }
+        //}
+        //----------
+        //コールバックを分けずに戻り値を待つ呼び出しに変更
+        //2025.10.01:CS)土田:Variousから移植したNavigationの引数にあわせて修正 <<<<< ここまで
 
         /// 表示期間一括反映ボタンクリック
         /// </summary>

@@ -58,7 +58,7 @@ namespace MicroSign.Core.Views.Pages
             /// <returns></returns>
             public static AnimationClipPageResult Cancel()
             {
-                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Cancel, null, AnimationClipPageViewModel.InitializeValues.DisplayPeriodMillisecond);
+                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Cancel, null, CommonConsts.Values.Zero.D);
                 return result;
             }
 
@@ -107,6 +107,16 @@ namespace MicroSign.Core.Views.Pages
             this.ViewModel.MatrixLedHeight = matrixLedHeight;
             this.ViewModel.OriginalImage = originalImage;
             this.ViewModel.OriginalImagePath = originalImagePath;
+        }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="moveSpeed">移動速度</param>
+        public AnimationClipPage(int matrixLedWidth, int matrixLedHeight, BitmapSource? originalImage, string? originalImagePath, int moveSpeed)
+            : this(matrixLedWidth, matrixLedHeight, originalImage, originalImagePath)
+        {
+            this.ViewModel.MoveSpeed = moveSpeed;
         }
 
         /// <summary>
