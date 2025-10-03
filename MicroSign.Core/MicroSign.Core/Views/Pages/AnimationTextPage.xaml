@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:MicroSign.Core.Views.Pages"
              xmlns:core="clr-namespace:MicroSign.Core"
              xmlns:vm="clr-namespace:MicroSign.Core.ViewModels.Pages"
+             xmlns:ValueConverters="clr-namespace:MicroSign.Core.ValueConverters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -29,18 +30,24 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="{StaticResource InputLineSpaceGridLength}"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="{StaticResource InputLineSpaceGridLength}"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="{StaticResource InputLineSpaceGridLength}"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{StaticResource InputLineSpaceGridLength}"/>
+            <RowDefinition/>
             <RowDefinition Height="{StaticResource InputLineSpaceGridLength}"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="サイズ"/>
-        <ComboBox Grid.Row="0" Grid.Column="2" Template="{DynamicResource StandardComboBoxTemplate}" SelectedValue="{Binding SelectFontSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Value">
+        <TextBlock Text="文字追加" Style="{StaticResource HeaderTextBlockStyle}" Grid.ColumnSpan="3"/>
+    
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="サイズ"/>
+        <ComboBox Grid.Row="2" Grid.Column="2" Template="{DynamicResource StandardComboBoxTemplate}" SelectedValue="{Binding SelectFontSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Value">
             <ComboBox.ItemsSource>
                 <x:Array Type="{x:Type core:SelectValueItem}">
                     <!--値(=value)はドット数=WPFで指定するフォントサイズ-->
@@ -51,8 +58,8 @@
             </ComboBox.ItemsSource>
         </ComboBox>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="色"/>
-        <ComboBox Grid.Row="2" Grid.Column="2" Template="{DynamicResource StandardComboBoxTemplate}" SelectedValue="{Binding SelectFontColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Value">
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="色"/>
+        <ComboBox Grid.Row="4" Grid.Column="2" Template="{DynamicResource StandardComboBoxTemplate}" SelectedValue="{Binding SelectFontColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Value">
             <ComboBox.ItemsSource>
                 <x:Array Type="{x:Type core:SelectValueItem}">
                     <!--値(=value)は8ビット色-->
@@ -67,15 +74,28 @@
             </ComboBox.ItemsSource>
         </ComboBox>
 
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="文章"/>
-        <TextBox Grid.Row="4" Grid.Column="2" FontFamily="{StaticResource MatrixLedTextFontFamily}" Text="{Binding DisplayText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"/>
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="文章"/>
+        <TextBox Grid.Row="6" Grid.Column="2" FontFamily="{StaticResource MatrixLedTextFontFamily}" Text="{Binding DisplayText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"/>
 
-        <Grid Grid.Row="6" Grid.Column="2">
+        <Grid Grid.Row="8" Grid.Column="2" HorizontalAlignment="Left" Height="{StaticResource Overlap.ButtonHeight}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="2"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+
+            </Grid.RowDefinitions>
+            <RadioButton Style="{StaticResource ToggleRadioButtonStyle}" Content="スクロール表示" IsChecked="{Binding IsScrollEnabled, Mode=TwoWay}" ToolTip="入力した文字が右端から左へ流れるアニメーションが作成されます"/>
+            <RadioButton Style="{StaticResource ToggleRadioButtonStyle}" Content="固定表示" IsChecked="{Binding IsScrollEnabled, Converter={StaticResource NotValueConverter}, Mode=OneWay}" ToolTip="マトリクスLEDパネルの横幅からはみ出た文字は表示されません" Grid.Column="2"/>
+        </Grid>
+
+        <Grid Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="3">
             <Image  Source="{Binding RenderBitmap}"/>
             <!--<TextBlock Text="{Binding StatusText}" Foreground="Red" FontWeight="Bold"/>-->
         </Grid>
-        
-        <Grid Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3">
+
+        <Grid Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="{StaticResource Overlap.ButtonMargin}"/>
                 <ColumnDefinition Width="Auto"/>

@@ -9,6 +9,7 @@
         /// <summary>
         /// 返却パラメータ
         /// </summary>
+        /// <param name="sender">返却元エレメント</param>
         /// <param name="arg">パラメータ</param>
         void NavigationReturnParameter(object sender, object? arg);
     }

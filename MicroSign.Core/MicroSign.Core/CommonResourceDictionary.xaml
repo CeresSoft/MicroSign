@@ -221,6 +221,22 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
+    <!-- トグルボタン風ラジオボタンスタイル -->
+    <Style x:Key="ToggleRadioButtonStyle" TargetType="RadioButton">
+        <Setter Property="Template" Value="{StaticResource StandardToggleButtonTemplate}"/>
+        <Setter Property="Foreground" Value="{StaticResource Button.Foreground}"/>
+        <Setter Property="Background" Value="{StaticResource Button.Background}"/>
+        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="6,2"/>
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="{StaticResource Accent.Foreground}"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style> 
+
 
     <!-- [[[ テキストボックス ]]] -->
 
@@ -589,7 +605,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="表示時間"/>
+                <TextBlock Text="表示期間"/>
                 <TextBox Text="{Binding DisplayPeriod, Mode=TwoWay, StringFormat=#0.000}" Grid.Column="2"/>
                 <TextBlock Text="秒" Grid.Column="4"/>
             </Grid>

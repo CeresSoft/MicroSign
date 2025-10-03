@@ -464,6 +464,105 @@ namespace MicroSign.Core.ViewModels.Pages
         }
         #endregion
 
+        #region 状態区分
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// 状態区分初期値
+            /// </summary>
+            public const AnimationClipPageStateKind StatusKind = AnimationClipPageStateKind.UnInitialize;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// 状態区分プロパティ名
+            /// </summary>
+            public const string StatusKind = "StatusKind";
+        }
+
+        /// <summary>
+        /// 状態区分保持変数
+        /// </summary>
+        protected AnimationClipPageStateKind _StatusKind = InitializeValues.StatusKind;
+
+        /// <summary>
+        /// 状態区分
+        /// </summary>
+        public AnimationClipPageStateKind StatusKind
+        {
+            get
+            {
+                return this._StatusKind;
+            }
+            set
+            {
+                AnimationClipPageStateKind now = this._StatusKind;
+                if (now == value)
+                {
+                    return;
+                }
+                this._StatusKind = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
+        #region 状態テキスト
+        /// <summary>
+        /// 初期値
+        /// </summary>
+        public static new partial class InitializeValues
+        {
+            /// <summary>
+            /// 状態テキスト初期値
+            /// </summary>
+            public const string? StatusText = null;
+        }
+
+        /// <summary>
+        /// プロパティ名
+        /// </summary>
+        public static new partial class PropertyNames
+        {
+            /// <summary>
+            /// 状態テキストプロパティ名
+            /// </summary>
+            public const string StatusText = "StatusText";
+        }
+
+        /// <summary>
+        /// 状態テキスト保持変数
+        /// </summary>
+        protected string? _StatusText = InitializeValues.StatusText;
+
+        /// <summary>
+        /// 状態テキスト
+        /// </summary>
+        public string? StatusText
+        {
+            get
+            {
+                return this._StatusText;
+            }
+            set
+            {
+                string? now = this._StatusText;
+                if (now == value)
+                {
+                    return;
+                }
+                this._StatusText = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        #endregion
+
         //「Documents\ViewModelプロパティ作成テンプレート.xlsx」の「ImageClipPageViewModel」をコピー <<<<< ここまで
     }
 }
