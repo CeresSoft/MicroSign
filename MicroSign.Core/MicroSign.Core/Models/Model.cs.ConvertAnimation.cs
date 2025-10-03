@@ -30,11 +30,12 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
         /// <param name="gamma">ガンマ値(2025.08.18:CS)土田:ガンマ補正対応で追加)</param>
         /// <param name="motionBlurReduction">残像軽減(2025.08.21:CS)土田:残像軽減対応で追加)</param>
+        /// <param name="savePath">保存先(2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加)</param>
         /// <returns></returns>
         /// <remarks>
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で不要なパラメータを削除
         /// </remarks>
-        public ConvertResult ConvertAnimation(FormatKinds formatKind, AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma, int motionBlurReduction)
+        public ConvertResult ConvertAnimation(FormatKinds formatKind, AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma, int motionBlurReduction, string savePath)
         //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
         {
             switch (formatKind)
@@ -62,9 +63,13 @@ namespace MicroSign.Core.Models
                     //2025.08.21:CS)土田:残像軽減対応で引数を追加 >>>>> ここから
                     //return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma);
                     //----------
-                    return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma, motionBlurReduction);
-                    //2025.08.21:CS)土田:残像軽減対応で引数を追加 <<<<< ここまで
-                    //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 <<<<< ここまで
+                    //2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加 >>>>> ここから
+                    //return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma, motionBlurReduction);
+                    //----------
+                    return this.ConvertAnimationIndexColor(animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma, motionBlurReduction, savePath);
+                //2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加 <<<<< ここまで
+                //2025.08.21:CS)土田:残像軽減対応で引数を追加 <<<<< ここまで
+                //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 <<<<< ここまで
                 //2025.08.05:CS)土田:インデックスカラー対応 <<<<< ここまで
 
                 default:

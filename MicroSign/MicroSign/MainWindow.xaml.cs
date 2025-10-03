@@ -623,12 +623,63 @@ namespace MicroSign
                 }
                 //2024.04.30:CS)杉原:リリース向けの機能追加 <<<<< ここまで
 
+                //2025.10.03:CS)土田:変換結果の保存先を選択できるように変更 >>>>> ここから
+                //----------
+                //保存先を選択
+                string savePath = string.Empty;
+                {
+                    //先頭画像の格納ディレクトリを取得する
+                    AnimationImageItem? item = this.ViewModel.GetAnimationImage(CommonConsts.Index.First);
+                    if (item == null)
+                    {
+                        //取得できない場合は失敗にする
+                        this.ShowWarning(CommonLogger.Warn($"先頭アニメーション画像の取得に失敗しました"));
+                        return;
+                    }
+                    else
+                    {
+                        //取得できた場合は続行
+                    }
+
+                    // >> 先頭画像のパスを取得
+                    string? imagePath = item.Path;
+                    // >> ディレクトリ取得
+                    // >> >> 取得できない場合は空文字となり、InitialDirectory未指定と同じ動作となる
+                    string dir = System.IO.Path.GetDirectoryName(imagePath) ?? string.Empty;
+
+                    //保存ダイアログを開く
+                    Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+                    dialog.Title = "テキスト画像を保存します";
+                    dialog.InitialDirectory = dir;
+                    dialog.FileName = MicroSignConsts.Path.MatrixLedImageFileName;
+                    dialog.DefaultExt = ".bin";
+                    dialog.Filter = "マトリクスLED画像(*.bin)|*.bin|すべてのファイル (*.*)|*.*";
+
+                    //保存ダイアログ表示
+                    {
+                        bool ret = dialog.ShowDialog() ?? false;
+                        if (ret)
+                        {
+                            //選択した場合は処理続行
+                        }
+                        else
+                        {
+                            //選択しなかった場合は終了
+                            return;
+                        }
+                    }
+
+                    //保存パスを取得
+                    savePath = dialog.FileName;
+                }
+                //2025.10.03:CS)土田:変換結果の保存先を選択できるように変更 <<<<< ここまで
+
                 //アニメーション変換開始
                 {
                     //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
                     //var ret = this.ViewModel.ConvertAnimation();
                     //----------
-                    MainWindowViewModel.ConvertAnimationResult ret = this.ViewModel.ConvertAnimation();
+                    MainWindowViewModel.ConvertAnimationResult ret = this.ViewModel.ConvertAnimation(savePath);
                     //2025.08.12:CS)杉原:パレット処理の流れを変更 <<<<< ここまで
                     if (ret.IsSuccess)
                     {

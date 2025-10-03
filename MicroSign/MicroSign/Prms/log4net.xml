@@ -11,7 +11,7 @@
 
       <!-- 作成するログファイル -->
       <!-- ログ・ファイル名の先頭部分 -->
-      <param name="File" value=".\log\log.txt" />
+      <param name="File" value="${USERPROFILE}\MicroSign\Log\log.txt" />
 
       <!-- 追加 -->
       <param name="AppendToFile" value="true" />

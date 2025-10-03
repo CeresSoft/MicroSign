@@ -16,7 +16,16 @@ namespace MicroSign.Core
             /// マトリクスLED画像パス
             /// </summary>
             /// <remarks>ESP32のMatrixLedImageSD側のファイル名が「MicroSignImage.bin」で固定なので固定にします</remarks>
-            public const string MatrixLedImagePath = @".\Temp\MicroSignImage.bin";
+            //2025.10.03:CS)土田:変換結果の保存先を選択できるように変更 >>>>> ここから
+            //public const string MatrixLedImagePath = @".\Temp\MicroSignImage.bin";
+            //----------
+            public const string MatrixLedImagePath = @".\Temp\" + MatrixLedImageFileName;
+
+            /// <summary>
+            /// マトリクスLED画像ファイル名
+            /// </summary>
+            public const string MatrixLedImageFileName = @"MicroSignImage.bin";
+            //2025.10.03:CS)土田:変換結果の保存先を選択できるように変更 <<<<< ここまで
 
             /// <summary>
             /// マトリクスLEDパネル設定パス
