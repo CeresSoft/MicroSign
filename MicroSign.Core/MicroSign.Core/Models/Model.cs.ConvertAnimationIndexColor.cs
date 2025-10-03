@@ -20,8 +20,9 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
         /// <param name="gamma">ガンマ値(2025.08.18:CS)土田:ガンマ補正対応で追加)</param>
         /// <param name="motionBlurReduction">残像軽減(2025.08.21:CS)土田:残像軽減対応で追加)</param>
+        /// <param name="savePath">保存先(2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加)</param>
         /// <returns></returns>
-        private ConvertResult ConvertAnimationIndexColor(AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma, int motionBlurReduction)
+        private ConvertResult ConvertAnimationIndexColor(AnimationImageItemCollection animationImages, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, double gamma, int motionBlurReduction, string savePath)
         {
             //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
             ////アニメーション画像からマージしたアニメーション用画像を生成
@@ -141,7 +142,11 @@ namespace MicroSign.Core.Models
                 //2025.08.21:CS)土田:残像軽減対応で引数を追加 >>>>> ここから
                 //ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(correctedImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness);
                 //----------
-                ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(correctedImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness, motionBlurReduction);
+                //2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加 >>>>> ここから
+                //ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(correctedImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness, motionBlurReduction);
+                //----------
+                ConvertAnimationIndexColor_SaveToFileResult ret = this.ConvertAnimationIndexColor_SaveToFile(correctedImage, animationDatas, matrixLedWidth, matrixLedHeight, matrixLedBrightness, motionBlurReduction, savePath);
+                //2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加 <<<<< ここまで
                 //2025.08.21:CS)土田:残像軽減対応で引数を追加 <<<<< ここまで
                 //2025.08.18:CS)土田:ガンマ補正対応で使用する画像を変更 <<<<< ここまで
                 if (ret.IsSuccess)
@@ -233,12 +238,13 @@ namespace MicroSign.Core.Models
         /// <param name="matrixLedHeight">マトリクスLED縦ドット数</param>
         /// <param name="matrixLedBrightness">マトリクスLED明るさ</param>
         /// <param name="motionBlurReduction">残像軽減(2025.08.21:CS)土田:残像軽減対応で追加)</param>
+        /// <param name="fname">保存先(2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加)</param>
         /// <returns></returns>
         /// <remarks>
         /// 2025.08.12:CS)杉原:パレット処理の流れを変更で追加
         /// ConvertColorFile()を移植(=ConvertColorFile()は削除)
         /// </remarks>
-        public ConvertAnimationIndexColor_SaveToFileResult ConvertAnimationIndexColor_SaveToFile(BitmapSource? image, AnimationDataCollection? animationDatas, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, int motionBlurReduction)
+        public ConvertAnimationIndexColor_SaveToFileResult ConvertAnimationIndexColor_SaveToFile(BitmapSource? image, AnimationDataCollection? animationDatas, int matrixLedWidth, int matrixLedHeight, int matrixLedBrightness, int motionBlurReduction, string fname)
         {
             //画像有効判定
             if (image == null)
@@ -636,8 +642,11 @@ namespace MicroSign.Core.Models
                 //@@ ファイルに書き込み
                 try
                 {
-                    //ESP32側のファイル名は固定なので、あえて名前は変更しない
-                    string fname = MicroSignConsts.Path.MatrixLedImagePath;
+                    //2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加 >>>>> ここから
+                    ////ESP32側のファイル名は固定なので、あえて名前は変更しない
+                    //string fname = MicroSignConsts.Path.MatrixLedImagePath;
+                    //----------
+                    //2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加 <<<<< ここまで
                     string path = CommonUtils.GetFullPath(fname);
                     CommonLogger.Debug($"アニメーションファイルパス='{path}'");
 

@@ -62,6 +62,17 @@ namespace MicroSign.Core.ViewModels
         /// <returns>アニメーション変換結果</returns>
         public ConvertAnimationResult ConvertAnimation()
         {
+            //デフォルトのマトリクスLED画像パスに保存
+            return this.ConvertAnimation(MicroSignConsts.Path.MatrixLedImagePath);
+        }
+
+        /// <summary>
+        /// アニメーション変換
+        /// </summary>
+        /// <param name="savePath">保存先(2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加)</param>
+        /// <returns>アニメーション変換結果</returns>
+        public ConvertAnimationResult ConvertAnimation(string savePath)
+        {
             //2025.08.12:CS)杉原:パレット処理の流れを変更 >>>>> ここから
             ////クラス名
             //string? name = this.Name;
@@ -109,7 +120,11 @@ namespace MicroSign.Core.ViewModels
             //2025.08.21:CS)土田:残像軽減対応で引数を追加 >>>>> ここから
             //Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma);
             //-----
-            Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma, motionBlurReduction);
+            //2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加 >>>>> ここから
+            //Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma, motionBlurReduction);
+            //-----
+            Models.Model.ConvertResult ret = this.Model.ConvertAnimation(formatKind, animationImages, matrixLedWidth, matrixLedHeight, matrixLedBrightness, gamma, motionBlurReduction, savePath);
+            //2025.10.03:CS)土田:変換結果の保存先を選択できるように引数追加 <<<<< ここまで
             //2025.08.21:CS)土田:残像軽減対応で引数を追加 <<<<< ここまで
             //2025.08.18:CS)土田:ガンマ補正対応で引数を追加 <<<<< ここまで
             this.AnimationMergedBitmap = ret.AnimationMergedBitmap;
