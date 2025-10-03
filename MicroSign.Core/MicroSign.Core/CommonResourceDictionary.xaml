@@ -605,7 +605,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="表示時間"/>
+                <TextBlock Text="表示期間"/>
                 <TextBox Text="{Binding DisplayPeriod, Mode=TwoWay, StringFormat=#0.000}" Grid.Column="2"/>
                 <TextBlock Text="秒" Grid.Column="4"/>
             </Grid>

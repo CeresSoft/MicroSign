@@ -10,8 +10,7 @@
              xmlns:ValueConverters="clr-namespace:MicroSign.Core.ValueConverters"
              xmlns:models="clr-namespace:MicroSign.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-    >
+             d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -46,12 +45,16 @@
             <ColumnDefinition Width="110"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="6"/>
             <RowDefinition/>
             <RowDefinition Height="{StaticResource InputLineSpaceGridLength}"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Border Background="{StaticResource Group.Background}">
+        <TextBlock Text="画像切り抜き" Style="{StaticResource HeaderTextBlockStyle}" Grid.ColumnSpan="3"/>
+
+        <Border Background="{StaticResource Group.Background}" Grid.Row="2">
             <Viewbox>
                 <Grid>
                     <Image x:Name="PreviewImage" Stretch="None" Source="{Binding PreviewImage}"/>
@@ -95,7 +98,7 @@
             </Viewbox>
         </Border>
 
-        <Grid Grid.Column="2">
+        <Grid Grid.Column="2" Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="{StaticResource InputLineSpaceGridLength}"/>
@@ -197,13 +200,13 @@
                     <x:Array Type="{x:Type core:SelectValueItem}">
                         <core:SelectValueItem Name="ゆっくり" Value="100"/>
                         <core:SelectValueItem Name="標準" Value="50"/>
-                        <core:SelectValueItem Name="滑らか" Value="33"/>
+                        <core:SelectValueItem Name="なめらか" Value="33"/>
                     </x:Array>
                 </ComboBox.ItemsSource>
             </ComboBox>
         </Grid>
 
-        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="{StaticResource Overlap.ButtonMargin}"/>
                 <ColumnDefinition Width="Auto"/>
