@@ -34,7 +34,7 @@ namespace MicroSign
         /// <param name="message"></param>
         private void ShowError(string message)
         {
-            this.NaviPanel.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.WarnMessageBox(message, this.Title));
+            this.MsgGrid.NavigationOverwrap(new MicroSign.Core.Views.Overlaps.WarnMessageBox(message, this.Title));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MicroSign.Core.Navigations;
 using MicroSign.Core.Navigations.Enums;
 using MicroSign.Core.ViewModels.Pages;
+using MicroSign.Core.Views.Overlaps;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -57,7 +58,7 @@ namespace MicroSign.Core.Views.Pages
             /// <returns></returns>
             public static AnimationClipPageResult Cancel()
             {
-                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Cancel, null, AnimationClipPageViewModel.InitializeValues.DisplayPeriodMillisecond);
+                AnimationClipPageResult result = new AnimationClipPageResult(NavigationResultKind.Cancel, null, CommonConsts.Values.Zero.D);
                 return result;
             }
 
@@ -109,6 +110,16 @@ namespace MicroSign.Core.Views.Pages
         }
 
         /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="moveSpeed">移動速度</param>
+        public AnimationClipPage(int matrixLedWidth, int matrixLedHeight, BitmapSource? originalImage, string? originalImagePath, int moveSpeed)
+            : this(matrixLedWidth, matrixLedHeight, originalImage, originalImagePath)
+        {
+            this.ViewModel.MoveSpeed = moveSpeed;
+        }
+
+        /// <summary>
         /// OKクリック
         /// </summary>
         /// <param name="sender"></param>
@@ -146,25 +157,27 @@ namespace MicroSign.Core.Views.Pages
                 bool isSuccess = taskResult.IsSuccess;
                 if (isSuccess)
                 {
-                    //出力結果を取得
-                    List<string>? outputPaths = taskResult.OutputPaths;
-
-                    //アニメーション設定値を取得
-                    int displayPeriodMs = vm.DisplayPeriodMillisecond;
-                    // >> ミリ秒を秒に変換
-                    double displayPeriod = displayPeriodMs / (double)CommonConsts.Intervals.OneSec;
-
-                    //成功で終了
-                    AnimationClipPageResult result = AnimationClipPageResult.Success(outputPaths, displayPeriod);
-                    this.NavigationReturn(result);
+                    //成功の場合は続行
                 }
                 else
                 {
-                    //失敗で終了
-                    AnimationClipPageResult result = AnimationClipPageResult.Failed();
-                    this.NavigationReturn(result);
+                    //失敗の場合はエラーメッセージを表示して終了
+                    this.NavigationOverwrap(new WarnMessageBox($"エラー '{taskResult.ErrorMessage}'"));
+                    return;
                 }
             }
+
+            //出力結果を取得
+            List<string>? outputPaths = taskResult.OutputPaths;
+
+            //アニメーション設定値を取得
+            int displayPeriodMs = vm.DisplayPeriodMillisecond;
+            // >> ミリ秒を秒に変換
+            double displayPeriod = displayPeriodMs / (double)CommonConsts.Intervals.OneSec;
+
+            //成功で終了
+            AnimationClipPageResult result = AnimationClipPageResult.Success(outputPaths, displayPeriod);
+            this.NavigationReturn(result);
         }
 
         /// <summary>
@@ -193,7 +206,7 @@ namespace MicroSign.Core.Views.Pages
             }
             catch (Exception ex)
             {
-                //TODO: 2025.09.22: this.ViewModel.SetStatus(AnimationClipPageStateKind.Failed, CommonLogger.Warn("Loadedで例外が発生しました", ex));
+                this.ViewModel.SetStatus(AnimationClipPageStateKind.Failed, CommonLogger.Warn("Loadedで例外が発生しました", ex));
             }
         }
     }

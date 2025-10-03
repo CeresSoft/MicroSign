@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MicroSign.Core.ViewModels.Pages
+﻿namespace MicroSign.Core.ViewModels.Pages
 {
     /// <summary>
-    /// AnimationTextPage状態
+    /// AnimationClipPage状態
     /// </summary>
-    public enum AnimationTextPageStateKind
+    public enum AnimationClipPageStateKind
     {
         /// <summary>
         /// 未初期化

@@ -14,7 +14,7 @@ namespace MicroSign.Core.ViewModels.Pages
             if (originalImage == null)
             {
                 //オリジナル画像が無効の場合は初期化失敗
-                //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Failed, CommonLogger.Warn($"レンダリングターゲットビットマップの生成に失敗しました (理由={ret.Message})"));
+                this.SetStatus(AnimationClipPageStateKind.Failed, CommonLogger.Warn($"オリジナル画像が設定されていません"));
                 return;
             }
             else
@@ -89,7 +89,7 @@ namespace MicroSign.Core.ViewModels.Pages
                     else
                     {
                         //失敗の場合は終了
-                        //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Failed, CommonLogger.Warn($"レンダリングターゲットビットマップの生成に失敗しました (理由={ret.Message})"));
+                        this.SetStatus(AnimationClipPageStateKind.Failed, CommonLogger.Warn($"レンダリングターゲットビットマップの生成に失敗しました (理由={ret.Message})"));
                         return;
                     }
 
@@ -107,7 +107,7 @@ namespace MicroSign.Core.ViewModels.Pages
                     else
                     {
                         //失敗の場合は終了
-                        //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Failed, CommonLogger.Warn($"プレビュー画像を描画に失敗しました (理由={ret.Message})"));
+                        this.SetStatus(AnimationClipPageStateKind.Failed, CommonLogger.Warn($"プレビュー画像を描画に失敗しました (理由={ret.Message})"));
                         return;
                     }
                 }
@@ -120,7 +120,7 @@ namespace MicroSign.Core.ViewModels.Pages
             }
 
             //初期化完了にする
-            //TODO: 2025.09.22: this.SetStatus(AnimationTextPageStateKind.Initialized, string.Empty);
+            this.SetStatus(AnimationClipPageStateKind.Initialized, string.Empty);
         }
     }
 }
