@@ -47,6 +47,13 @@ Clip Studio PAINTのアニメーション機能を使ってアニメーション
 ![MicroSignプロモーション](./DocumentImages/MicroSignPromotion.png)
 
 
+## アプリケーションの使い方
+
+以下をご覧ください。
+
+**[MicroSign 操作マニュアル](./Manuals/microsign_manual.md)**
+
+
 ## 更新履歴
 
 ### v 1.4.2.1
