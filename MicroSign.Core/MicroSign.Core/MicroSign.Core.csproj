@@ -10,6 +10,7 @@
     <Copyright>(C) 2023-2026 CeresSoft</Copyright>
     <AssemblyTitle>MicroSignアニメーション作成 コア</AssemblyTitle>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
