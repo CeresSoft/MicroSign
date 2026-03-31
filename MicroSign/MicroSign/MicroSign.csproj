@@ -10,6 +10,8 @@
     <FileVersion>1.4.2.1</FileVersion>
     <Copyright>(C) 2023-2025 CeresSoft</Copyright>
     <AssemblyTitle>MicroSignアニメーション作成</AssemblyTitle>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
