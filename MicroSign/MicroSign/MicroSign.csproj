@@ -7,11 +7,13 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MicroSign.ico</ApplicationIcon>
     <Authors>CeresSoft</Authors>
-    <FileVersion>1.4.2.1</FileVersion>
-    <Copyright>(C) 2023-2025 CeresSoft</Copyright>
+    <FileVersion>1.4.3.2</FileVersion>
+    <Copyright>(C) 2023-2026 CeresSoft</Copyright>
     <AssemblyTitle>MicroSignアニメーション作成</AssemblyTitle>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
