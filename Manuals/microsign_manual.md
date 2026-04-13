@@ -1,130 +1,87 @@
-## 1枚画像からアニメーションを作成する
+## 目次
 
-『画像追加』ボタンをクリックします。
+- [概要](https://www.ceressoft.co.jp/microsign_manual.html)
+- [基本操作](https://www.ceressoft.co.jp/microsign_manual_basic.html)
+- [1枚画像からアニメーションを作成する](https://www.ceressoft.co.jp/microsign_manual_picture.html)
+- [文字を入力してアニメーションを作成する](https://www.ceressoft.co.jp/microsign_manual_text.html)
 
-![画像追加ボタンをクリック](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture01.png)
 
-表示したい画像ファイルを選択します。
-画像のサイズは、LEDパネルのドット数と異なっていても問題ありません。
+## MicroSignの概要
 
-![画像ファイル選択](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture02.png)
+MicroSignシリーズの表示パネル(MS-06など)でアニメーションを表示するには「専用のアニメーションファイル」を必要とします。
+この専用のアニメーションファイルを作成するのが「MicroSign」アプリケーションとなります。
 
-『画像切り抜き』画面が開きます。
-選択した画像は、LEDパネルに合わせて自動的にサイズ調整されます。
-画像の縦横比がLEDパネルと異なる場合、上下または左右に画像をスクロールする機能が有効になります。
+MicroSignでは静止画を連続して表示する「パラパラ漫画方式のアニメーション」を作成します
 
-![画像ファイル読込](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture03.png)
+表示パネルのサイズに合わせた静止画を複数枚用意し、
+それぞれの静止画に対して何秒間表示するかを設定することでアニメーションを作成します
 
-### 移動方向
+![](./images/microsign_basic_system0.png)
 
-![移動方向（上下）](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture04.png)
-![移動方向（左右）](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture05.png)
 
-アニメーションの移動方向を指定します。
+作成したアニメーションは「変換」することで「専用のアニメーションファイル」(.binファイル)を作成します。
+この作成した専用のアニメーションファイルをmicro SDカードに入れ、表示パネル(MS-06など)に挿入することでアニメーションが表示されます。
 
-|移動方向     |プレビュー|
-|:------------|:---------|
-| 下から上へ  |![設定例: 下から上へ](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture15.png)|
-| 上から下へ  |![設定例: 上から下へ](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture16.png)|
+これら全体の流れは以下となります
 
-### 移動速度
+![](./images/microsign_basic_system1.png)
 
-![移動速度](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture06.png)
 
-スクロールの移動速度を指定します。
-数値を大きくするほど、動きが速くなります。
+また複数枚の静止画を用意しなくても
+簡単にアニメーションを作成する機能として
 
-|移動速度     |プレビュー|
-|:------------|:---------|
-| 1px（標準） |![設定例: 1px](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture08.png)|
-| 5px（最大） |![設定例: 5px](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture09.png)|
+- 写真をスクールして表示する → 「1枚画像からアニメーションを作成する」
+- 文字列をスクロール表示する → 「文字を入力してアニメーションを作成する」
 
-### アニメーション密度
+が存在します。
+複数枚の静止画の作成が難しい場合にご活用ください.
 
-![アニメーション密度](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture07.png)
+本格的なアニメーションを表示したい場合は
 
-アニメーションのコマの密度（動きのなめらかさ）を指定します。
+- Adobi After Effect,Clip Studioなどを使ってGIFアニメーションファイルを作成する
+- ゆっくりMovieMaker4(YMM4)などを使っての連番の静止画を作成する
 
-|移動速度     |プレビュー|
-|:------------|:---------|
-| 標準        |![設定例: 標準](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture10.png)|
-| ゆっくり    |![設定例: ゆっくり](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture11.png)|
-| なめらか    |![設定例: なめらか](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture12.png)|
+など外部ツールを使用してください
 
-画像切り抜きの設定が決定したら、『OK』ボタンをクリックします。
-![OKボタンをクリック](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture13.png)
+これらの以下のような流れになります
 
-画像が切り抜かれ、アニメーションが作成されます。
-![画像切り抜き後](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture14.png)
+![](./images/microsign_basic_system2.png)
 
-## 文字を入力してアニメーションを作成する
 
-『文字追加』ボタンをクリックします。
+この中で一番のおすすめなのは「GIFファイル」を使用する方法です
 
-![文字追加ボタンをクリック](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text01.png)
+これは表示パネルに「最大256色までしか使用できない」制限があるためです。
+写真などをそのまま使うと最大256色を超えてしまうことが多いのですが、
+この場合MicroSignが減色処理を行い256色までとなるように調整します。
+ただ、このMicroSignの減色処理はAdobi After Effectなどに比べると非常に簡素なものとなっているため
+Adobi After EffectなどでGIFファイルを作成した方がきれいな映像となります。
 
-『文字追加』画面が表示されます。
+よってできるだけGIFファイルでの運用をお勧めします
 
-![文字追加画面](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text02.png)
+このほかにもGIFファイルであれば複数の静止画の管理やフレームの表示期間なども
+合わせて保存されているので、非常に扱いやすいのでお勧めです。
 
-### サイズ
+※ケレスソフト内ではGIFファイルでアニメーションを管理しています
 
-![サイズ](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text03.png)
 
-|移動速度     |プレビュー|
-|:------------|:---------|
-| 小          |![設定例: 小](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text04.png)|
-| 中（標準）  |![設定例: 中](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text05.png)|
-| 大          |![設定例: 大](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text06.png)|
+## 表示できるアニメーションの長さについて
 
-### 色
+MicroSignで作成するアニメーションの長さ(=時間)に制限はありませんが
+表示パネル(MS-06など)側には制限が存在します
 
-![色](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text07.png)
+これは表示パネルで保持できるフレームの数に制限があり、
+「30 FPS であれば10秒ほど」が制限になります
 
-|移動速度     |プレビュー|
-|:------------|:---------|
-| 白色（標準）|![設定例: 白色](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text08.png)|
-| 赤色        |![設定例: 赤色](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text09.png)|
-| 緑色        |![設定例: 緑色](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text10.png)|
-| 黄色        |![設定例: 黄色](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text11.png)|
-| 青色        |![設定例: 青色](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text12.png)|
-| 紫色        |![設定例: 紫色](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text13.png)|
-| 水色        |![設定例: 水色](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text14.png)|
+長さがあいまいなのは専用アニメーションは多少圧縮が行われているためで
+ユニークなフレームが約300枚保持できるようになっています。
 
-### 文章
+この他１フレームの表示期間が長い場合、例えば15 FPSであれば
+30 FPSの2倍となる20秒ほどが目安になります
 
-![文章](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text15.png)
+弊社の経験上であれば表示パネル前に10秒も立ち止まっていただける方はあまりいらっしゃらないので
+短くインパクトのある映像を流すことをお勧めします
 
-アニメーションに表示したい文章を入力します。
 
-英数字と日本語が使用できます。
-入力できる文字数に制限はありませんが、他のパラメータによって一部が見切れる場合があります。
 
-### スクロール表示/固定表示
 
-![スクロール表示/固定表示](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text16.png)
 
-入力した文字の表示方法を選択します。
-『スクロール表示』の場合、文字が画面外からスクロールする動きに対応するため、余白が追加されます。
-
-|移動速度         |プレビュー|
-|:----------------|:---------|
-| スクロール表示  |![設定例: スクロール表示](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text17.png)|
-| 固定表示（標準）|![設定例: 固定表示](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text18.png)|
-
-文字の設定が決定したら、『OK』ボタンをクリックします。
-
-![OKボタンをクリック](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text19.png)
-
-作成される画像の保存場所を選択します。
-
-![文字画像の保存先を選択](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text20.png)
-
-- ### 固定表示の場合
-    作成した画像がアニメーションフレームとして追加されます。
-    ![固定表示](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text19.png)
-- ### スクロール表示の場合
-    『画像切り抜き』画面が開き、作成した画像が読み込まれます。
-    スクロール動作を調整するには、アニメーション動作のパラメータを変更します。
-    パラメータの詳細は [**『1枚画像からアニメーションを作成する』**](#1枚画像からアニメーションを作成する) を参照してください。
-    ![スクロール表示](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_text22.png)
