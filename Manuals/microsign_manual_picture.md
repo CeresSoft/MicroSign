@@ -1,26 +1,41 @@
 ## 1枚画像からアニメーションを作成する
 
-『画像追加』ボタンをクリックします。
+スマホで撮影した写真などから単純なスクロールアニメーションを作成する方法です。
+
+MicroSignの操作方法は「基本操作」を参照してください
+
+ここではMicroSignを起動し、表示パネルのドット数を設定した状態から進めます。
+
+### 画像の選択
+
+「画像追加」ボタンをクリックします。
 
 ![画像追加ボタンをクリック](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture01.png)
 
-表示したい画像ファイルを選択します。
-画像のサイズは、LEDパネルのドット数と異なっていても問題ありません。
+アニメーション画像追加ダイアログが開くので、
+表示したい画像ファイルを選択し「開く」をクリックします
+
+選択する画像のサイズは、表示パネルのドット数と異なっていても問題ありません。
 
 ![画像ファイル選択](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture02.png)
 
-『画像切り抜き』画面が開きます。
-選択した画像は、LEDパネルに合わせて自動的にサイズ調整されます。
-画像の縦横比がLEDパネルと異なる場合、上下または左右に画像をスクロールする機能が有効になります。
+画像切り抜き画面が開きます。
+選択した画像は、表示パネルのドット数に合わせて自動的にサイズ調整され
+画像の縦横比により上下または左右に画像をスクロールする機能が有効になります。
+
 
 ![画像ファイル読込](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture03.png)
 
-### 移動方向
+### 移動方向の設定
 
-![移動方向（上下）](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture04.png)
-![移動方向（左右）](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture05.png)
+画像の縦横比により上下または左右のどちらかの選択が表示されます
 
-アニメーションの移動方向を指定します。
+|移動方向 |選択|
+|--------|----|
+|上下     |![上下](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture04.png)|
+|左右     |![左右](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture05.png)|
+
+アニメーションする方向を指定してください。
 
 |移動方向     |プレビュー|
 |:------------|:---------|
@@ -31,7 +46,7 @@
 
 ![移動速度](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture06.png)
 
-スクロールの移動速度を指定します。
+スクロールして表示する速度を指定します。
 数値を大きくするほど、動きが速くなります。
 
 |移動速度     |プレビュー|
@@ -43,16 +58,18 @@
 
 ![アニメーション密度](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture07.png)
 
-アニメーションのコマの密度（動きのなめらかさ）を指定します。
+生成するフレームの表示期間（=動きのなめらかさ）を指定します。
 
 |移動速度     |プレビュー|
 |:------------|:---------|
-| 標準        |![設定例: 標準](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture10.png)|
-| ゆっくり    |![設定例: ゆっくり](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture11.png)|
-| なめらか    |![設定例: なめらか](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture12.png)|
+| ゆっくり (10 FPS)  |![設定例: ゆっくり](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture11.png)|
+| 標準 (20 FPS)      |![設定例: 標準](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture10.png)|
+| なめらか  (30 FPS)  |![設定例: なめらか](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture12.png)|
 
-画像切り抜きの設定が決定したら、『OK』ボタンをクリックします。
+### アニメーション生成
+
+設定が決定したら、「OK」ボタンをクリックします。
 ![OKボタンをクリック](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture13.png)
 
-画像が切り抜かれ、アニメーションが作成されます。
+これで指定した画像がフレームごとの画像に分解され、アニメーションが作成されます。
 ![画像切り抜き後](https://raw.githubusercontent.com/CeresSoft/MicroSign/refs/heads/master/Manuals/images/microsign_manual_picture14.png)
