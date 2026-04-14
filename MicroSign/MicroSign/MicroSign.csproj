@@ -6,9 +6,6 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MicroSign.ico</ApplicationIcon>
-    <Authors>CeresSoft</Authors>
-    <FileVersion>1.4.3.2</FileVersion>
-    <Copyright>(C) 2023-2026 CeresSoft</Copyright>
     <AssemblyTitle>MicroSignアニメーション作成</AssemblyTitle>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PlatformTarget>AnyCPU</PlatformTarget>
