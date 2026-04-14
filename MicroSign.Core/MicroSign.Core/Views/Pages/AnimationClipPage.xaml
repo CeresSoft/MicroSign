@@ -136,7 +136,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <TextBlock Text="下から上へ"/>
+                    <TextBlock Text="上から下へ"/>
                 </Button>
                 <Button Command="{Binding MoveDirectionSelectCommand}" CommandParameter="{x:Static vm:AnimationMoveDirection.Down}" Visibility="{Binding MoveDirection, ConverterParameter=Up:Visible;Down:Visible;, Converter={StaticResource EnumMatchVisibilityValueConverter}}" Grid.Row="1">
                     <Button.Style>
@@ -149,7 +149,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <TextBlock Text="上から下へ"/>
+                    <TextBlock Text="下から上へ"/>
                 </Button>
                 <Button Command="{Binding MoveDirectionSelectCommand}" CommandParameter="{x:Static vm:AnimationMoveDirection.Left}" Visibility="{Binding MoveDirection, ConverterParameter=Left:Visible;Right:Visible;, Converter={StaticResource EnumMatchVisibilityValueConverter}}" Grid.Row="2">
                     <Button.Style>
@@ -162,7 +162,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <TextBlock Text="右から左へ"/>
+                    <TextBlock Text="左から右へ"/>
                 </Button>
                 <Button Command="{Binding MoveDirectionSelectCommand}" CommandParameter="{x:Static vm:AnimationMoveDirection.Right}" Visibility="{Binding MoveDirection, ConverterParameter=Left:Visible;Right:Visible;, Converter={StaticResource EnumMatchVisibilityValueConverter}}" Grid.Row="3">
                     <Button.Style>
@@ -175,7 +175,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <TextBlock Text="左から右へ"/>
+                    <TextBlock Text="右から左へ"/>
                 </Button>
             </Grid>
 
