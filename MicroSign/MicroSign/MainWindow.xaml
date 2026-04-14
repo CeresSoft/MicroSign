@@ -331,7 +331,7 @@
                         </Button>
                     </Grid>
 
-                    <ListView Style="{StaticResource ImageListViewStyle}" d:ItemsSource="{d:SampleData ItemCount=8}" ItemsSource="{Binding AnimationImages}" SelectedItem="{Binding SelectedAnimationImageItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Grid.Row="4" SelectionMode="Single" AllowDrop="True" PreviewDrop="ListView_PreviewDrop" PreviewDragOver="ListView_PreviewDragOver">
+                    <ListView x:Name="TimeLineView" Style="{StaticResource ImageListViewStyle}" d:ItemsSource="{d:SampleData ItemCount=8}" ItemsSource="{Binding AnimationImages}" SelectedItem="{Binding SelectedAnimationImageItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Grid.Row="4" SelectionMode="Single" AllowDrop="True" PreviewDrop="ListView_PreviewDrop" PreviewDragOver="ListView_PreviewDragOver">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="BorderThickness" Value="1"/>
@@ -358,7 +358,7 @@
 
                         <TextBlock Style="{StaticResource InputHeaderTextBlockStyle}" Text="アニメーション設定" TextAlignment="Left"/>
                         <TextBlock Text="標準表示期間" Grid.Column="1"/>
-                        <TextBox x:Name="DefaultDisplayPeriodText1" Grid.Column="3" Text="{Binding DefaultDisplayPeriod, Mode=TwoWay, StringFormat=#0.000, UpdateSourceTrigger=PropertyChanged}" ToolTip="デフォルトの表示秒数を設定してください" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}"/>
+                        <TextBox x:Name="DefaultDisplayPeriodText1" Grid.Column="3" Text="{Binding DefaultDisplayPeriod, Mode=TwoWay, StringFormat=#0.000, UpdateSourceTrigger=LostFocus}" ToolTip="デフォルトの表示秒数を設定してください" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}"/>
                         <TextBlock Text="秒" Grid.Column="5" />
 
                         <Button x:Name="ApplyAllDisplayPeriodButton" Content="一括反映" Style="{StaticResource OperationButtonStyle}" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Grid.Column="7" Click="ApplyAllDisplayPeriodButton_Click"/>

@@ -1401,6 +1401,12 @@ namespace MicroSign
         {
             try
             {
+                //タイムラインにフォーカスを移動して「標準表示期間」のLostForcsを動作させ
+                //「標準表示期間」を確定する
+                // >> これをしないと「標準表示期間」入力中でDropを受け付けると
+                // >> 「標準表示期間」が入力中の値にならない
+                this.TimeLineView.Focus();
+
                 //ドロップされた内容からファイルの一覧を取得
                 GetDropImageFilesResult ret = this.GetDropImageFiles(e);
                 if (ret.IsSucess)
