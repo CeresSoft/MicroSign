@@ -1401,6 +1401,12 @@ namespace MicroSign
         {
             try
             {
+                //タイムラインにフォーカスを移動して「標準表示期間」のLostForcsを動作させ
+                //「標準表示期間」を確定する
+                // >> これをしないと「標準表示期間」入力中でDropを受け付けると
+                // >> 「標準表示期間」が入力中の値にならない
+                this.TimeLineView.Focus();
+
                 //ドロップされた内容からファイルの一覧を取得
                 GetDropImageFilesResult ret = this.GetDropImageFiles(e);
                 if (ret.IsSucess)
@@ -1441,8 +1447,12 @@ namespace MicroSign
             try
             {
                 //ドラッグ内容が有効か判定
-                GetDropImageFilesResult ret = this.GetDropImageFiles(e);
-                if(ret.IsSucess)
+                //2026.04.14:CS)杉原:プレビュー用の関数を追加 >>>>> ここから
+                //GetDropImageFilesResult ret = this.GetDropImageFiles(e);
+                //----------
+                GetDropImageFilesResult ret = this.GetDropImageFilesPreview(e);
+                //2026.04.14:CS)杉原:プレビュー用の関数を追加 <<<<< ここまで
+                if (ret.IsSucess)
                 {
                     //成功の場合は画像ファイルが存在するのでCopyを設定
                     e.Effects = DragDropEffects.Copy;

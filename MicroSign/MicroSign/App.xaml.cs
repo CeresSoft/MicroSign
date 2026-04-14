@@ -1,11 +1,7 @@
-﻿using log4net.Repository.Hierarchy;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+
+//LOG4NET
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = @".\Prms\log4net.xml", Watch = true)]
 
 namespace MicroSign
 {
