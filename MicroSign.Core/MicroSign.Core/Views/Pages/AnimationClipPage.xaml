@@ -194,13 +194,13 @@
                 <TextBlock Text="px" Grid.Column="4"/>
             </Grid>
 
-            <TextBlock Text="アニメーション密度" Grid.Row="9"/>
+            <TextBlock Text="表示期間" Grid.Row="9"/>
             <ComboBox SelectedValue="{Binding DisplayPeriodMillisecond, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="Value" Grid.Row="11">
                 <ComboBox.ItemsSource>
                     <x:Array Type="{x:Type core:SelectValueItem}">
-                        <core:SelectValueItem Name="ゆっくり" Value="100"/>
-                        <core:SelectValueItem Name="標準" Value="50"/>
-                        <core:SelectValueItem Name="なめらか" Value="33"/>
+                        <core:SelectValueItem Name="低速 (0.100秒)" Value="100"/>
+                        <core:SelectValueItem Name="標準 (0.050秒)" Value="50"/>
+                        <core:SelectValueItem Name="高速 (0.033秒)" Value="33"/>
                     </x:Array>
                 </ComboBox.ItemsSource>
             </ComboBox>
