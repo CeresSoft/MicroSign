@@ -226,7 +226,7 @@
                             </ComboBox>
                         </Grid>
                         <Border Style="{StaticResource VerticalSplitStyle}"/>
-                        <Button x:Name="ConvertExecuteButton" Click="ConvertExecuteButton_Click" ToolTip="登録されているアニメーション画像をマトリクスLEDで再生できるように変換します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource OperationEmphasisButtonStyle}" Width="80">
+                        <Button x:Name="ConvertExecuteButton" Click="ConvertExecuteButton_Click" ToolTip="設定されているアニメーションを表示パネルで再生できるアニメーションデータに変換します" IsEnabled="{Binding IsPlayingAnimation, Converter={StaticResource NotValueConverter}}" Style="{StaticResource OperationEmphasisButtonStyle}" Width="80">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
