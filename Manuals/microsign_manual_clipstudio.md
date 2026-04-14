@@ -4,78 +4,101 @@
 
 CLIP STUDIO PAINT (クリスタ) を使って表示パネル向けのアニメーションを作成する方法です
 
-[YMM4](https://manjubox.net/ymm4/)
+[CLIP STUDIO PAINT](https://www.clipstudio.net/ja/)
 
-YMM4 でアニメーションを作成する手順は説明しません。
-あくまで YMM4 で表示パネル向けのアニメーションを作成するときの
-設定などについて説明します
+この章では CLIP STUDIO PAINT で表示パネル向けのデータ作成する際の設定について説明します
+アニメーションの具体的な作成方法はCLIP STUDIO PAINTの公式チュートリアル等をご参考ください
 
 MicroSignの操作方法は「基本操作」を参照してください
 
 
+### アニメーション用ファイルの作成
 
-ここではMicroSignを起動し、表示パネルのドット数を設定した状態から進めます。
+メニューから「ファイル」→「新規」を開きます
 
-### 動画の設定
+![新規ファイルメニュー](./images/microsign_manual_clipstudio_001.png)
 
-YMM4で一番最初に行う「動画の設定」です
-メニューから「ファイル」→「動画の設定」を開きます
+「作品の用途」から「アニメーション」を選択します
 
-![動画の設定メニュー](./images//microsign_ymm4_001.png)
+![作品の用途を選択](./images/microsign_manual_clipstudio_002.png)
 
-以下のように設定してください
+以下のように設定します
 
-|項目          |設定値  |
-|--------------|-------|
-|画面サイズ     |「カスタム」で表示パネルのドット数(128x32など)に設定してください|
-|フレームレート  |10fps,15fps,20fp,30fpsのいづれか。15fpsか20fps当たりがおすすめです|
-|音声サンプリングレート|MicroSignでは音声は扱わないのでなんでもよいです|
+|項目                      |設定値  |
+|--------------------------|--------|
+|単位                      |px|
+|基準サイズ                |表示パネルのドット数(128x32など)に設定してください|
+|アニメーション作画用紙設定|チェックを入れます|
+|余白                      |作画しやすいサイズ（上下左右64など）に設定してください|
+|フレームレート            |10fps,15fps,20fp,30fpsのいづれか。15fpsか20fps当たりがおすすめです|
+|再生時間                  |作成したいアニメーションの長さを設定してください。単位は「秒＋コマ」がおすすめです|
+|変形のピクセル補間        |ハードな輪郭(ニアレストネイバー法)|
 
-![動画の設定](./images//microsign_ymm4_002.png)
+上記項目以外はお好みで設定してください
 
-これで動画の作成を行ってください
+![作品設定](./images/microsign_manual_clipstudio_003.png)
 
-### 動画出力
-
-YMM4で動画の出力を行う画面を開きます
-
-![動画出力メニュー](./images//microsign_ymm4_003.png)
+これでファイルの作成を行ってください
 
 
-動画出力画面が開くので以下のように設定して出力してください
+### タイムラインパレット表示
 
-|項目          |設定値           |
-|--------------|----------------|
-|動画出力       |連番PNG + WAV出力|
-|連番PNG出力    |ON              |
-|WAV出力        |OFF(ONでもよいですが使用しません)|
+CLIP STUDIO PAINTでは、一連のアニメーションを『タイムライン』として扱い、『タイムラインパレット』で編集することができます
+タイムラインパレットは初期状態のワークスペースでは非表示のため、メニューからパレットを表示します
 
-その他は出力したい動画に合わせてください
+メニューから「ウィンドウ」→「タイムライン」を選択します
 
-![動画出力](./images//microsign_ymm4_004.png)
+![タイムラインパレット表示メニュー](./images/microsign_manual_clipstudio_004.png)
 
-フォルダの選択画面が開くので、連番pngを出力するフォルダを選択します
+タイムラインパレットが表示されます
 
-![動画出力](./images//microsign_ymm4_005.png)
+![タイムラインパレット表示](./images/microsign_manual_clipstudio_005.png)
 
-以下のように動画が出力されます
 
-![動画出力](./images//microsign_ymm4_006.png)
+### アニメーション出力
+
+アニメーションの出力を行う画面を開きます
+
+メニューから「ファイル」→「アニメーション書き出し」→「アニメーションGIF」を選択します
+
+![アニメーション書き出しメニュー（GIF）](./images/microsign_manual_clipstudio_006.png)
+
+アニメーションGIFの書き出し場所を選択し、保存します
+
+![保存場所を選択](./images/microsign_manual_clipstudio_007.png)
+
+『アニメーションGIF出力設定』画面が開くので、以下のように設定して出力してください
+
+|項目              |設定値                          |
+|------------------|--------------------------------|
+|幅                |『基準サイズ』と同じ            |
+|高さ              |『基準サイズ』と同じ            |
+|フレームレート    |作成したアニメーションに合わせる|
+|透過情報を書き出す|チェックを外す                  |
+
+その他は出力したいアニメーションに合わせてください
+
+![アニメーションGIF出力設定](./images/microsign_manual_clipstudio_008.png)
+
+以下のようにアニメーションGIFが出力されます
+
+![GIF出力](./images/microsign_manual_clipstudio_009.png)
+
 
 ### MicroSignへの取り込み
 
 MicroSignを起動し、ドット数を表示パネルのドット数にします
 
-![MicroSign起動](./images//microsign_ymm4_007.png)
+![MicroSign起動](./images/microsign_manual_clipstudio_010.png)
 
-標準表示期間をYMM4で設定したFPSの表示期間に設定します
-今回は15 fps で作成したので「0.066」を設定します
+『GIF読込』ボタンをクリックします
 
-![MicroSign表示期間](./images//microsign_ymm4_008.png)
+![GIF読込](./images/microsign_manual_clipstudio_011.png)
 
-YMM4で出力した連番PNGをMicroSignのタイムラインにドラッグ＆ドロップして
-連番PNGをフレームとして登録します
+CLIP STUDIO PAINTで出力したアニメーションGIFを選択し、開きます
 
-![MicroSign表示期間](./images//microsign_ymm4_009.png)
+![アニメーションGIF選択](./images/microsign_manual_clipstudio_012.png)
 
+アニメーションGIFのフレームがそのままMicroSignのフレームとして読み込まれます
 
+![MicroSign表示期間](./images/microsign_manual_clipstudio_013.png)
