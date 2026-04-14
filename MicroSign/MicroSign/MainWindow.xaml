@@ -182,7 +182,7 @@
                                 <Slider Value="{Binding MatrixLedBrightness, Mode=TwoWay}" Maximum="255" LargeChange="32" SmallChange="1" Grid.Column="2"/>
                             </Grid>
 
-                            <TextBlock Text="残像軽減" Grid.Column="6" Grid.Row="2"/>
+                            <TextBlock Text="階調補正" Grid.Column="6" Grid.Row="2"/>
                             <ComboBox SelectedValue="{Binding MotionBlurReduction, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="Value" Grid.Column="6" Grid.Row="4">
                                 <ComboBox.ItemsSource>
                                     <x:Array Type="{x:Type core:SelectValueItem}">

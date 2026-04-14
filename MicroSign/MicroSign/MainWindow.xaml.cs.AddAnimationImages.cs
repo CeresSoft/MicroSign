@@ -95,7 +95,32 @@ namespace MicroSign
 
 
             //ファイル名でソートしながら読込
-            IOrderedEnumerable<string> sortedImagePaths = imagePaths.OrderBy(x => x);
+            //2026.04.14:CS)杉原:自然順ソートに変更 >>>>> ここから
+            //IOrderedEnumerable<string> sortedImagePaths = imagePaths.OrderBy(x => x);
+            //----------
+            // >> ファイルパスを画像ファイルパスクラスに変換する
+            // >> >> 先頭または最後の数値部分を比較できるようにクラスにしました
+            List<ImageFilePath> imageFilePaths = new List<ImageFilePath>();
+            {
+                int n = CommonUtils.GetCount(imagePaths);
+                for (int i = CommonConsts.Index.First; i < n; i += CommonConsts.Index.Step)
+                {
+                    string path = imagePaths[i];
+                    ImageFilePath? ret = ImageFilePath.Create(path);
+                    if (ret == null)
+                    {
+                        //変換できない場合は無視
+                    }
+                    else
+                    {
+                        //変換できた場合は追加
+                        imageFilePaths.Add(ret);
+                    }
+                }
+            }
+            // >> ソート下パスを得る
+            IEnumerable<string> sortedImagePaths = imageFilePaths.OrderBy(x => x).Select(x => x.Path);
+            //2026.04.14:CS)杉原:自然順ソートに変更 <<<<< ここまで
             foreach (string imagePath in sortedImagePaths)
             {
                 //拡張子を取得

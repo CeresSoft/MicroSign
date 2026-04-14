@@ -1441,8 +1441,12 @@ namespace MicroSign
             try
             {
                 //ドラッグ内容が有効か判定
-                GetDropImageFilesResult ret = this.GetDropImageFiles(e);
-                if(ret.IsSucess)
+                //2026.04.14:CS)杉原:プレビュー用の関数を追加 >>>>> ここから
+                //GetDropImageFilesResult ret = this.GetDropImageFiles(e);
+                //----------
+                GetDropImageFilesResult ret = this.GetDropImageFilesPreview(e);
+                //2026.04.14:CS)杉原:プレビュー用の関数を追加 <<<<< ここまで
+                if (ret.IsSucess)
                 {
                     //成功の場合は画像ファイルが存在するのでCopyを設定
                     e.Effects = DragDropEffects.Copy;
