@@ -1,11 +1,16 @@
 ## 目次
 
-- [概要](./microsign_manual.md)
-- [基本操作](./microsign_manual_basic.md)
-- [1枚画像からアニメーションを作成する](./microsign_manual_picture.md)
-- [文字を入力してアニメーションを作成する](./microsign_manual_text.md)
-- [CLIP STUDIO PAINTを使ったアニメーションの作成](./microsign_manual_clipstudio.md)
-- [ゆっくりMovie Maker 4 を使ったアニメーションの作成](./microsign_manual_ymm4.md)
+[概要](./microsign_manual.md) ← このページ
+
+[基本操作](./microsign_manual_basic.md)
+
+[写真のアニメーションを作成](./microsign_manual_picture.md)
+
+[メッセージのアニメーションを作成](./microsign_manual_text.md)
+
+[CLIP STUDIO PAINTを使ったアニメーションの作成](./microsign_manual_clipstudio.md)
+
+[ゆっくりMovie Maker 4 を使ったアニメーションの作成](./microsign_manual_ymm4.md)
 
 ## MicroSignの概要
 
