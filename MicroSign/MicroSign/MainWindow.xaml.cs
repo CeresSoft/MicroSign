@@ -39,6 +39,34 @@ namespace MicroSign
 
             //アニメーションタイマーのイベント設定
             this._AnimationTimer.Tick += this._AnimationTimer_Tick;
+
+            //ファイルバージョンをタイトルに設定
+            {
+                string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                System.Diagnostics.FileVersionInfo versionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(path);
+                if(versionInfo == null)
+                {
+                    //無効の場合は何もしない
+                }
+                else
+                {
+                    //有効の場合
+                    string? ver = versionInfo.FileVersion;
+                    bool isNull = string.IsNullOrEmpty(ver);
+                    if (isNull)
+                    {
+                        //無効の場合は何もしない
+                    }
+                    else
+                    {
+                        //有効の場合は連結する
+                        string nowTitle = this.Title;
+                        string newTitle = $"{nowTitle} - v{ver}";
+                        this.Title = newTitle;
+                        ;
+                    }
+                }
+            }
         }
 
         /// <summary>
